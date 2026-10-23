@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .pair { display: flex; align-items: center; justify-content: center; gap: 2rem; font-family: var(--read); font-weight: 700; margin: 0.6rem 0 1.4rem; }
+  .pair .a { font-size: 4rem; color: var(--purple); }
+  .pair .arrow { font-size: 3rem; color: var(--muted); }
+  .pair .b { font-size: 4rem; letter-spacing: 0.1rem; }
+  .pair .b .gap { color: var(--orange); border-bottom: 0.35rem dashed var(--orange); padding: 0 0.3rem; }
+  .pair .bird { font-size: 5rem; min-width: 6rem; }
+  .colhead { display: flex; gap: 2rem; justify-content: center; font-size: 1.4rem; font-weight: 800; color: var(--muted); }
+  .choice { font-family: var(--read); font-size: 3rem; min-width: 9rem; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Read the word in Column A. Complete the word in Column B that rhymes with it. Hint: Column B words are names of birds!</p>
+  <div class="card" id="game" style="width:100%;max-width:76rem"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Rhyming Birds', subtitle: 'The Crow · Let us write', back: '../index.html#ch10' });
+
+/* The book's pairs. b = the letters already given; x = wrong choices. */
+const ITEMS = [
+  { a: 'grow', w: 'crow', b: 'row', e: '🐦‍⬛', x: ['g', 'th'] },
+  { a: 'carrot', w: 'parrot', b: 'arrot', e: '🦜', x: ['c', 'b'] },
+  { a: 'pen', w: 'hen', b: 'en', e: '🐔', x: ['t', 'm'] },
+  { a: 'arrow', w: 'sparrow', b: 'arrow', e: '🐦', x: ['n', 'b'] },
+  { a: 'block', w: 'peacock', b: 'ock', e: '🦚', x: ['bl', 'cl'] },
+];
+const head = (it) => it.w.slice(0, it.w.length - it.b.length);
+
+G.quiz({
+  el: G.$('#game'),
+  items: ITEMS,
+  shuffleItems: false,
+  question: (it) => `<div class="colhead"><span>Column A</span><span>→</span><span>Column B</span></div>
+    <div class="pair"><span class="a">${it.a}</span><span class="arrow">→</span><span class="b"><span class="gap">${'_ '.repeat(head(it).length).trim()}</span>${it.b}</span><span class="bird">❓</span></div>`,
+  options: (it) => G.shuffle([head(it), ...it.x]).map((x) => ({ label: x, value: x })),
+  answer: (it) => head(it),
+  onShow: (it, el) => {
+    G.say(it.a + '. Which bird rhymes with ' + it.a + '?');
+    G.$$('.choice', el).forEach((b) => b.addEventListener('click', () => {
+      if (!b.classList.contains('right')) return;
+      G.$('.gap', el).textContent = head(it);
+      G.$('.bird', el).textContent = it.e;
+    }));
+  },
+  explain: (it) => `${it.a} – <b>${it.w}</b>`,
+  endMsg: 'crow · parrot · hen · sparrow · peacock',
+});
+</script>
+</body>
+</html>

@@ -12,6 +12,7 @@ Interactive games for a 75" smartboard. Open `index.html` → pick a chapter tab
 - `ch6/` – Chapter 6 "Between Home and School" (13 games)
 - `ch7/` – Chapter 7 "This is My Town" (14 games)
 - `ch8/` – Chapter 8 "A Show of Clouds" (12 games)
-- `ch9/` – Chapter 9 "My Name" (14 games)
+- `ch9/` – Chapter 9 "My Name" (13 games)
+- `ch10/` – Chapter 10 "The Crow" (12 games)
 
 Chapter PDFs: Google Drive › Lesson Plan Organiser Class 1-5 › Class 2 English.

@@ -384,7 +384,38 @@ const CHAPTERS = [
       ]},
     ],
   },
-  ...Array.from({ length: 4 }, (_, i) => ({ n: i + 10, title: 'Coming soon', sections: [] })),
+  {
+    n: 10, unit: 'Unit 4 · Life Around Us', title: 'The Crow',
+    sections: [
+      { key: 'recite', name: '🎤 Let us recite', games: [
+        { href: 'ch10/poem.html', ic: '🐦‍⬛', t: 'Poem Time', d: 'Listen, read and say "The Crow"' },
+        { href: 'ch10/poem-missing.html', ic: '🧩', t: 'Missing Word', d: 'Find the word that fits the poem' },
+        { href: 'ch10/true-false.html', ic: '✅', t: 'Tick or Cross', d: 'Is it right? Check the poem' },
+      ]},
+      { key: 'read', name: '👀 Words', games: [
+        { href: 'ch10/sight-words.html', ic: '🎈', t: 'Pop the Sight Word', d: 'once · as · how · to · one · be · now …' },
+        { href: 'ch10/new-words.html', ic: '🃏', t: 'New Word Cards', d: 'colourful · feather · wings · peacock …' },
+      ]},
+      { key: 'speak', name: '🗣️ Let us speak', games: [
+        { href: 'ch10/talk-wheel.html', ic: '🎡', t: 'Talk Wheel', d: 'Which birds do you see near your house?' },
+      ]},
+      { key: 'write', name: '✏️ Let us write', games: [
+        { href: 'ch10/name-birds.html', ic: '🦜', t: 'Name the Birds', d: 'crow · peacock · parrot · sparrow …' },
+        { href: 'ch10/rhyme-birds.html', ic: '🐔', t: 'Rhyming Birds', d: 'carrot → parrot · pen → hen' },
+        { href: 'ch10/make-sentences.html', ic: '📝', t: 'Make Sentences', d: 'Rajni will go to a park.' },
+      ]},
+      { key: 'think', name: '🎨 Let us draw', games: [
+        { href: 'ch10/draw-bird.html', ic: '🖍️', t: 'My Favourite Bird', d: 'Draw it and name it' },
+      ]},
+      { key: 'listen', name: '👂 Let us listen', games: [
+        { href: 'ch10/syllables.html', ic: '👏', t: 'Clap the Parts', d: 'pea-cock · beau-ti-ful · a-no-ther' },
+      ]},
+      { key: 'play', name: '🏁 Class challenge', games: [
+        { href: 'ch10/bird-race.html', ic: '🏆', t: 'Bird Race', d: 'Team A vs Team B – whole chapter quiz' },
+      ]},
+    ],
+  },
+  ...Array.from({ length: 3 }, (_, i) => ({ n: i + 11, title: 'Coming soon', sections: [] })),
 ];
 
 const tabs = document.getElementById('tabs');

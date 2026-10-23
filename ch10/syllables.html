@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .words { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 90rem; }
+  .wrow { display: flex; align-items: center; gap: 1rem; background: #fff; border: 0.25rem solid var(--line); border-radius: 1.4rem; padding: 0.3rem 1rem; box-shadow: var(--shadow); }
+  .wrow .e { font-size: 3.4rem; width: 4.4rem; text-align: center; }
+  .syl { display: flex; gap: 0.5rem; flex: 1; }
+  .syl span { font-family: var(--read); font-size: 2.4rem; font-weight: 700; padding: 0.1rem 0.8rem; border-radius: 0.8rem; background: #f4f0ff; color: var(--purple); transition: background 0.15s, transform 0.15s; }
+  .syl span.on { background: var(--yellow); color: var(--ink); transform: scale(1.12); }
+  .whole { font-family: var(--read); font-size: 2.4rem; font-weight: 700; min-width: 14rem; }
+  .hands { font-size: 4rem; line-height: 1; height: 4.4rem; }
+  .hands.go { animation: pop 0.25s; }
+  .q .t { font-family: var(--read); font-size: 4.4rem; font-weight: 700; }
+  .q .e { font-size: 6rem; line-height: 1; }
+  .choice { font-size: 2.6rem; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mClap">👏 Listen and clap</button>
+    <button class="big-btn orange" id="mCount">🔢 How many claps?</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Clap the Parts', subtitle: 'The Crow · Let us listen · Syllables', back: '../index.html#ch10' });
+
+/* The five words from the book. */
+const BOOK = [
+  { e: '🦚', p: ['pea', 'cock'], w: 'peacock' },
+  { e: '🪶', p: ['fea', 'ther'], w: 'feather' },
+  { e: '✨', p: ['beau', 'ti', 'ful'], w: 'beautiful' },
+  { e: '🌈', p: ['co', 'lour', 'ful'], w: 'colourful' },
+  { e: '➕', p: ['a', 'no', 'ther'], w: 'another' },
+];
+/* Extra practice words for counting claps. */
+const MORE = [
+  { e: '🐦‍⬛', p: ['crow'], w: 'crow' }, { e: '🦜', p: ['par', 'rot'], w: 'parrot' }, { e: '🐦', p: ['spar', 'row'], w: 'sparrow' },
+  { e: '🐘', p: ['el', 'e', 'phant'], w: 'elephant' }, { e: '🍌', p: ['ba', 'na', 'na'], w: 'banana' }, { e: '🪽', p: ['wings'], w: 'wings' },
+];
+const area = G.$('#area');
+let token = 0;
+
+function clap(at = 0) {
+  if (G.isMuted()) return;
+  const c = G.ctx();
+  const buf = c.createBuffer(1, c.sampleRate * 0.15, c.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 4);
+  const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+  src.buffer = buf; f.type = 'bandpass'; f.frequency.value = 1500; g.gain.value = 0.9;
+  src.connect(f).connect(g).connect(c.destination);
+  src.start(c.currentTime + at);
+}
+
+/* Say each part with a clap, then the whole word. */
+function sayParts(it, spans, my, done) {
+  let i = 0;
+  const step = () => {
+    if (my !== token) return;
+    spans?.forEach((s, k) => s.classList.toggle('on', k === i));
+    if (i >= it.p.length) { spans?.forEach((s) => s.classList.remove('on')); G.say(it.w, { rate: 0.8, onend: done }); return; }
+    clap();
+    const h = G.$('#hands'); if (h) { h.classList.remove('go'); void h.offsetWidth; h.classList.add('go'); }
+    G.say(it.p[i], { rate: 0.7, onend: () => setTimeout(step, 350) });
+    i++;
+  };
+  step();
+}
+
+function clapMode() {
+  token++;
+  area.innerHTML = `<p class="hint">Close your eyes and listen. Say each part and clap! Tap a word.</p>
+    <div class="hands" id="hands">👏</div>
+    <div class="words">${BOOK.map((it, i) => `<button class="wrow" data-i="${i}"><span class="e">${it.e}</span>
+      <span class="syl">${it.p.map((s) => `<span>${s}</span>`).join('')}</span><span class="whole">${it.w}</span></button>`).join('')}</div>
+    <div class="row" style="margin-top:1rem"><button class="big-btn green" id="all">▶ Clap all the words</button></div>`;
+  G.$$('.wrow').forEach((b) => (b.onclick = () => { token++; sayParts(BOOK[+b.dataset.i], G.$$('.syl span', b), token); }));
+  G.$('#all').onclick = () => {
+    const my = ++token, rows = G.$$('.wrow');
+    const go = (i) => { if (i < rows.length && my === token) sayParts(BOOK[i], G.$$('.syl span', rows[i]), my, () => setTimeout(() => go(i + 1), 900)); else if (my === token) G.star(2); };
+    go(0);
+  };
+}
+
+function countMode() {
+  token++;
+  area.innerHTML = `<p class="hint">Listen to the word and clap the parts. How many claps?</p><div class="hands" id="hands">👏</div><div class="card" id="game" style="width:100%;max-width:70rem"></div>`;
+  G.quiz({
+    el: G.$('#game'),
+    items: [...BOOK, ...MORE],
+    question: (it) => `<div class="e">${it.e}</div><div class="t">${it.w}</div>`,
+    options: () => [1, 2, 3].map((n) => ({ label: '👏'.repeat(n), value: n })),
+    answer: (it) => it.p.length,
+    onShow: (it) => G.say(it.w, { rate: 0.7 }),
+    explain: (it) => it.p.join(' – '),
+    endMsg: 'You can break words into parts!',
+  });
+}
+
+G.$('#mClap').onclick = clapMode;
+G.$('#mCount').onclick = countMode;
+clapMode();
+</script>
+</body>
+</html>

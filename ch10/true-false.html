@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .q .e { font-size: 7rem; line-height: 1; }
+  .q .st { font-family: var(--read); font-size: 3rem; margin: 0.6rem 0 1.4rem; }
+  .choice { font-size: 5rem; min-width: 12rem; min-height: 9rem; }
+  .choice.tick { color: var(--green); }
+  .choice.cross { color: var(--red); }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Is the sentence correct? Tap ✓ for correct and ✘ for incorrect.</p>
+  <div class="card" id="game" style="width:100%;max-width:76rem"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Tick or Cross', subtitle: 'The Crow · Poem check', back: '../index.html#ch10' });
+
+const ITEMS = [
+  { e: '🐦‍⬛', s: 'The crow was black.', ok: true, fix: 'He was black, as you know.' },
+  { e: '🌈', s: 'The crow wanted colourful feathers.', ok: true, fix: 'He wanted to be beautiful.' },
+  { e: '🦜', s: 'He found a parrot feather.', ok: false, fix: 'He found a <b>peacock</b> feather.' },
+  { e: '🪶', s: 'He stuck the feathers in his tail and wings.', ok: true, fix: 'And he put one on his head!' },
+  { e: '😢', s: 'The crow cried and said, “I am ugly.”', ok: false, fix: 'He <b>danced</b> and said, “I am now beautiful.”' },
+  { e: '😆', s: 'The other crows laughed at him.', ok: true, fix: '“Oh, what a fool you are!”' },
+  { e: '💗', s: 'The other crows love him for what he is.', ok: true, fix: 'You are beautiful in black!' },
+];
+
+G.quiz({
+  el: G.$('#game'),
+  items: ITEMS,
+  shuffleItems: false,
+  question: (it) => `<div class="e">${it.e}</div><div class="st">${it.s}</div>`,
+  options: () => [{ label: '✓', value: true }, { label: '✘', value: false }],
+  answer: (it) => it.ok,
+  onShow: (it, el) => {
+    const [t, c] = G.$$('.choice', el);
+    t.classList.add('tick'); c.classList.add('cross');
+    G.say(it.s);
+  },
+  explain: (it) => it.fix,
+  endMsg: 'You checked all the sentences!',
+});
+</script>
+</body>
+</html>

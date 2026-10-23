@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; width: 100%; max-width: 110rem; }
+  .bird { background: #fff; border: 0.25rem solid var(--line); border-radius: 1.4rem; box-shadow: var(--shadow); padding: 0.6rem; display: flex; flex-direction: column; align-items: center; font-family: var(--read); font-size: 2.2rem; font-weight: 700; min-height: 11rem; justify-content: center; }
+  .bird .e { font-size: 5.4rem; line-height: 1.1; }
+  .q .e { font-size: 9rem; line-height: 1; }
+  .choice { font-family: var(--read); font-size: 2.6rem; }
+  @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mLearn">🐦 Meet the birds</button>
+    <button class="big-btn orange" id="mQuiz">🎯 Name the bird</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Name the Birds', subtitle: 'The Crow · Let us write · A', back: '../index.html#ch10' });
+
+const BIRDS = [
+  { w: 'crow', e: '🐦‍⬛' }, { w: 'peacock', e: '🦚' }, { w: 'parrot', e: '🦜' }, { w: 'sparrow', e: '🐦' }, { w: 'pigeon', e: '🕊️' },
+  { w: 'hen', e: '🐔' }, { w: 'duck', e: '🦆' }, { w: 'owl', e: '🦉' }, { w: 'eagle', e: '🦅' }, { w: 'swan', e: '🦢' },
+];
+const area = G.$('#area');
+function learn() {
+  area.innerHTML = `<p class="hint">Tap a bird to hear its name. Which of these birds do you see near your home?</p>
+    <div class="grid">${BIRDS.map((b) => `<button class="bird" data-w="${b.w}"><span class="e">${b.e}</span>${b.w}</button>`).join('')}</div>`;
+  G.$$('.bird').forEach((b) => (b.onclick = () => G.say(b.dataset.w, { rate: 0.75 })));
+}
+function quiz() {
+  area.innerHTML = `<p class="hint">Look at the bird. What is its name? Tap it, then write it in your notebook.</p><div class="card" id="game" style="width:100%;max-width:70rem"></div>`;
+  G.quiz({
+    el: G.$('#game'),
+    items: BIRDS,
+    question: (it) => `<div class="e">${it.e}</div>`,
+    options: (it) => G.shuffle([it, ...G.shuffle(BIRDS.filter((x) => x !== it)).slice(0, 2)]).map((x) => ({ label: x.w, value: x.w })),
+    answer: (it) => it.w,
+    onShow: () => G.say('What is this bird?'),
+    explain: (it) => `It is a <b>${it.w}</b>.`,
+    endMsg: 'You can name lots of birds!',
+  });
+}
+G.$('#mLearn').onclick = learn;
+G.$('#mQuiz').onclick = quiz;
+learn();
+</script>
+</body>
+</html>

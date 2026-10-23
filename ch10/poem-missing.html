@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .q { font-family: var(--read); font-size: 2.8rem; margin: 1rem 0 1.6rem; line-height: 1.4; }
+  .q .blank { display: inline-block; min-width: 7rem; border-bottom: 0.3rem dashed var(--orange); color: var(--orange); }
+  .q .pic { font-size: 5rem; display: block; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Read the line from the poem. Tap the missing word.</p>
+  <div class="card" id="game" style="width:100%;max-width:70rem"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Missing Word', subtitle: 'The Crow · Let us recite', back: '../index.html#ch10' });
+
+const ITEMS = [
+  { pic: '🐦‍⬛', a: 'There once was a', w: 'crow.', b: '', opts: ['crow.', 'cow.', 'cat.'] },
+  { pic: '⚫', a: 'He was', w: 'black,', b: 'as you know.', opts: ['black,', 'white,', 'red,'] },
+  { pic: '🌈', a: 'Colourful', w: 'feathers,', b: 'he wanted to grow.', opts: ['feathers,', 'flowers,', 'fingers,'] },
+  { pic: '🦚', a: 'He found one', w: 'peacock', b: 'feather.', opts: ['peacock', 'parrot', 'pigeon'] },
+  { pic: '🪶', a: 'He stuck it in his', w: 'tail.', b: '', opts: ['tail.', 'nail.', 'tree.'] },
+  { pic: '🪽', a: 'He stuck them in his', w: 'wings,', b: '', opts: ['wings,', 'rings,', 'things,'] },
+  { pic: '💃', a: 'I am now beautiful, He', w: 'danced', b: 'and said.', opts: ['danced', 'slept', 'cried'] },
+  { pic: '😆', a: 'The other crows', w: 'laughed', b: 'at him.', opts: ['laughed', 'cried', 'sang'] },
+  { pic: '🖤', a: 'You are beautiful in', w: 'black.', b: '', opts: ['black.', 'blue.', 'green.'] },
+  { pic: '💗', a: 'We', w: 'love', b: 'you for what you are.', opts: ['love', 'hate', 'call'] },
+];
+
+G.quiz({
+  el: G.$('#game'),
+  items: ITEMS,
+  shuffleItems: false,
+  question: (it) => `<span class="pic">${it.pic}</span>${it.a} <span class="blank">&nbsp;?&nbsp;</span> ${it.b}`,
+  options: (it) => G.shuffle(it.opts).map((o) => ({ label: o, value: o })),
+  answer: (it) => it.w,
+  onShow: (it, el) => {
+    const s = el.querySelector('.q');
+    G.$$('.choice', el).forEach((b) => b.addEventListener('click', () => {
+      if (b.classList.contains('right')) s.querySelector('.blank').textContent = it.w;
+    }));
+  },
+  explain: (it) => `${it.a} ${it.w} ${it.b}`,
+  endMsg: 'You know the poem "The Crow"! Be happy as you are.',
+});
+</script>
+</body>
+</html>
