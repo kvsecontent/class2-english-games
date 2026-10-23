@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/tug.css">
+</head>
+<body>
+<main></main>
+<script src="../assets/common.js"></script>
+<script src="../assets/tug.js"></script>
+<script>
+G.init({ title: 'Tug of War', subtitle: 'The Crow · Two players', back: '../index.html#ch10' });
+
+/* Questions from the whole chapter (o[0] is the right answer). */
+const BANK = [
+  { e: '🐦‍⬛', t: 'There once was a ____.', o: ['crow', 'cow', 'cat'] },
+  { e: '⚫', t: 'What colour was the crow?', o: ['black', 'white', 'green'] },
+  { e: '🌈', t: 'The crow wanted ____ feathers.', o: ['colourful', 'black', 'small'] },
+  { e: '🦚', t: 'Whose feather did the crow find?', o: ['a peacock’s', 'a parrot’s', 'a hen’s'] },
+  { e: '🪶', t: 'He stuck the first feather in his ____.', o: ['tail', 'beak', 'nest'] },
+  { e: '🪽', t: 'He stuck them in his ____.', o: ['wings', 'legs', 'eyes'] },
+  { e: '💃', t: '“I am now beautiful,” he ____ and said.', o: ['danced', 'cried', 'slept'] },
+  { e: '😆', t: 'What did the other crows do?', o: ['They laughed at him.', 'They ran away.', 'They slept.'] },
+  { e: '💗', t: '“You are beautiful in ____.”', o: ['black', 'blue', 'feathers'] },
+  { e: '🤪', t: '“Oh, what a ____ you are!”', o: ['fool', 'fly', 'friend'] },
+  { e: '👏', t: 'How many claps in “peacock”?', o: ['2', '1', '3'] },
+  { e: '👏', t: 'How many claps in “beautiful”?', o: ['3', '2', '1'] },
+  { e: '👏', t: 'How many claps in “feather”?', o: ['2', '3', '1'] },
+  { e: '🦜', t: 'Which bird rhymes with “carrot”?', o: ['parrot', 'crow', 'hen'] },
+  { e: '🐔', t: 'Which bird rhymes with “pen”?', o: ['hen', 'owl', 'duck'] },
+  { e: '🐦', t: 'Which bird rhymes with “arrow”?', o: ['sparrow', 'peacock', 'crow'] },
+  { e: '🐦‍⬛', t: 'Which bird rhymes with “grow”?', o: ['crow', 'parrot', 'eagle'] },
+  { e: '🦉', t: 'Which bird is this?', o: ['owl', 'duck', 'hen'] },
+  { e: '🦆', t: 'Which bird is this?', o: ['duck', 'swan', 'crow'] },
+  { e: '🏞️', t: 'Rajni will go ____ a park.', o: ['to', 'on', 'at'] },
+  { e: '👀', t: 'Which is a sight word?', o: ['once', 'feather', 'peacock'] },
+  { e: '➕', t: '“One more” means ____.', o: ['another', 'colourful', 'beautiful'] },
+  { e: '🫳', t: 'He ____ up all without fail.', o: ['picked', 'pecked', 'painted'] },
+  { e: '🌟', t: 'What makes the crow special?', o: ['being himself', 'peacock feathers', 'a red tail'] },
+  { e: '🪶', t: 'Birds have soft ____ on their body.', o: ['feathers', 'leaves', 'scales'] },
+];
+
+TUG({ bank: BANK });
+</script>
+</body>
+</html>

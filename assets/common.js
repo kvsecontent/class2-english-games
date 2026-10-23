@@ -92,7 +92,7 @@ const G = (() => {
     if (el) el.textContent = stars;
   }
   function confetti(n = 40) {
-    const bits = ['🎉', '⭐', '🎈', '✨', '🚲', '🌟'];
+    const bits = ['🎉', '⭐', '🎈', '✨', '🎊', '🌟'];
     for (let i = 0; i < n; i++) {
       const s = document.createElement('div');
       s.className = 'confetti';

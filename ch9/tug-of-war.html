@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/tug.css">
+</head>
+<body>
+<main></main>
+<script src="../assets/common.js"></script>
+<script src="../assets/tug.js"></script>
+<script>
+G.init({ title: 'Tug of War', subtitle: 'My Name · Two players', back: '../index.html#ch9' });
+
+/* Questions from the whole chapter (o[0] is the right answer). */
+const BANK = [
+  { e: '🪰', t: 'Who forgot his name?', o: ['the fly', 'the ant', 'the cow'] },
+  { e: '🐜', t: 'Whom did the fly ask first?', o: ['the ant', 'the cow', 'the leaf'] },
+  { e: '🌳', t: 'The ant said, “You may ask the ____ I climb.”', o: ['tree', 'grass', 'cow'] },
+  { e: '🐄', t: 'The tree said, “You may ask the ____ sleeping in my shade.”', o: ['cow', 'ant', 'fly'] },
+  { e: '🌱', t: 'The cow said, “You may ask the ____ I eat.”', o: ['grass', 'leaf', 'tree'] },
+  { e: '🍃', t: 'The grass said, “You may ask the ____ fallen on me.”', o: ['leaves', 'trees', 'cows'] },
+  { e: '💨', t: 'What blew when the leaf was about to answer?', o: ['the wind', 'the cow', 'the ant'] },
+  { e: '🍃', t: 'Seeing the leaf ____, the fly remembered his name.', o: ['fly', 'fall', 'sleep'] },
+  { e: '😄', t: '“My name is ____!” he said happily.', o: ['Fly', 'Ant', 'Leaf'] },
+  { e: '🐦‍⬛', t: 'A crow says…', o: ['caw', 'roar', 'buzz'] },
+  { e: '🐝', t: 'A bee says…', o: ['buzz', 'meow', 'quack'] },
+  { e: '🦁', t: 'A lion…', o: ['roars', 'chirps', 'quacks'] },
+  { e: '🐦', t: 'A sparrow…', o: ['chirps', 'roars', 'buzzes'] },
+  { e: '🐈', t: '“Please give me some ____,” said the cat to the cow.', o: ['milk', 'grass', 'water'] },
+  { e: '🐄', t: '“Then I will give you ____,” said the cow.', o: ['milk', 'grass', 'a leaf'] },
+  { e: '🔵', t: 'Which word starts with “bl”?', o: ['blue', 'plum', 'plate'] },
+  { e: '🪴', t: 'Which word starts with “pl”?', o: ['plant', 'black', 'blanket'] },
+  { e: '🛏️', t: 'Rohit has a blue ____.', o: ['blanket', 'plate', 'plum'] },
+  { e: '🍽️', t: 'Which word is this?', o: ['plate', 'plant', 'black'] },
+  { e: '👀', t: 'Which is a sight word?', o: ['when', 'grass', 'shade'] },
+  { e: '🌳', t: 'A cool, dark place under a tree is ____.', o: ['shade', 'wind', 'grass'] },
+  { e: '🐜', t: 'A tiny insect is an ____.', o: ['ant', 'cow', 'owl'] },
+  { e: '💡', t: 'The fly ____ his name at last.', o: ['remembered', 'forgot', 'ate'] },
+  { e: '🪰', t: 'Once there was a ____ fly.', o: ['little', 'big', 'blue'] },
+  { e: '💗', t: '“____ tree, do you know my name?”', o: ['Dear', 'Bad', 'Big'] },
+];
+
+TUG({ bank: BANK });
+</script>
+</body>
+</html>

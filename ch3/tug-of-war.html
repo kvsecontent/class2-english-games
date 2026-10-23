@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/tug.css">
+</head>
+<body>
+<main></main>
+<script src="../assets/common.js"></script>
+<script src="../assets/tug.js"></script>
+<script>
+G.init({ title: 'Tug of War', subtitle: 'It is Fun · Two players', back: '../index.html#ch3' });
+
+/* Questions from the whole chapter (o[0] is the right answer). */
+const BANK = [
+  { e: '🐑', t: 'To leap like a ____.', o: ['lamb', 'fish', 'cat'] },
+  { e: '🐈', t: 'To climb like a ____.', o: ['cat', 'horse', 'frog'] },
+  { e: '🐸', t: 'To hop like a ____.', o: ['frog', 'bird', 'lamb'] },
+  { e: '🐟', t: 'To swim like a ____.', o: ['fish', 'cat', 'horse'] },
+  { e: '🐎', t: 'To trot like a ____.', o: ['horse', 'fish', 'bird'] },
+  { e: '🐦', t: 'To fly like a ____.', o: ['bird', 'frog', 'lamb'] },
+  { e: '😄', t: 'It’s ____ to be this, it’s fun to be that.', o: ['fun', 'sad', 'hot'] },
+  { e: '🎭', t: 'I can act just like them ____.', o: ['all', 'none', 'this'] },
+  { e: '🐍', t: 'The snake ____.', o: ['crawls', 'flies', 'trots'] },
+  { e: '🐒', t: 'The monkey ____.', o: ['swings', 'swims', 'crawls'] },
+  { e: '🐿️', t: 'The squirrel ____.', o: ['runs', 'flies', 'swims'] },
+  { e: '🦆', t: 'Which one can swim?', o: ['duck', 'camel', 'hen'] },
+  { e: '🌳', t: 'Which animal lives on trees?', o: ['monkey', 'cow', 'fish'] },
+  { e: '🦆', t: 'What does a duck say?', o: ['quack quack', 'moo moo', 'baa baa'] },
+  { e: '🐑', t: 'What does a sheep say?', o: ['baa baa', 'woof woof', 'croak'] },
+  { e: '🐸', t: 'What does a frog say?', o: ['croak croak', 'meow', 'neigh'] },
+  { e: '📏', t: 'Choose the right one.', o: ['an inch', 'a inch', 'inch an'] },
+  { e: '❄️🏠', t: 'Choose the right one.', o: ['an igloo', 'a igloo', 'igloo an'] },
+  { e: '📌', t: 'Choose the right one.', o: ['a pin', 'an pin', 'pin a'] },
+  { e: '🚢', t: 'Choose the right one.', o: ['a ship', 'an ship', 'ship a'] },
+  { e: '💍', t: 'Which word is this?', o: ['ring', 'king', 'wing'] },
+  { e: '🐷', t: 'Which word is this?', o: ['pig', 'pin', 'peg'] },
+  { e: '🙋', t: 'Riya says: “____ am Riya.”', o: ['I', 'i', 'Riya'] },
+  { e: '👀', t: 'Which is a sight word?', o: ['them', 'trot', 'lamb'] },
+  { e: '🐒', t: 'Monkeys ____ trees.', o: ['climb', 'swim', 'fly'] },
+];
+
+TUG({ bank: BANK });
+</script>
+</body>
+</html>

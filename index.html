@@ -70,7 +70,7 @@
 
 <script>
 /* Chapters of Mridang (Class 2). Add games to a chapter to switch its tab on. */
-const COLORS = { recite: '#e63946', speak: '#2f7de1', listen: '#13b5b1', read: '#ff8a3d', write: '#2bb673', think: '#8a5cf6', play: '#ff6fa8' };
+const COLORS = { recite: '#e63946', speak: '#2f7de1', listen: '#13b5b1', read: '#ff8a3d', write: '#2bb673', think: '#8a5cf6', play: '#ff6fa8', tug: '#8b5a2b' };
 const CHAPTERS = [
   {
     n: 1, unit: 'Unit 1 · Fun with Friends', title: 'My Bicycle',
@@ -102,6 +102,9 @@ const CHAPTERS = [
       { key: 'think', name: '💭 Let us think', games: [
         { href: 'ch1/magic-bicycle.html', ic: '🪄', t: 'My Magic Bicycle', d: 'Draw it! Where will you go?' },
         { href: 'ch1/colour-bike.html', ic: '🎨', t: 'Colour the Bicycle', d: 'Red bicycle, blue seat, black tyres' },
+      ]},
+      { key: 'tug', name: '🪢 Tug of War', games: [
+        { href: 'ch1/tug-of-war.html', ic: '🪢', t: 'Tug of War', d: 'Two players – each right answer pulls the rope!' },
       ]},
       { key: 'play', name: '🏁 Class challenge', games: [
         { href: 'ch1/bicycle-race.html', ic: '🏆', t: 'Bicycle Race', d: 'Team A vs Team B – whole chapter quiz' },
@@ -138,6 +141,9 @@ const CHAPTERS = [
       { key: 'think', name: '🎭 Let us do', games: [
         { href: 'ch2/act-it-out.html', ic: '🎭', t: 'Act It Out', d: 'Be Babli and Jeet – act the story' },
         { href: 'ch2/old-games.html', ic: '👵', t: 'Games of Long Ago', d: 'Ask grandparents about their games' },
+      ]},
+      { key: 'tug', name: '🪢 Tug of War', games: [
+        { href: 'ch2/tug-of-war.html', ic: '🪢', t: 'Tug of War', d: 'Two players – each right answer pulls the rope!' },
       ]},
       { key: 'play', name: '🏁 Class challenge', games: [
         { href: 'ch2/ball-race.html', ic: '🏆', t: 'Bat and Ball Race', d: 'Team A vs Team B – whole chapter quiz' },
@@ -182,6 +188,9 @@ const CHAPTERS = [
       { key: 'think', name: '🎨 Let us draw', games: [
         { href: 'ch3/rangoli.html', ic: '🌸', t: 'Rangoli', d: 'Follow the steps and colour' },
       ]},
+      { key: 'tug', name: '🪢 Tug of War', games: [
+        { href: 'ch3/tug-of-war.html', ic: '🪢', t: 'Tug of War', d: 'Two players – each right answer pulls the rope!' },
+      ]},
       { key: 'play', name: '🏁 Class challenge', games: [
         { href: 'ch3/animal-race.html', ic: '🏆', t: 'Animal Race', d: 'Team A vs Team B – whole chapter quiz' },
       ]},
@@ -218,6 +227,9 @@ const CHAPTERS = [
         { href: 'ch4/a-or-an.html', ic: '🦊', t: 'a or an?', d: 'a clock · a fox · an ox · an orange' },
         { href: 'ch4/word-train.html', ic: '🚂', t: 'Word Train', d: 'Make words: b + ox = box' },
       ]},
+      { key: 'tug', name: '🪢 Tug of War', games: [
+        { href: 'ch4/tug-of-war.html', ic: '🪢', t: 'Tug of War', d: 'Two players – each right answer pulls the rope!' },
+      ]},
       { key: 'play', name: '🏁 Class challenge', games: [
         { href: 'ch4/senses-race.html', ic: '🏆', t: 'Senses Race', d: 'Team A vs Team B – whole chapter quiz' },
       ]},
@@ -251,6 +263,9 @@ const CHAPTERS = [
         { href: 'ch5/a-or-an.html', ic: '☂️', t: 'a or an?', d: 'an umbrella · a truck · a duck · a hut' },
         { href: 'ch5/word-train.html', ic: '🚂', t: 'Word Train', d: 'Make words: b + us = bus' },
       ]},
+      { key: 'tug', name: '🪢 Tug of War', games: [
+        { href: 'ch5/tug-of-war.html', ic: '🪢', t: 'Tug of War', d: 'Two players – each right answer pulls the rope!' },
+      ]},
       { key: 'play', name: '🏁 Class challenge', games: [
         { href: 'ch5/vehicle-race.html', ic: '🏆', t: 'Vehicle Race', d: 'Team A vs Team B – whole chapter quiz' },
       ]},
@@ -282,6 +297,9 @@ const CHAPTERS = [
       ]},
       { key: 'listen', name: '✂️ Let us do', games: [
         { href: 'ch6/vehicle-chart.html', ic: '🚌', t: 'Vehicle Chart', d: 'Paste vehicles and write their names' },
+      ]},
+      { key: 'tug', name: '🪢 Tug of War', games: [
+        { href: 'ch6/tug-of-war.html', ic: '🪢', t: 'Tug of War', d: 'Two players – each right answer pulls the rope!' },
       ]},
       { key: 'play', name: '🏁 Class challenge', games: [
         { href: 'ch6/school-race.html', ic: '🏆', t: 'Race to School', d: 'Team A vs Team B – whole chapter quiz' },
@@ -316,6 +334,9 @@ const CHAPTERS = [
         { href: 'ch7/spot-difference.html', ic: '🔍', t: 'Spot the Difference', d: 'Find what is different' },
         { href: 'ch7/complete-picture.html', ic: '🖍️', t: 'Complete the Picture', d: 'Add what the street needs' },
       ]},
+      { key: 'tug', name: '🪢 Tug of War', games: [
+        { href: 'ch7/tug-of-war.html', ic: '🪢', t: 'Tug of War', d: 'Two players – each right answer pulls the rope!' },
+      ]},
       { key: 'play', name: '🏁 Class challenge', games: [
         { href: 'ch7/town-race.html', ic: '🏆', t: 'Town Race', d: 'Team A vs Team B – whole chapter quiz' },
       ]},
@@ -346,6 +367,9 @@ const CHAPTERS = [
       ]},
       { key: 'listen', name: '👂 Let us listen', games: [
         { href: 'ch8/ck-words.html', ic: '🦆', t: 'The “ck” Sound', d: 'back · pack · tick · duck · truck' },
+      ]},
+      { key: 'tug', name: '🪢 Tug of War', games: [
+        { href: 'ch8/tug-of-war.html', ic: '🪢', t: 'Tug of War', d: 'Two players – each right answer pulls the rope!' },
       ]},
       { key: 'play', name: '🏁 Class challenge', games: [
         { href: 'ch8/cloud-race.html', ic: '🏆', t: 'Cloud Race', d: 'Team A vs Team B – whole chapter quiz' },
@@ -379,6 +403,9 @@ const CHAPTERS = [
         { href: 'ch9/give-me.html', ic: '🍃', t: 'Give Me!', d: 'Say “give me” when you see the leaf' },
         { href: 'ch9/my-name.html', ic: '🙋', t: 'My Name', d: 'What does your name mean?' },
       ]},
+      { key: 'tug', name: '🪢 Tug of War', games: [
+        { href: 'ch9/tug-of-war.html', ic: '🪢', t: 'Tug of War', d: 'Two players – each right answer pulls the rope!' },
+      ]},
       { key: 'play', name: '🏁 Class challenge', games: [
         { href: 'ch9/fly-race.html', ic: '🏆', t: 'Fly Race', d: 'Team A vs Team B – whole chapter quiz' },
       ]},
@@ -409,6 +436,9 @@ const CHAPTERS = [
       ]},
       { key: 'listen', name: '👂 Let us listen', games: [
         { href: 'ch10/syllables.html', ic: '👏', t: 'Clap the Parts', d: 'pea-cock · beau-ti-ful · a-no-ther' },
+      ]},
+      { key: 'tug', name: '🪢 Tug of War', games: [
+        { href: 'ch10/tug-of-war.html', ic: '🪢', t: 'Tug of War', d: 'Two players – each right answer pulls the rope!' },
       ]},
       { key: 'play', name: '🏁 Class challenge', games: [
         { href: 'ch10/bird-race.html', ic: '🏆', t: 'Bird Race', d: 'Team A vs Team B – whole chapter quiz' },
@@ -445,6 +475,9 @@ const CHAPTERS = [
       { key: 'think', name: '🛒 Project work', games: [
         { href: 'ch11/shop.html', ic: '🏪', t: 'Going Shopping', d: 'What did you like in the shop?' },
       ]},
+      { key: 'tug', name: '🪢 Tug of War', games: [
+        { href: 'ch11/tug-of-war.html', ic: '🪢', t: 'Tug of War', d: 'Two players – each right answer pulls the rope!' },
+      ]},
       { key: 'play', name: '🏁 Class challenge', games: [
         { href: 'ch11/monkey-race.html', ic: '🏆', t: 'Monkey Race', d: 'Team A vs Team B – whole chapter quiz' },
       ]},
@@ -478,6 +511,9 @@ const CHAPTERS = [
       ]},
       { key: 'think', name: '🧂 Project work', games: [
         { href: 'ch12/grainy.html', ic: '🌾', t: 'Is It Grainy?', d: 'salt · sugar · rice · wheat' },
+      ]},
+      { key: 'tug', name: '🪢 Tug of War', games: [
+        { href: 'ch12/tug-of-war.html', ic: '🪢', t: 'Tug of War', d: 'Two players – each right answer pulls the rope!' },
       ]},
       { key: 'play', name: '🏁 Class challenge', games: [
         { href: 'ch12/water-race.html', ic: '🏆', t: 'Water Drop Race', d: 'Team A vs Team B – whole chapter quiz' },
@@ -513,6 +549,9 @@ const CHAPTERS = [
       { key: 'listen', name: '🎤 Project work', games: [
         { href: 'ch13/folk-song.html', ic: '🎶', t: 'My Folk Song', d: 'Present a folk song from your family' },
       ]},
+      { key: 'tug', name: '🪢 Tug of War', games: [
+        { href: 'ch13/tug-of-war.html', ic: '🪢', t: 'Tug of War', d: 'Two players – each right answer pulls the rope!' },
+      ]},
       { key: 'play', name: '🏁 Class challenge', games: [
         { href: 'ch13/india-race.html', ic: '🏆', t: 'India Race', d: 'Team A vs Team B – whole chapter quiz' },
       ]},
@@ -546,6 +585,7 @@ tabs.innerHTML = CHAPTERS.map((c) => `
 tabs.addEventListener('click', (e) => { const b = e.target.closest('.tab'); if (b) show(+b.dataset.n); });
 
 show(+(location.hash.match(/ch(\d+)/)?.[1] || 1));
+window.addEventListener('hashchange', () => show(+(location.hash.match(/ch(\d+)/)?.[1] || 1)));
 </script>
 </body>
 </html>

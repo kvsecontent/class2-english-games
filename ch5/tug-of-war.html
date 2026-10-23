@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/tug.css">
+</head>
+<body>
+<main></main>
+<script src="../assets/common.js"></script>
+<script src="../assets/tug.js"></script>
+<script>
+G.init({ title: 'Tug of War', subtitle: 'Come Back Soon · Two players', back: '../index.html#ch5' });
+
+/* Questions from the whole chapter (o[0] is the right answer). */
+const BANK = [
+  { e: '🚌', t: 'Take a bus or take a ____.', o: ['train', 'tree', 'rain'] },
+  { e: '⛵', t: 'Take a boat or take a ____.', o: ['plane', 'plate', 'plant'] },
+  { e: '🚕', t: 'Take a taxi, take a ____.', o: ['car', 'cat', 'cap'] },
+  { e: '🏠', t: 'Maybe near or maybe ____.', o: ['far', 'fun', 'fat'] },
+  { e: '🚀', t: 'Take a rocket to the ____.', o: ['moon', 'sun', 'sea'] },
+  { e: '🏡', t: 'But be sure to come back ____.', o: ['soon', 'moon', 'noon'] },
+  { e: '🌙', t: 'Which one can go to the moon?', o: ['a rocket', 'a taxi', 'a boat'] },
+  { e: '🌊', t: 'Which one moves on water?', o: ['a ship', 'a truck', 'a jeep'] },
+  { e: '☁️', t: 'Which one moves in the air?', o: ['a helicopter', 'a tractor', 'a raft'] },
+  { e: '🛣️', t: 'Which one moves on land?', o: ['a jeep', 'a yacht', 'an aeroplane'] },
+  { e: '🌊', t: 'A raft moves ____.', o: ['on water', 'in the air', 'on land'] },
+  { e: '🚜', t: 'A tractor moves ____.', o: ['on land', 'on water', 'in the air'] },
+  { e: '🤸', t: 'Everybody jump, everybody ____.', o: ['run', 'sleep', 'eat'] },
+  { e: '🙋', t: 'Everybody sit, and raise your ____.', o: ['hand', 'head', 'bag'] },
+  { e: '😄', t: 'Everybody stop, oh! What ____.', o: ['fun', 'sun', 'run'] },
+  { e: '☂️', t: 'Choose the right one.', o: ['an umbrella', 'a umbrella', 'umbrella an'] },
+  { e: '🦆', t: 'Choose the right one.', o: ['a duck', 'an duck', 'duck a'] },
+  { e: '🚚', t: 'Choose the right one.', o: ['a truck', 'an truck', 'truck a'] },
+  { e: '🛖', t: 'Which word is this?', o: ['hut', 'hat', 'hot'] },
+  { e: '☕', t: 'Which word is this?', o: ['cup', 'cap', 'cop'] },
+  { e: '🚌', t: 'Which word is this?', o: ['bus', 'bat', 'box'] },
+  { e: '👀', t: 'Which is a sight word?', o: ['take', 'rocket', 'taxi'] },
+  { e: '🚕', t: 'A car you pay to ride in is a ____.', o: ['taxi', 'boat', 'rocket'] },
+  { e: '🏠', t: 'The opposite of far is ____.', o: ['near', 'soon', 'take'] },
+  { e: '✈️', t: 'It has wings and flies. It is a ____.', o: ['plane', 'train', 'boat'] },
+];
+
+TUG({ bank: BANK });
+</script>
+</body>
+</html>

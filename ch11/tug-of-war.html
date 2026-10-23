@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/tug.css">
+</head>
+<body>
+<main></main>
+<script src="../assets/common.js"></script>
+<script src="../assets/tug.js"></script>
+<script>
+G.init({ title: 'Tug of War', subtitle: 'The Smart Monkey · Two players', back: '../index.html#ch11' });
+
+/* Questions from the whole chapter (o[0] is the right answer). */
+const BANK = [
+  { e: '🛍️', t: 'Where did Anju and Farida go?', o: ['to the market', 'to school', 'to the zoo'] },
+  { e: '👜', t: 'Anju bought a ____.', o: ['bag', 'book', 'banana'] },
+  { e: '🍶', t: 'Farida bought a ____.', o: ['water bottle', 'bag', 'toy'] },
+  { e: '🥜', t: 'They bought a packet of ____.', o: ['groundnuts', 'biscuits', 'chips'] },
+  { e: '🪑', t: 'They sat on a ____ under a tree.', o: ['bench', 'chair', 'bed'] },
+  { e: '🐒', t: 'Who was on the branch of the tree?', o: ['a monkey', 'a bird', 'a cat'] },
+  { e: '🍌', t: 'What did the monkey have?', o: ['a banana', 'an apple', 'groundnuts'] },
+  { e: '🚮', t: 'What did the girls do with the packet?', o: ['threw it down', 'kept it in the bag', 'gave it to the monkey'] },
+  { e: '🗑️', t: 'Where did the monkey throw the banana peel?', o: ['into the dustbin', 'on the road', 'on the girls'] },
+  { e: '😳', t: 'How did the girls feel?', o: ['ashamed', 'angry', 'sleepy'] },
+  { e: '♻️', t: 'What did the girls do at the end?', o: ['put the rubbish in the dustbin', 'ran away', 'went to sleep'] },
+  { e: '🍪', t: 'After eating biscuits, put the wrapper ____.', o: ['in the dustbin', 'on the floor', 'in the park'] },
+  { e: '👏', t: 'How many claps in “banana”?', o: ['3', '2', '1'] },
+  { e: '👏', t: 'How many claps in “monkey”?', o: ['2', '3', '1'] },
+  { e: '👏', t: 'How many claps in “Farida”?', o: ['3', '2', '4'] },
+  { e: '🚩', t: 'Which word starts with “fl”?', o: ['flag', 'clap', 'clock'] },
+  { e: '🕰️', t: 'Which word starts with “cl”?', o: ['clock', 'flower', 'floor'] },
+  { e: '☁️', t: 'Which word is this?', o: ['cloud', 'clap', 'flag'] },
+  { e: '🌸', t: 'Which word is this?', o: ['flower', 'floor', 'clown'] },
+  { e: '🫙', t: 'A bottle with nothing in it is ____.', o: ['empty', 'full', 'smart'] },
+  { e: '🍌', t: 'The outer skin of a banana is the ____.', o: ['peel', 'branch', 'packet'] },
+  { e: '🥜', t: 'Groundnuts are also called ____.', o: ['peanuts', 'coconuts', 'walnuts'] },
+  { e: '👀', t: 'Which is a sight word?', o: ['nearby', 'dustbin', 'groundnuts'] },
+  { e: '🧹', t: 'Which one helps to keep a house clean?', o: ['a broom', 'a kite', 'a ball'] },
+  { e: '🐒', t: 'Why is the monkey smart?', o: ['He used the dustbin.', 'He ate a banana.', 'He sat on a tree.'] },
+];
+
+TUG({ bank: BANK });
+</script>
+</body>
+</html>

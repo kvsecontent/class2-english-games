@@ -3,7 +3,8 @@
 Interactive games for a 75" smartboard. Open `index.html` → pick a chapter tab → tap a game.
 
 - `index.html` – dashboard with chapter tabs (add new chapters to the `CHAPTERS` list)
-- `assets/` – shared style and helpers (`common.js`: quiz, drag/tap, speech, sounds)
+- `assets/` – shared style and helpers (`common.js`: quiz, drag/tap, speech, sounds; `tug.js` + `tug.css`: two-player Tug of War)
+- Every chapter has a `tug-of-war.html` (two players, split screen) built from that chapter's race questions
 - `ch1/` – Chapter 1 "My Bicycle" (13 games)
 - `ch2/` – Chapter 2 "OUT! OUT!" (15 games)
 - `ch3/` – Chapter 3 "It is Fun" (16 games)

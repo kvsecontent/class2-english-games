@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/tug.css">
+</head>
+<body>
+<main></main>
+<script src="../assets/common.js"></script>
+<script src="../assets/tug.js"></script>
+<script>
+G.init({ title: 'Tug of War', subtitle: 'Between Home and School · Two players', back: '../index.html#ch6' });
+
+/* Questions from the whole chapter (o[0] is the right answer). */
+const BANK = [
+  { e: '👦🏽', t: 'What is the name of the boy in the story?', o: ['Ravi', 'Jeet', 'Unni'] },
+  { e: '🏫', t: 'Ravi studies in Class ____.', o: ['2', '5', '1'] },
+  { e: '🚶', t: 'How do Ravi and his friend go to school?', o: ['on foot', 'by bus', 'by car'] },
+  { e: '🌾', t: 'They pass through the ____ fields.', o: ['paddy', 'cricket', 'flower'] },
+  { e: '🥭', t: 'They pass the ____ grove.', o: ['mango', 'apple', 'banana'] },
+  { e: '🛣️', t: 'Then they reach the main ____.', o: ['road', 'gate', 'canal'] },
+  { e: '🗺️', t: 'That is the ____ route they take to school.', o: ['shortest', 'longest', 'saddest'] },
+  { e: '🌊', t: 'They jump over the ____.', o: ['canals', 'cars', 'chairs'] },
+  { e: '🌿', t: 'They swing from the ____.', o: ['branches', 'bicycles', 'buses'] },
+  { e: '🦎', t: 'They watch garden ____.', o: ['lizards', 'lions', 'ladders'] },
+  { e: '⏰', t: 'Yet they reach school ____.', o: ['on time', 'late', 'at night'] },
+  { e: '🏥', t: 'Which one does Ravi NOT see on the way?', o: ['a hospital', 'paddy fields', 'trees'] },
+  { e: '🍱', t: 'Today I have brought upma for lun__.', o: ['ch', 'sh', 'th'] },
+  { e: '🪑', t: 'It is on the wall behind her __air.', o: ['ch', 'sh', 'th'] },
+  { e: '🍟', t: 'Unni loves to eat banana __ips.', o: ['ch', 'sh', 'th'] },
+  { e: '👩‍🏫', t: 'Our Tea__er put up a new chart.', o: ['ch', 'sh', 'th'] },
+  { e: '🥭', t: 'Unjumble: o-g-n-a-m', o: ['mango', 'among', 'gamon'] },
+  { e: '🦎', t: 'Unjumble: d-r-a-z-i-l', o: ['lizard', 'wizard', 'lazier'] },
+  { e: '🌳', t: 'A small group of trees is a ____.', o: ['grove', 'route', 'canal'] },
+  { e: '🌊', t: 'A long, narrow path of water is a ____.', o: ['canal', 'branch', 'field'] },
+  { e: '🗺️', t: 'The way we take to go somewhere is a ____.', o: ['route', 'grove', 'lizard'] },
+  { e: '🚲', t: 'It has two wheels and pedals.', o: ['bicycle', 'bus', 'train'] },
+  { e: '🚆', t: 'Which one moves on a railway track?', o: ['a train', 'a ship', 'a helicopter'] },
+  { e: '🚪', t: 'Our school has a big ____.', o: ['gate', 'lizard', 'lunch'] },
+  { e: '🍱', t: 'I eat my ____ at school.', o: ['lunch', 'road', 'gate'] },
+];
+
+TUG({ bank: BANK });
+</script>
+</body>
+</html>

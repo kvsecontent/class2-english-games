@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/tug.css">
+</head>
+<body>
+<main></main>
+<script src="../assets/common.js"></script>
+<script src="../assets/tug.js"></script>
+<script>
+G.init({ title: 'Tug of War', subtitle: 'A Show of Clouds · Two players', back: '../index.html#ch8' });
+
+/* Questions from the whole chapter (o[0] is the right answer). */
+const BANK = [
+  { e: '🧒', t: 'As I lie on my ____.', o: ['back', 'bag', 'bed'] },
+  { e: '☁️', t: 'Looking up at the ____.', o: ['sky', 'sea', 'tree'] },
+  { e: '🐻‍❄️', t: 'I see a big white ____.', o: ['bear', 'bird', 'boat'] },
+  { e: '⛵', t: 'I see a ship ____.', o: ['sailing', 'flying', 'sleeping'] },
+  { e: '🌊', t: 'The ship sails on a white ____.', o: ['sea', 'sky', 'sun'] },
+  { e: '🐘', t: 'The elephant is waving its ____ at me.', o: ['trunk', 'tail', 'ear'] },
+  { e: '😄', t: 'It’s fun to see whatever I ____ to see.', o: ['want', 'wait', 'wash'] },
+  { e: '🐾', t: 'Which animals did the child see in the clouds?', o: ['a bear and an elephant', 'a cat and a dog', 'a lion and a fish'] },
+  { e: '☁️', t: 'Which colour can clouds NOT be?', o: ['green', 'white', 'grey'] },
+  { e: '🌅', t: 'Clouds can look red at ____.', o: ['sunset', 'midnight', 'lunch'] },
+  { e: '🌧️', t: 'Before rain, clouds are often ____.', o: ['black', 'pink', 'green'] },
+  { e: '🌙', t: 'What do we see in the sky at night?', o: ['the moon and stars', 'the sun and a rainbow', 'kites'] },
+  { e: '☀️', t: 'What do we see in the sky during the day?', o: ['the sun', 'the stars', 'fireflies'] },
+  { e: '⬆️', t: 'When I look ____, I see the sky.', o: ['up', 'down', 'in'] },
+  { e: '⬇️', t: 'When I look ____, I see the ground.', o: ['down', 'up', 'out'] },
+  { e: '🦆', t: 'du__', o: ['ck', 'sh', 'ch'] },
+  { e: '🚚', t: 'tru__', o: ['ck', 'ch', 'sh'] },
+  { e: '🎒', t: 'pa__', o: ['ck', 'sh', 'ch'] },
+  { e: '🔤', t: 'What sound is common in back, pack and rack?', o: ['ck', 'sh', 'ch'] },
+  { e: '🔤', t: 'Which letter comes after c?', o: ['d', 'b', 'e'] },
+  { e: '🔤', t: 'Which letter comes after m?', o: ['n', 'l', 'o'] },
+  { e: '👀', t: 'Which is a sight word?', o: ['sky', 'bear', 'sailing'] },
+  { e: '🛌', t: 'Which new word means “rest with your body flat”?', o: ['lie', 'sea', 'waving'] },
+  { e: '👋', t: 'Moving a hand to say hello is ____.', o: ['waving', 'sailing', 'lying'] },
+  { e: '🐻', t: 'A big, furry animal is a ____.', o: ['bear', 'sea', 'ship'] },
+];
+
+TUG({ bank: BANK });
+</script>
+</body>
+</html>

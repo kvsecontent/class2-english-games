@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/tug.css">
+</head>
+<body>
+<main></main>
+<script src="../assets/common.js"></script>
+<script src="../assets/tug.js"></script>
+<script>
+G.init({ title: 'Tug of War', subtitle: 'This is My Town · Two players', back: '../index.html#ch7' });
+
+/* Questions from the whole chapter (o[0] is the right answer). */
+const BANK = [
+  { e: '🏙️', t: 'This is my ____.', o: ['town', 'train', 'tree'] },
+  { e: '🛣️', t: 'In my town, there are ____.', o: ['streets', 'flowers', 'beds'] },
+  { e: '🏠', t: 'In my street, there are ____.', o: ['houses', 'baskets', 'rooms'] },
+  { e: '🚪', t: 'In my house, there are ____.', o: ['rooms', 'streets', 'towns'] },
+  { e: '🛏️', t: 'In my room, there is a ____.', o: ['bed', 'bus', 'boat'] },
+  { e: '🧺', t: 'On the bed, there is a ____.', o: ['basket', 'house', 'street'] },
+  { e: '💐', t: 'In the basket, there are some ____.', o: ['flowers', 'houses', 'trains'] },
+  { e: '🛏️', t: 'Basket on the ____.', o: ['bed', 'street', 'town'] },
+  { e: '🏙️', t: 'Street in the ____.', o: ['town', 'basket', 'room'] },
+  { e: '🔤', t: 'Make a word: e-b-d', o: ['bed', 'deb', 'ebd'] },
+  { e: '🔤', t: 'Make a word: o-m-o-r', o: ['room', 'moor', 'romo'] },
+  { e: '🔤', t: 'Make a word: w-o-t-n', o: ['town', 'wont', 'notw'] },
+  { e: '🐭', t: 'Which one is a small animal?', o: ['mouse', 'house', 'mountain'] },
+  { e: '🏊', t: 'Which word means to move in water?', o: ['swim', 'skin', 'swing'] },
+  { e: '🦈', t: 'A fish has a ____.', o: ['fin', 'fan', 'fun'] },
+  { e: '🪣', t: 'We get water from a ____.', o: ['well', 'wall', 'will'] },
+  { e: '☀️', t: 'The sun is __ining today.', o: ['sh', 'ch', 'th'] },
+  { e: '👟', t: 'My uncle is polishing his __oes.', o: ['sh', 'ch', 'th'] },
+  { e: '🧣', t: 'My grandmother is folding a __awl.', o: ['sh', 'ch', 'th'] },
+  { e: '🐚', t: 'Which word is this?', o: ['shell', 'shelf', 'smell'] },
+  { e: '👕', t: 'Which word is this?', o: ['shirt', 'skirt', 'short'] },
+  { e: '📮', t: 'Which comes in an address?', o: ['Name of the street', 'Name of a flower', 'Name of a game'] },
+  { e: '🇮🇳', t: 'Which one is our country?', o: ['India', 'Delhi', 'Kerala'] },
+  { e: '👀', t: 'Which is a sight word?', o: ['there', 'basket', 'street'] },
+  { e: '🌸', t: 'Which is a new word in the poem?', o: ['flower', 'them', 'that'] },
+];
+
+TUG({ bank: BANK });
+</script>
+</body>
+</html>

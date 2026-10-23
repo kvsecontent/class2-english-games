@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/tug.css">
+</head>
+<body>
+<main></main>
+<script src="../assets/common.js"></script>
+<script src="../assets/tug.js"></script>
+<script>
+G.init({ title: 'Tug of War', subtitle: 'OUT! OUT! · Two players', back: '../index.html#ch2' });
+
+/* Questions from the whole chapter (o[0] is the right answer). */
+const BANK = [
+  { e: '🏖️', t: 'It was a ____ when Jeet and Babli played.', o: ['holiday', 'school day', 'rainy day'] },
+  { e: '👧🏽👦🏽', t: 'Who are the two friends in the story?', o: ['Jeet and Babli', 'Suresh and Gopal', 'Mohit and Babli'] },
+  { e: '🪢', t: 'Both of them skipped the ____.', o: ['rope', 'ball', 'bat'] },
+  { e: '🙈', t: 'They played hide and ____.', o: ['seek', 'run', 'jump'] },
+  { e: '🏏', t: 'Babli and Jeet decided to play ____.', o: ['bat and ball', 'kho-kho', 'marbles'] },
+  { e: '🏡', t: 'The ball went into ____ garden.', o: ['Mohit’s', 'Jeet’s', 'Babli’s'] },
+  { e: '🔒', t: 'Mohit’s house was ____.', o: ['locked', 'open', 'new'] },
+  { e: '🧶', t: 'Who knew how to make a ball?', o: ['Babli', 'Jeet', 'Mohit'] },
+  { e: '📰', t: 'Babli used rags, paper and ____.', o: ['wool', 'stones', 'glass'] },
+  { e: '🧵', t: 'She tied the ball with a ____.', o: ['string', 'ribbon', 'rope'] },
+  { e: '💥', t: 'Jeet hit the ball hard. The ball ____.', o: ['opened up', 'went home', 'got bigger'] },
+  { e: '🙌', t: 'What did Babli shout?', o: ['OUT! OUT!', 'RUN! RUN!', 'STOP! STOP!'] },
+  { e: '🥚', t: 'Choose the right one.', o: ['an egg', 'a egg', 'egg an'] },
+  { e: '🐘', t: 'Choose the right one.', o: ['an elephant', 'a elephant', 'elephant a'] },
+  { e: '🚂', t: 'Choose the right one.', o: ['an engine', 'a engine', 'engine an'] },
+  { e: '🐔', t: 'Choose the right one.', o: ['a hen', 'an hen', 'hen a'] },
+  { e: '🖊️', t: 'Which word is this?', o: ['pen', 'hen', 'ten'] },
+  { e: '🛏️', t: 'Which word is this?', o: ['bed', 'red', 'bell'] },
+  { e: '🔥', t: 'The opposite of hot is ____.', o: ['cold', 'big', 'up'] },
+  { e: '🐭', t: 'The opposite of small is ____.', o: ['big', 'thin', 'down'] },
+  { e: '🚪', t: 'The opposite of open is ____.', o: ['close', 'out', 'fat'] },
+  { e: '📥', t: 'The opposite of in is ____.', o: ['out', 'up', 'hot'] },
+  { e: '🐈🐕', t: 'The cat ____ the dog sat on the mat.', o: ['and', 'of', 'how'] },
+  { e: '👀', t: 'Which is a sight word?', o: ['also', 'courtyard', 'string'] },
+  { e: '🤾', t: 'Jeet ____ the ball. (new word)', o: ['threw', 'skipped', 'gathered'] },
+];
+
+TUG({ bank: BANK });
+</script>
+</body>
+</html>

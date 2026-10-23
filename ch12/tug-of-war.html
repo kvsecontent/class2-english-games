@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/tug.css">
+</head>
+<body>
+<main></main>
+<script src="../assets/common.js"></script>
+<script src="../assets/tug.js"></script>
+<script>
+G.init({ title: 'Tug of War', subtitle: 'Little Drops of Water · Two players', back: '../index.html#ch12' });
+
+/* Questions from the whole chapter (o[0] is the right answer). */
+const BANK = [
+  { e: '💧', t: 'Little drops of ____.', o: ['water', 'milk', 'sand'] },
+  { e: '🏖️', t: 'Little grains of ____.', o: ['sand', 'rice', 'love'] },
+  { e: '🌊', t: 'They make the mighty ____.', o: ['ocean', 'mountain', 'sky'] },
+  { e: '🏞️', t: 'And the pleasant ____.', o: ['land', 'sea', 'rain'] },
+  { e: '💗', t: 'Little words of ____.', o: ['love', 'water', 'sand'] },
+  { e: '🤝', t: 'Little acts of ____.', o: ['kindness', 'sadness', 'water'] },
+  { e: '😊', t: 'Little deeds of warmth spread smiles and ____.', o: ['happiness', 'water', 'sand'] },
+  { e: '💪', t: '“Very big and strong” means ____.', o: ['mighty', 'pleasant', 'little'] },
+  { e: '🌊', t: 'A very, very big sea is an ____.', o: ['ocean', 'oil', 'owl'] },
+  { e: '🥛', t: 'We can say “drops of ____”.', o: ['milk', 'bread', 'rice'] },
+  { e: '🫒', t: 'Which one is a liquid?', o: ['oil', 'salt', 'carrot'] },
+  { e: '🍞', t: 'A ____ of bread', o: ['slice', 'tube', 'cup'] },
+  { e: '🪥', t: 'A ____ of toothpaste', o: ['tube', 'slice', 'bag'] },
+  { e: '✏️', t: 'A ____ of pencils', o: ['box', 'cup', 'slice'] },
+  { e: '🥛', t: 'A ____ of milk', o: ['cup', 'box', 'tube'] },
+  { e: '👕', t: 'A ____ of clothes', o: ['bag', 'slice', 'cup'] },
+  { e: '🏫', t: 'Which is a proper sentence?', o: ['Ramona went to school.', 'went Ramona school to', 'Ramona school went to.'] },
+  { e: '🦋', t: 'Which is a proper sentence?', o: ['These butterflies are very beautiful.', 'very these beautiful are butterflies', 'butterflies these are.'] },
+  { e: '🔠', t: 'A sentence begins with a ____.', o: ['capital letter', 'full stop', 'comma'] },
+  { e: '⏺️', t: 'A sentence ends with a ____.', o: ['full stop', 'capital letter', 'dash'] },
+  { e: '🧂', t: 'Which one feels grainy?', o: ['salt', 'oil', 'milk'] },
+  { e: '🍚', t: 'Which one feels grainy?', o: ['rice', 'banana', 'juice'] },
+  { e: '🐦', t: '“Colour the birds.” What do you colour?', o: ['the birds', 'the leaves', 'the plant'] },
+  { e: '🚰', t: 'How can we save water?', o: ['Close the tap.', 'Leave the tap open.', 'Throw water away.'] },
+  { e: '🤝', t: 'Which is an act of kindness?', o: ['Helping a friend', 'Pushing a friend', 'Shouting'] },
+];
+
+TUG({ bank: BANK });
+</script>
+</body>
+</html>

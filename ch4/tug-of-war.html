@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/tug.css">
+</head>
+<body>
+<main></main>
+<script src="../assets/common.js"></script>
+<script src="../assets/tug.js"></script>
+<script>
+G.init({ title: 'Tug of War', subtitle: 'Seeing without Seeing · Two players', back: '../index.html#ch4' });
+
+/* Questions from the whole chapter (o[0] is the right answer). */
+const BANK = [
+  { e: '🤫', t: 'Onshangla was very ____ that day.', o: ['quiet', 'loud', 'angry'] },
+  { e: '👩🏽', t: 'Onshangla calls her mother ____.', o: ['Ava', 'Amma', 'Maa'] },
+  { e: '👦🏽', t: 'Who came to Onshangla’s school?', o: ['a new boy', 'a new teacher', 'a new girl'] },
+  { e: '🕶️', t: 'The new boy wears ____ glasses.', o: ['black', 'red', 'blue'] },
+  { e: '🪑', t: 'The teacher helped him sit in the ____ desk.', o: ['front', 'back', 'last'] },
+  { e: '🍪', t: 'Ava placed biscuits and ____ on the table.', o: ['milk', 'tea', 'rice'] },
+  { e: '🧣', t: 'Ava tied a ____ over Onshangla’s eyes.', o: ['scarf', 'rope', 'cap'] },
+  { e: '🌹', t: 'How did Onshangla know it was a rose?', o: ['She smelled it.', 'She heard it.', 'She tasted it.'] },
+  { e: '🔔', t: 'How did Onshangla know it was a bell?', o: ['She heard it.', 'She smelled it.', 'She tasted it.'] },
+  { e: '🍊', t: 'It is not water, it is ____ juice.', o: ['orange', 'apple', 'mango'] },
+  { e: '😉', t: 'Onshangla ____ and looked at Ava.', o: ['blinked', 'slept', 'cried'] },
+  { e: '🤝', t: 'Ava hopes the children will be ____ with the new boy.', o: ['friends', 'angry', 'quiet'] },
+  { e: '👃', t: 'We smell with our ____.', o: ['nose', 'ears', 'hands'] },
+  { e: '👂', t: 'We hear with our ____.', o: ['ears', 'eyes', 'nose'] },
+  { e: '👅', t: 'We taste with our ____.', o: ['tongue', 'hands', 'ears'] },
+  { e: '📺', t: 'Which one is good for our eyes?', o: ['Read in good light.', 'Sit very close to the TV.', 'Stare at the sun.'] },
+  { e: '🥕', t: 'Which food is good for our eyes?', o: ['carrots', 'chips', 'sweets'] },
+  { e: '🐂', t: 'Choose the right one.', o: ['an ox', 'a ox', 'ox an'] },
+  { e: '🍊', t: 'Choose the right one.', o: ['an orange', 'a orange', 'orange an'] },
+  { e: '🦦', t: 'Choose the right one.', o: ['an otter', 'a otter', 'otter an'] },
+  { e: '🦊', t: 'Choose the right one.', o: ['a fox', 'an fox', 'fox a'] },
+  { e: '🔒', t: 'Which word is this?', o: ['lock', 'clock', 'frock'] },
+  { e: '🕰️', t: 'Which word is this?', o: ['clock', 'lock', 'sock'] },
+  { e: '👀', t: 'Which is a sight word?', o: ['what', 'scarf', 'blink'] },
+  { e: '🤫', t: 'Which word means “making very little sound”?', o: ['quiet', 'joy', 'front'] },
+];
+
+TUG({ bank: BANK });
+</script>
+</body>
+</html>

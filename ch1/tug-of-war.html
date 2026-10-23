@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/tug.css">
+</head>
+<body>
+<main></main>
+<script src="../assets/common.js"></script>
+<script src="../assets/tug.js"></script>
+<script>
+G.init({ title: 'Tug of War', subtitle: 'My Bicycle · Two players', back: '../index.html#ch1' });
+
+/* Questions from the whole chapter (o[0] is the right answer). */
+const BANK = [
+  { e: '🚲', t: 'What colour is the bicycle in the poem?', o: ['red', 'blue', 'black'] },
+  { e: '💺', t: 'The seat is ____ in colour.', o: ['blue', 'red', 'green'] },
+  { e: '⚫', t: 'The tyres and pedals are ____.', o: ['black', 'white', 'yellow'] },
+  { e: '🔔', t: 'What goes "trin… trin… trin…"?', o: ['the bell', 'the seat', 'the tyre'] },
+  { e: '💨', t: 'What does the bicycle need to keep moving?', o: ['air', 'water', 'milk'] },
+  { e: '⛑️', t: 'What does the child put on to stay safe?', o: ['a helmet', 'a cap', 'a shoe'] },
+  { e: '🧍↔️🧍', t: 'The bell makes my friends move ____.', o: ['aside', 'inside', 'up'] },
+  { e: '🌍', t: 'And go happily ____.', o: ['everywhere', 'to sleep', 'nowhere'] },
+  { e: '🐇🐢', t: 'Sometimes fast, sometimes ____.', o: ['slow', 'tall', 'red'] },
+  { e: '🍎', t: 'Choose the right one.', o: ['an apple', 'a apple', 'apple an'] },
+  { e: '🐜', t: 'Choose the right one.', o: ['an ant', 'a ant', 'ant a'] },
+  { e: '🐈', t: 'Choose the right one.', o: ['a cat', 'an cat', 'cat a'] },
+  { e: '🪓', t: 'Choose the right one.', o: ['an axe', 'a axe', 'axe an'] },
+  { e: '🧢', t: 'Choose the right one.', o: ['a cap', 'an cap', 'a cat'] },
+  { e: '🍳', t: 'Which word is this?', o: ['pan', 'man', 'pen'] },
+  { e: '🐀', t: 'Which word is this?', o: ['rat', 'cat', 'mat'] },
+  { e: '🛞', t: 'A bicycle has how many wheels?', o: ['2', '3', '4'] },
+  { e: '🛞', t: 'A tricycle has how many wheels?', o: ['3', '2', '5'] },
+  { e: '🦶', t: 'We push the ____ with our feet.', o: ['pedals', 'bell', 'seat'] },
+  { e: '✋', t: 'We hold the ____ to turn the bicycle.', o: ['handle', 'carrier', 'tyre'] },
+  { e: '🛑', t: 'We use the ____ to stop the bicycle.', o: ['brake', 'bell', 'seat'] },
+  { e: '🎒', t: 'We keep a bag on the ____.', o: ['carrier', 'pedal', 'bell'] },
+  { e: '👀', t: 'Which is a sight word?', o: ['my', 'helmet', 'pedal'] },
+  { e: '🦽', t: 'Who uses a wheelchair?', o: ['people who cannot walk easily', 'fish', 'birds'] },
+];
+
+TUG({ bank: BANK });
+</script>
+</body>
+</html>
