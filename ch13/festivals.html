@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%; max-width: 120rem; }
+  .fest { text-align: left; background: #fff; border: 0.25rem solid var(--line); border-radius: 1.4rem; box-shadow: var(--shadow); padding: 0.8rem 1.2rem; }
+  .fest h3 { margin: 0 0 0.3rem; font-size: 2rem; display: flex; align-items: center; gap: 0.6rem; }
+  .fest h3 span { font-size: 3rem; }
+  .fest p { margin: 0; font-family: var(--read); font-size: 1.5rem; line-height: 1.45; }
+  .fest.now { border-color: var(--yellow); background: #fff9e0; }
+  .q .e { font-size: 6rem; line-height: 1; }
+  .q .t { font-family: var(--read); font-size: 2.6rem; margin: 0.4rem 0 1rem; }
+  .choice { font-family: var(--read); font-size: 2.2rem; }
+  @media (max-width: 900px) { .cards { grid-template-columns: 1fr; } }
+  /* compact layout so the page fits one smartboard screen */
+  .fest p { font-size: 1.35rem !important; }
+  .fest h3 { font-size: 1.8rem !important; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mRead">📖 Festivals of India</button>
+    <button class="big-btn orange" id="mQuiz">🎯 Festival quiz</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Festivals of India', subtitle: 'We are all Indians · Let us write · A', back: '../index.html#ch13' });
+
+/* The four festival texts from the book. */
+const FEST = [
+  { e: '🌸', n: 'Phool Dei', t: 'This is a festival of flowers. This festival marks the beginning of Spring. Children collect different kinds of flowers. They go to the houses near their home. They offer flowers to the elders. Sometimes they keep the flowers on the doorstep. The elders give them rice and jaggery.' },
+  { e: '🌕', n: 'Sharad Poornima', t: 'Sharad Poornima is celebrated on a full moon night. It is celebrated in the month of Ashvin (September–October). The weather is generally pleasant. Sharad Poornima marks the ending of the monsoon season.' },
+  { e: '🏞️', n: 'Aadi Perukku', t: 'Aadi Perukku is a Tamil monsoon festival. It is celebrated in the Aadi month (July–August). People worship the river Cauvery. Farmers pray for a good harvest.' },
+  { e: '🏔️', n: 'Pang Lhabsol', t: 'Pang Lhabsol is a festival of Sikkim. This festival is celebrated in the month of August or September. Mt Kanchenjunga is worshipped on this day. Mt Kanchenjunga is considered as a protector by the worshippers. People dance and celebrate.' },
+];
+const area = G.$('#area');
+let token = 0;
+
+function readMode() {
+  area.innerHTML = `<p class="hint">Tap a festival to hear about it. ☀️ The sun is the source of energy on the earth. Do you know any festival that respects the sun?</p>
+    <div class="cards">${FEST.map((f, i) => `<button class="fest" data-i="${i}"><h3><span>${f.e}</span>${f.n}</h3><p>${f.t}</p></button>`).join('')}</div>`;
+  G.$$('.fest').forEach((b) => (b.onclick = () => {
+    token++;
+    G.$$('.fest').forEach((x) => x.classList.toggle('now', x === b));
+    const f = FEST[+b.dataset.i];
+    G.say(f.n + '. ' + f.t.replace(/–/g, ' to '), { rate: 0.85 });
+  }));
+}
+
+function quizMode() {
+  token++;
+  speechSynthesis.cancel();
+  area.innerHTML = `<div class="card" id="game" style="width:100%;max-width:80rem"></div>`;
+  const ITEMS = [
+    { e: '🇮🇳', t: 'What do we call the people who live in India?', o: ['Indians', 'Indias', 'Indies'] },
+    { e: '🎨', t: 'Name the festival of colours.', o: ['Holi', 'Pongal', 'Onam'] },
+    { e: '🌸', t: 'Phool Dei is a festival of ____.', o: ['flowers', 'lights', 'kites'] },
+    { e: '🍚', t: 'In Phool Dei, the elders give children ____.', o: ['rice and jaggery', 'toys', 'books'] },
+    { e: '🌕', t: 'Sharad Poornima is celebrated on a ____ night.', o: ['full moon', 'rainy', 'dark'] },
+    { e: '🏞️', t: 'In Aadi Perukku, people worship the river ____.', o: ['Cauvery', 'Ganga', 'Yamuna'] },
+    { e: '🏔️', t: 'Pang Lhabsol is a festival of ____.', o: ['Sikkim', 'Kerala', 'Punjab'] },
+    { e: '☀️', t: 'Which festival thanks the sun?', o: ['Pongal', 'Phool Dei', 'Pang Lhabsol'] },
+  ];
+  G.quiz({
+    el: G.$('#game'),
+    items: ITEMS,
+    shuffleItems: false,
+    question: (it) => `<div class="e">${it.e}</div><div class="t">${it.t}</div>`,
+    options: (it) => G.shuffle(it.o).map((x) => ({ label: x, value: x })),
+    answer: (it) => it.o[0],
+    onShow: (it) => G.say(it.t.replace(/_+/g, 'blank')),
+    endMsg: 'India has so many festivals! Which one do you like the most? Why?',
+  });
+}
+
+G.$('#mRead').onclick = readMode;
+G.$('#mQuiz').onclick = quizMode;
+readMode();
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .pic { font-size: 5.5rem; line-height: 1; }
+  .slots, .letters { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; margin: 1rem 0; }
+  .slot { width: 6rem; height: 6.6rem; border-radius: 1rem; border: 0.3rem dashed var(--orange); background: #fffaf0; display: flex; align-items: center; justify-content: center; font-family: var(--read); font-size: 4rem; font-weight: 700; color: #117a4a; }
+  .slot.filled { border-style: solid; border-color: var(--green); background: #d9f7e8; animation: pop 0.3s; }
+  .letter { width: 6rem; height: 6.6rem; border: 0; border-radius: 1rem; background: var(--blue); color: #fff; font-family: var(--read); font-size: 4rem; font-weight: 700; box-shadow: 0 0.35rem 0 rgba(0, 0, 0, 0.2); }
+  .letter.used { visibility: hidden; }
+  .letter.wrong { background: var(--red); animation: shake 0.4s; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Rearrange the jumbled letters. The answers are names of languages! Tap the letters in the right order.</p>
+  <div class="card center" style="width:100%;max-width:80rem">
+    <div class="progress" id="pg"></div>
+    <div class="pic" id="pic"></div>
+    <div class="slots" id="slots"></div>
+    <div class="letters" id="letters"></div>
+    <div class="row"><button class="say" id="hear">🔊</button><button class="big-btn ghost" id="hint">💡 Hint</button></div>
+    <div class="feedback" id="fb"></div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Jumbled Languages', subtitle: 'We are all Indians · Let us write · B', back: '../index.html#ch13' });
+
+/* The first four are from the book (INHDI, GNIELHS, RUUD, ELUTGU). */
+const WORDS = [
+  { w: 'HINDI', e: '🗣️', j: 'INHDI' }, { w: 'ENGLISH', e: '🔤', j: 'GNIELHS' }, { w: 'URDU', e: '📜', j: 'RUUD' }, { w: 'TELUGU', e: '🌾', j: 'ELUTGU' },
+  { w: 'TAMIL', e: '🪔' }, { w: 'ODIA', e: '🏝️' },
+];
+let list, i, pos, firstTry;
+
+function scramble(w) {
+  let s;
+  do { s = G.shuffle(w.split('')); } while (s.join('') === w);
+  return s;
+}
+function start() { list = [...WORDS]; i = 0; round(); }
+function round() {
+  if (i >= list.length) { G.end({ title: 'Word wizard!', msg: 'Hindi · English · Urdu · Telugu · Tamil · Odia', onReplay: start }); return; }
+  const it = list[i];
+  pos = 0; firstTry = true;
+  G.progress(G.$('#pg'), i, list.length);
+  G.$('#pic').textContent = it.e;
+  G.$('#fb').textContent = '';
+  G.$('#slots').innerHTML = it.w.split('').map(() => '<div class="slot"></div>').join('');
+  G.$('#letters').innerHTML = (it.j ? it.j.split('') : scramble(it.w)).map((c) => `<button class="letter">${c}</button>`).join('');
+  G.$$('.letter').forEach((b) => (b.onclick = () => pick(b, it)));
+}
+function pick(b, it) {
+  if (b.textContent === it.w[pos]) {
+    const slot = G.$$('.slot')[pos++];
+    slot.textContent = b.textContent;
+    slot.classList.add('filled');
+    b.classList.add('used');
+    G.sfx('pop');
+    if (pos === it.w.length) {
+      if (firstTry) G.star();
+      G.sfx('good');
+      G.feedback(G.$('#fb'), true, `🎉 ${it.w}!`);
+      G.say(it.w);
+      i++;
+      setTimeout(round, 1900);
+    }
+  } else {
+    firstTry = false;
+    b.classList.add('wrong');
+    G.sfx('bad');
+    setTimeout(() => b.classList.remove('wrong'), 450);
+  }
+}
+G.$('#hear').onclick = () => G.say(list[i]?.w || '', { rate: 0.7 });
+G.$('#hint').onclick = () => { firstTry = false; const it = list[i]; if (it) G.feedback(G.$('#fb'), true, `💡 It starts with “${it.w[0]}”.`); G.say(list[i] ? list[i].w : ''); };
+start();
+</script>
+</body>
+</html>

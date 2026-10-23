@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .wrap { display: grid; grid-template-columns: 1fr 24rem; gap: 1.4rem; width: 100%; max-width: 110rem; align-items: start; }
+  .env { background: #fffdf5; border: 0.3rem solid #e0c97a; border-radius: 1rem; padding: 1.2rem 1.6rem; position: relative; }
+  .env::before { content: '✉️'; position: absolute; right: 1rem; top: 0.6rem; font-size: 3rem; }
+  .row2 { display: grid; grid-template-columns: 22rem 1fr; gap: 0.8rem; align-items: center; margin-bottom: 0.7rem; }
+  .row2 label { font-size: 1.6rem; font-weight: 800; color: var(--muted); }
+  .row2 input { font-family: var(--read); font-size: 2.2rem; padding: 0.4rem 0.9rem; border-radius: 0.8rem; border: 0.25rem solid var(--line); min-height: 4.4rem; width: 100%; }
+  .row2 input:focus { outline: none; border-color: var(--blue); }
+  .side { display: flex; flex-direction: column; gap: 0.8rem; }
+  .side .big-btn { width: 100%; }
+  .chain { font-size: 1.4rem; line-height: 1.8; }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } .row2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Ask your family about a folk song they used to sing in their village. Learn it! Fill in your presentation, practise it, and then sing the song for the class.</p>
+  <div class="wrap">
+    <div class="env" id="env">
+      <div class="row2"><label for="f1">1. My name is</label><input id="f1" autocomplete="off"></div>
+      <div class="row2"><label for="f2">2. My family belongs to</label><input id="f2" autocomplete="off" placeholder="village or state"></div>
+      <div class="row2"><label for="f3">3. My mother tongue is</label><input id="f3" autocomplete="off"></div>
+      <div class="row2"><label for="f4">4. The main idea of my song is</label><input id="f4" autocomplete="off"></div>
+    </div>
+    <div class="side">
+      <button class="big-btn green" id="read">🔊 Practise my talk</button>
+      <button class="big-btn purple" id="ex">👀 See an example</button>
+      <button class="big-btn ghost" id="clear">🧹 Clear</button>
+      <div class="card chain">🎤 Then sing your song!<br>🕰️ Ask: When did they sing it?<br>🌾 At a festival? At harvest time? At a wedding?</div>
+    </div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'My Folk Song', subtitle: 'We are all Indians · Project work', back: '../index.html#ch13' });
+
+/* Nothing typed here is saved, so each child can use the board in turn. */
+const EXAMPLE = ['Riya', 'a village in Bihar', 'Bhojpuri', 'the rain and the green fields'];
+const LEAD = ['My name is', 'My parents and grandparents belong to', 'My mother tongue is', 'The main idea of my song is'];
+const fields = G.$$('#env input');
+G.$('#read').onclick = () => {
+  const vals = fields.map((f) => f.value.trim());
+  if (vals.every((v) => !v)) { G.say('Fill in your presentation first.'); fields[0].focus(); return; }
+  G.say(vals.map((v, i) => (v ? `${LEAD[i]} ${v}.` : '')).join(' ') + (vals.every(Boolean) ? ' Now I will sing my song.' : ''));
+  if (vals.every(Boolean)) { G.star(2); G.confetti(15); }
+};
+G.$('#ex').onclick = () => { fields.forEach((f, i) => (f.value = EXAMPLE[i])); G.say('Here is an example. Now fill in your own.'); };
+G.$('#clear').onclick = () => { fields.forEach((f) => (f.value = '')); fields[0].focus(); };
+fields.forEach((f, i) => f.addEventListener('keydown', (e) => { if (e.key === 'Enter') (fields[i + 1] || G.$('#read')).focus(); }));
+</script>
+</body>
+</html>

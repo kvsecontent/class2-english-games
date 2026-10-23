@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .kid { width: 100%; max-width: 90rem; display: grid; grid-template-columns: 18rem 1fr; gap: 1.4rem; align-items: center; }
+  .who { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+  .who .face { font-size: 9rem; line-height: 1; }
+  .who .name { font-size: 2.6rem; font-weight: 800; color: var(--purple); }
+  .who .tag { font-size: 1.3rem; font-weight: 800; background: #fff4cc; border-radius: 1rem; padding: 0.2rem 0.8rem; }
+  .text { font-family: var(--read); font-size: 2.4rem; line-height: 1.55; }
+  .text .s { border-radius: 0.5rem; padding: 0 0.2rem; }
+  .text .s.now { background: #ffd34d; }
+  .ask { margin-top: 1rem; font-family: var(--read); font-size: 2.2rem; font-weight: 700; color: var(--blue); background: #e7f1ff; border-radius: 1.2rem; padding: 0.6rem 1rem; }
+  .end { text-align: center; font-size: 3rem; font-weight: 800; }
+  .end .flag { font-size: 8rem; }
+  @media (max-width: 900px) { .kid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Meet children from all over India! Read what they say. Then answer their question.</p>
+  <div class="progress" id="pg"></div>
+  <div class="card" style="width:100%;max-width:96rem" id="card"></div>
+  <div class="row" style="margin-top:1rem">
+    <button class="big-btn ghost" id="prev">◀ Back</button>
+    <button class="big-btn green" id="read">🔊 Read</button>
+    <button class="big-btn orange" id="good">⭐ Good answer!</button>
+    <button class="big-btn ghost" id="next">Next ▶</button>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'We are all Indians', subtitle: 'Let us read', back: '../index.html#ch13' });
+
+/* Book text. q is the question each child asks the reader. */
+const KIDS = [
+  { n: 'Meenakshi', f: '👧🏾', st: 'Tamil Nadu', t: 'My name is Meenakshi. I come from Tamil Nadu. I speak Tamil. My favourite festival is Pongal.', q: 'What is your name?' },
+  { n: 'Ramu', f: '👦🏽', st: 'Gujarat', t: 'I am Ramu. I come from Gujarat. I speak Gujarati. I like to dance the Garba. I am seven years old.', q: 'How old are you?' },
+  { n: 'Badal', f: '👦🏻', st: 'Bengal', t: 'I am Badal. I come from Bengal. I speak Bengali. I like painting and music. I study at Santiniketan.', q: 'Where do you study?' },
+  { n: 'Gulabo', f: '👧🏽', st: 'Rajasthan', t: 'My name is Gulabo. I come from Rajasthan. I like wearing colourful clothes. I enjoy seeing puppet shows. I travel by camel.', q: 'How do you travel?' },
+  { n: 'Surinder', f: '👦🏽', st: 'Punjab', t: 'I am Surinder. I come from Punjab. I speak Punjabi. My neighbour Mallika likes to do Bhangra.', q: 'Which dance do you like?' },
+  { n: 'Vibha', f: '👧🏻', st: 'Maharashtra', t: 'I am Vibha. I come from Maharashtra. I speak Marathi. Once I visited Ellora and Ajanta caves.', q: 'Have you travelled anywhere?' },
+  { n: 'Kamala', f: '👧🏾', st: 'Karnataka', t: 'My name is Kamala. I come from Karnataka. I speak Kannada. I play the Mridang.', q: 'Do you play any musical instrument?' },
+  { n: 'Nonglik', f: '👧🏻', st: 'Manipur', t: 'My name is Nonglik. I come from Manipur. I speak Manipuri.', q: 'What language do you speak?' },
+  { n: 'Neerja', f: '👧🏽', st: 'Uttar Pradesh', t: 'I am Neerja. I come from Uttar Pradesh. I have seen the Taj Mahal.', q: 'Have you seen any monument?' },
+  { n: 'Bharti', f: '👧🏾', st: 'Andhra Pradesh', t: 'Bharti is my name. I come from Andhra Pradesh. I speak Telugu. During my summer holidays I go to Kashmir and stay with my friends Salma and Suresh.', q: 'Where do you go for your holidays?' },
+  { n: 'Two sisters', f: '👧🏽👧🏽', st: 'Odisha', t: 'We are two sisters. We belong to Odisha. We speak Odia. We decorate our walls and floors.', q: 'Do you have a sister or a brother?' },
+  { n: 'Unni', f: '👦🏾', st: 'Kerala', t: 'My name is Unni. I come from Kerala. I speak Malayalam. My favourite tree is the coconut tree.', q: 'Which tree do you like?' },
+];
+let i = 0, token = 0;
+const total = KIDS.length + 1;
+
+function draw() {
+  token++;
+  speechSynthesis.cancel();
+  G.progress(G.$('#pg'), i, total);
+  G.$('#good').disabled = false;
+  if (i === KIDS.length) {
+    G.$('#card').innerHTML = `<div class="end"><div class="flag">🇮🇳</div>But we are all Indians.<br>Each of us is unique.</div>`;
+    G.say('But we are all Indians. Each of us is unique.');
+    return;
+  }
+  const k = KIDS[i];
+  G.$('#card').innerHTML = `<div class="kid"><div class="who"><span class="face">${k.f}</span><span class="name">${k.n}</span><span class="tag">📍 ${k.st}</span></div>
+    <div><div class="text">${k.t.split(/(?<=\.)\s+/).map((s) => `<span class="s">${s}</span>`).join(' ')}</div><div class="ask">❓ ${k.q}</div></div></div>`;
+}
+function read() {
+  if (i === KIDS.length) { G.say('But we are all Indians. Each of us is unique.'); return; }
+  const my = ++token, ss = G.$$('.text .s');
+  const go = (k) => {
+    ss.forEach((s, j) => s.classList.toggle('now', j === k));
+    if (my !== token) return;
+    if (k >= ss.length) { ss.forEach((s) => s.classList.remove('now')); G.say(KIDS[i].q); return; }
+    G.say(ss[k].textContent, { rate: 0.8, onend: () => setTimeout(() => go(k + 1), 300) });
+  };
+  go(0);
+}
+G.$('#read').onclick = read;
+G.$('#prev').onclick = () => { i = (i + total - 1) % total; draw(); };
+G.$('#next').onclick = () => { if (i === total - 1) { G.end({ title: 'Unity in diversity!', msg: 'We are all Indians. Each of us is unique.', onReplay: () => { i = 0; draw(); } }); return; } i++; draw(); };
+G.$('#good').onclick = (e) => { G.star(); G.sfx('good'); G.confetti(10); e.currentTarget.disabled = true; };
+draw();
+</script>
+</body>
+</html>

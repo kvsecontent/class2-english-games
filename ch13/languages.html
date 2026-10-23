@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .rows { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; width: 100%; max-width: 110rem; }
+  @media (max-width: 900px) { .rows { grid-template-columns: 1fr; } }
+  .rowx { display: flex; align-items: center; gap: 1rem; background: #fff; border: 0.25rem solid var(--line); border-radius: 1.4rem; padding: 0.5rem 1.2rem; box-shadow: var(--shadow); font-family: var(--read); font-size: 1.9rem; font-weight: 700; }
+  .rowx .e { font-size: 2.8rem; width: 3.6rem; text-align: center; display: inline-block; }
+  .gap { display: inline-flex; align-items: center; justify-content: center; min-width: 11rem; height: 3.8rem; border-radius: 0.8rem; padding: 0 0.6rem;
+    border: 0.25rem dashed var(--orange); background: #fffaf0; color: var(--orange); }
+  .gap.filled { border-style: solid; border-color: var(--green); background: #d9f7e8; color: #117a4a; animation: pop 0.35s; }
+  .gap.nope { border-color: var(--red); background: #ffe1e3; animation: shake 0.4s; }
+  .bank { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 1.4rem 0 0.4rem; }
+  .chip { border: 0; border-radius: 1rem; background: var(--blue); color: #fff; font-family: var(--read); font-size: 2rem; font-weight: 700;
+    padding: 0.3rem 1rem; min-height: 3.8rem; box-shadow: 0 0.35rem 0 rgba(0, 0, 0, 0.2); }
+  .chip.used { visibility: hidden; }
+  /* each animal moves its own way once matched */
+  .go-trots { animation: trot 0.5s 4; } .go-leaps { animation: leap 0.7s 3; } .go-crawls { animation: crawl 1.2s 2; }
+  .go-runs { animation: run 0.4s 5; } .go-swings { animation: swing 0.8s 3; transform-origin: top center; }
+  @keyframes trot { 50% { transform: translateY(-0.6rem); } }
+  @keyframes leap { 50% { transform: translateY(-2.4rem) rotate(-10deg); } }
+  @keyframes crawl { 50% { transform: translateX(1.4rem) scaleX(1.15); } }
+  @keyframes run { 50% { transform: translateX(1rem); } }
+  @keyframes swing { 25% { transform: rotate(18deg); } 75% { transform: rotate(-18deg); } }
+  /* compact layout so the page fits one smartboard screen */
+  .rowx { font-size: 1.6rem !important; padding: 0.15rem 0.8rem !important; gap: 0.6rem !important; }
+  .rowx .e { font-size: 2.4rem !important; width: 3rem !important; }
+  .gap { height: 3.2rem !important; min-width: 10rem !important; }
+  .chip { font-size: 1.7rem !important; min-height: 3.4rem !important; padding: 0.2rem 0.9rem !important; }
+  .bank { margin: 0.8rem 0 0.2rem !important; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Which language does each child speak? Drag a language to the gap (or tap it, then tap the gap).</p>
+  <div class="rows" id="rows"></div>
+  <div class="bank" id="bank"></div>
+  <div class="feedback" id="fb"></div>
+  <button class="big-btn ghost" id="reset">🔁 Start again</button>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Who Speaks What?', subtitle: 'We are all Indians · Languages of India', back: '../index.html#ch13' });
+
+const ITEMS = [
+  { n: 'Meenakshi', s: 'Tamil Nadu', e: '👧🏾', v: 'Tamil' }, { n: 'Ramu', s: 'Gujarat', e: '👦🏽', v: 'Gujarati' },
+  { n: 'Badal', s: 'Bengal', e: '👦🏻', v: 'Bengali' }, { n: 'Surinder', s: 'Punjab', e: '👦🏽', v: 'Punjabi' },
+  { n: 'Vibha', s: 'Maharashtra', e: '👧🏻', v: 'Marathi' }, { n: 'Kamala', s: 'Karnataka', e: '👧🏾', v: 'Kannada' },
+  { n: 'Nonglik', s: 'Manipur', e: '👧🏻', v: 'Manipuri' }, { n: 'Bharti', s: 'Andhra Pradesh', e: '👧🏾', v: 'Telugu' },
+  { n: 'Unni', s: 'Kerala', e: '👦🏾', v: 'Malayalam' }, { n: 'The two sisters', s: 'Odisha', e: '👧🏽', v: 'Odia' },
+];
+
+function build() {
+  let done = 0;
+  G.$('#fb').textContent = '';
+  G.$('#rows').innerHTML = G.shuffle(ITEMS).map((it) => `<div class="rowx"><span class="e">${it.e}</span><span>${it.n} <small style="font-size:1.2rem;color:var(--muted)">(${it.s})</small> speaks</span>
+    <span class="gap" data-v="${it.v}">?</span></div>`).join('');
+  G.$('#bank').innerHTML = G.shuffle(ITEMS).map((it) => `<button class="chip" data-w="${it.v}">${it.v}</button>`).join('');
+  G.$$('.chip').forEach((c) => c.addEventListener('click', () => G.say(c.dataset.w)));
+  G.tapDrag(G.$$('.chip'), G.$$('.gap'), (chip, gap) => {
+    if (gap.classList.contains('filled')) return;
+    if (chip.dataset.w === gap.dataset.v) {
+      gap.classList.add('filled');
+      gap.textContent = chip.dataset.w;
+      chip.classList.add('used');
+      chip.dataset.locked = 1;
+      
+      G.sfx('good');
+      G.star();
+      { const it = ITEMS.find((x) => x.v === chip.dataset.w); G.say(`${it.n} ${it.n.startsWith('The') ? 'speak' : 'speaks'} ${chip.dataset.w}.`); }
+      if (++done === ITEMS.length) setTimeout(() => G.end({ title: 'Well done!', msg: 'India has many languages. We are all Indians!', onReplay: build }), 1800);
+    } else {
+      gap.classList.add('nope');
+      G.sfx('bad');
+      G.feedback(G.$('#fb'), false, '🙂 Try again!');
+      setTimeout(() => gap.classList.remove('nope'), 500);
+    }
+  });
+}
+G.$('#reset').onclick = build;
+build();
+</script>
+</body>
+</html>

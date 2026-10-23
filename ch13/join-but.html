@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .q .e { font-size: 5rem; line-height: 1; }
+  .two { display: flex; flex-direction: column; gap: 0.5rem; align-items: center; margin: 0.6rem 0 1rem; }
+  .two div { font-family: var(--read); font-size: 2.4rem; background: #f4f0ff; border-radius: 1rem; padding: 0.3rem 1.2rem; }
+  .two .plus { background: none; font-family: var(--head); font-size: 2rem; font-weight: 800; color: var(--orange); }
+  .opts { flex-direction: column; }
+  .choice { font-family: var(--read); font-size: 2.2rem; text-align: left; width: min(64rem, 92vw); }
+  .choice .and { color: var(--orange); }
+  .ex { font-family: var(--read); font-size: 1.6rem; background: #fff4cc; border-radius: 1rem; padding: 0.6rem 1.2rem; margin-bottom: 1rem; }
+  /* compact layout so the page fits one smartboard screen */
+  .ex { font-size: 1.3rem !important; padding: 0.4rem 1rem !important; }
+  .q .e { font-size: 3.4rem !important; }
+  .two { margin: 0.2rem 0 0.6rem !important; gap: 0.2rem !important; }
+  .two div { font-size: 1.9rem !important; }
+  .choice { font-size: 1.8rem !important; min-height: 4rem !important; padding: 0.4rem 1.2rem !important; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="ex">💡 I like to eat mangoes. + I don’t like to eat apples. → <b>I like to eat mangoes <span style="color:var(--orange)">but</span> I don’t like to eat apples.</b></div>
+  <p class="hint">Join the two sentences using <b>but</b>. Tap the right sentence.</p>
+  <div class="card" id="game" style="width:100%;max-width:80rem"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Join with "but"', subtitle: 'We are all Indians · Let us write · C', back: '../index.html#ch13' });
+
+/* o[0] is the right answer. */
+const ITEMS = [
+  { e: '🥭🍎', a: 'I like to eat mangoes.', b: 'I don’t like to eat apples.', o: ['I like to eat mangoes but I don’t like to eat apples.', 'I like to eat but mangoes apples.', 'I don’t like mangoes but I like apples.'] },
+  { e: '🥛☕', a: 'I like milk.', b: 'I don’t like tea.', o: ['I like milk but I don’t like tea.', 'I like tea but I don’t like milk.', 'I like milk but tea.'] },
+  { e: '👴💪', a: 'My grandfather is old.', b: 'He is strong.', o: ['My grandfather is old but he is strong.', 'My grandfather is strong but old is he.', 'He is old but my grandfather.'] },
+  { e: '🚪😴', a: 'I wanted to go out.', b: 'I was too tired.', o: ['I wanted to go out but I was too tired.', 'I was too tired but I wanted.', 'I wanted but to go out tired.'] },
+];
+const hi = (s) => s.replace(/\bbut\b/g, '<span class="and">but</span>');
+
+G.quiz({
+  el: G.$('#game'),
+  items: ITEMS,
+  shuffleItems: false,
+  question: (it) => `<div class="e">${it.e}</div><div class="two"><div>${it.a}</div><div class="plus">+ but +</div><div>${it.b}</div></div>`,
+  options: (it) => G.shuffle(it.o).map((x) => ({ label: hi(x), value: x })),
+  answer: (it) => it.o[0],
+  onShow: (it) => G.say(it.a + ' ' + it.b),
+  explain: (it) => `<b>${it.o[0]}</b>`,
+  endMsg: 'You can join sentences with “but”.',
+});
+</script>
+</body>
+</html>

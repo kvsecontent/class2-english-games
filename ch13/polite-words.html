@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; width: 100%; max-width: 110rem; }
+  .bird { background: #fff; border: 0.25rem solid var(--line); border-radius: 1.4rem; box-shadow: var(--shadow); padding: 0.6rem; display: flex; flex-direction: column; align-items: center; font-family: var(--read); font-size: 2rem; font-weight: 700; min-height: 15rem; justify-content: center; gap: 0.4rem; }
+  .bird .e { font-size: 5.4rem; line-height: 1.1; }
+  .q .e { font-size: 9rem; line-height: 1; }
+  .choice { font-family: var(--read); font-size: 2.2rem; }
+  @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mLearn">💬 Magic words</button>
+    <button class="big-btn orange" id="mQuiz">🎯 What do you say?</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'What Do You Say?', subtitle: 'We are all Indians · Let us speak · A', back: '../index.html#ch13' });
+
+/* The five situations from the book. */
+const ITEMS = [
+  { e: '🚪', t: 'You want to enter the classroom.', a: 'May I come in?' },
+  { e: '🚻', t: 'You want to visit the washroom.', a: 'May I go to the washroom, please?' },
+  { e: '📘', t: 'You want to borrow a book from your friend.', a: 'May I borrow your book, please?' },
+  { e: '🤕', t: 'You hurt someone by mistake.', a: 'I am sorry.' },
+  { e: '✏️', t: 'You need a pencil and your friend gives you a pencil.', a: 'Thank you!' },
+];
+const area = G.$('#area');
+function learn() {
+  area.innerHTML = `<p class="hint">These magic words make everyone happy. Tap a card and say it together!</p>
+    <div class="grid">${ITEMS.map((it) => `<button class="bird" data-a="${it.a}"><span class="e">${it.e}</span><small style="font-size:1.3rem;color:var(--muted)">${it.t}</small>${it.a}</button>`).join('')}</div>`;
+  G.$$('.bird').forEach((b) => (b.onclick = () => G.say(b.dataset.a)));
+}
+function quiz() {
+  area.innerHTML = `<p class="hint">What do you say when…?</p><div class="card" id="game" style="width:100%;max-width:80rem"></div>`;
+  G.quiz({
+    el: G.$('#game'),
+    items: ITEMS,
+    question: (it) => `<div class="e" style="font-size:6rem">${it.e}</div><div style="font-family:var(--read);font-size:2.6rem;margin:0.4rem 0 1rem">${it.t}</div>`,
+    options: (it) => G.shuffle([it, ...G.shuffle(ITEMS.filter((x) => x !== it)).slice(0, 2)]).map((x) => ({ label: x.a, value: x.a })),
+    answer: (it) => it.a,
+    onShow: (it) => G.say(it.t + ' What do you say?'),
+    endMsg: 'Please, Thank you, Sorry, May I… are magic words!',
+  });
+}
+G.$('#mLearn').onclick = learn;
+G.$('#mQuiz').onclick = quiz;
+learn();
+</script>
+</body>
+</html>
