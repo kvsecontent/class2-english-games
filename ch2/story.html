@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .story-wrap { display: grid; grid-template-columns: 1fr 22rem; gap: 1.4rem; align-items: start; }
+  .story { font-family: var(--read); font-size: 2.2rem; line-height: 1.6; }
+  .story h2 { font-family: var(--head); font-size: 3rem; margin: 0 0 0.6rem; color: var(--red); text-align: center; }
+  .page { margin: 0 0 1.2rem; padding: 0.6rem 1rem; border-radius: 1rem; display: grid; grid-template-columns: 7rem 1fr; gap: 1rem; align-items: start; }
+  .page .pic { font-size: 4.2rem; line-height: 1.2; text-align: center; }
+  .page.now { background: #fff4cc; }
+  .line { border-radius: 0.6rem; padding: 0 0.2rem; transition: background 0.2s; }
+  .line.now { background: #ffd34d; }
+  .w { cursor: pointer; border-radius: 0.4rem; }
+  .w:active { background: #cfe3ff; }
+  .show-tags .w.sight { background: #d9f7e8; color: #117a4a; font-weight: 700; }
+  .show-tags .w.new { background: #ffe1ec; color: #b4235a; font-weight: 700; }
+  .side { display: flex; flex-direction: column; gap: 0.8rem; position: sticky; top: 6rem; }
+  .side .big-btn { width: 100%; }
+  .key { font-size: 1.1rem; display: flex; flex-direction: column; gap: 0.4rem; }
+  .key span { padding: 0.2rem 0.6rem; border-radius: 0.5rem; display: inline-block; }
+  .side .pic { font-size: 5rem; text-align: center; }
+  @media (max-width: 900px) { .story-wrap { grid-template-columns: 1fr; } .side { position: static; } }
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="story-wrap">
+    <div class="card story" id="story"></div>
+    <div class="side">
+      <div class="pic">🏏</div>
+      <button class="big-btn green" id="readAll">▶ Read the story</button>
+      <button class="big-btn orange" id="echo">🗣️ My turn, your turn</button>
+      <button class="big-btn ghost" id="stop">⏹ Stop</button>
+      <button class="big-btn purple" id="tags">🎨 Show special words</button>
+      <div class="key card">
+        <b>Tap any word to hear it.</b>
+        <div><span style="background:#d9f7e8;color:#117a4a">Sight words</span> This, a, how, also, they, after, and, of</div>
+        <div><span style="background:#ffe1ec;color:#b4235a">New words</span> skipped, threw, brought, picked</div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Story Time: OUT! OUT!', subtitle: 'Let us read', back: '../index.html#ch2' });
+
+const PAGES = [
+  { pic: '🏖️<br>👧🏽👦🏽', lines: ['It was a holiday.', 'Jeet and Babli were playing.', 'They played many games.', 'Both of them skipped the rope.', 'They played hide and seek.'] },
+  { pic: '🏏<br>⚾', lines: ['Babli and Jeet decided to play ‘bat and ball’.', 'Jeet got ready to throw the ball.'] },
+  { pic: '🏡<br>🔒', lines: ['Jeet threw the ball.', 'Babli hit the ball.', 'The ball went into Mohit’s garden.', 'But his house was locked.', 'They could not find the ball.', 'So the game stopped.'] },
+  { pic: '🧶📰<br>🧵', lines: ['Babli knew how to make a ball.', 'They got a few rags, paper and wool.', 'Babli also brought a piece of string.', 'She rolled rags, paper and wool to make a ball.'] },
+  { pic: '🎾<br>😃', lines: ['Then she tied the ball with a string.', 'They liked the new ball.', 'The game started again.'] },
+  { pic: '🏏💥<br>🙌', lines: ['This time Babli picked the ball.', 'Jeet picked the bat.', 'Babli threw the ball.', 'Jeet hit the ball hard.', 'The ball opened up and scattered in the air!', 'Babli jumped and caught a piece of rag.', 'She jumped and shouted, “OUT! OUT!”'] },
+];
+const SIGHT = ['this', 'a', 'how', 'also', 'they', 'after', 'and', 'of'];
+const NEW = ['skipped', 'threw', 'courtyard', 'gathered', 'brought', 'picked'];
+
+const storyEl = G.$('#story');
+storyEl.innerHTML = '<h2>OUT! OUT!</h2>' + PAGES.map((p, s) => `<div class="page" data-s="${s}"><div class="pic">${p.pic}</div><div>` +
+  p.lines.map((ln) => `<span class="line">` + ln.split(' ').map((w) => {
+    const bare = w.toLowerCase().replace(/’s$/, '').replace(/[^a-z]/g, '');
+    const cls = SIGHT.includes(bare) ? 'sight' : NEW.includes(bare) ? 'new' : '';
+    return `<span class="w ${cls}" data-w="${bare}">${w}</span>`;
+  }).join(' ') + '</span>').join(' ') + '</div></div>').join('');
+
+storyEl.addEventListener('click', (e) => {
+  const w = e.target.closest('.w');
+  if (!w) return;
+  stopAll();
+  G.say(w.dataset.w, { rate: 0.7 });
+});
+
+const lines = G.$$('.line');
+let token = 0;
+function clearMarks() { G.$$('.now').forEach((e) => e.classList.remove('now')); }
+function stopAll() { token++; speechSynthesis.cancel(); clearMarks(); }
+
+function mark(i) {
+  clearMarks();
+  const ln = lines[i];
+  ln.classList.add('now');
+  ln.closest('.page').classList.add('now');
+  ln.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/* Read each sentence in turn. pauseMs > 0 leaves time for the class to repeat (echo reading). */
+function readFrom(i, pauseMs) {
+  const my = token;
+  if (i >= lines.length) { clearMarks(); if (pauseMs) { G.star(3); G.confetti(20); } return; }
+  mark(i);
+  G.say(lines[i].textContent, {
+    rate: 0.75,
+    onend: () => { if (my === token) setTimeout(() => readFrom(i + 1, pauseMs), pauseMs || 350); },
+  });
+}
+
+G.$('#readAll').onclick = () => { stopAll(); readFrom(0, 0); };
+G.$('#echo').onclick = () => { stopAll(); readFrom(0, 3200); };
+G.$('#stop').onclick = stopAll;
+G.$('#tags').onclick = () => storyEl.classList.toggle('show-tags');
+</script>
+</body>
+</html>

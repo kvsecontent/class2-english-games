@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1rem; width: 100%; max-width: 110rem; }
+  .gm { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; background: #fff; border: 0.25rem solid var(--line); border-radius: 1.4rem; padding: 0.8rem; box-shadow: var(--shadow); }
+  .gm .e { font-size: 5rem; line-height: 1.1; }
+  .gm b { font-size: 1.8rem; }
+  .gm em { font-style: normal; font-family: var(--read); font-size: 1.3rem; color: var(--muted); }
+  .gm.on { border-color: var(--yellow); background: #fff4cc; }
+  .ask { display: flex; flex-direction: column; gap: 0.8rem; width: 100%; max-width: 80rem; }
+  .ask .card { display: flex; align-items: center; gap: 1rem; text-align: left; }
+  .ask .card .e { font-size: 3.4rem; }
+  .ask .card .qq { font-family: var(--read); font-size: 2.2rem; font-weight: 700; flex: 1; }
+  .ask .card .st { display: block; font-size: 1.6rem; font-weight: 400; color: var(--muted); }
+  .ask .card.on { background: #fff4cc; border-color: var(--yellow); }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mAsk">👵 Ask your grandparents</button>
+    <button class="big-btn orange" id="mGames">🎲 Games of long ago</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+  <button class="big-btn green" id="told" style="margin-top:1rem">⭐ I told the class!</button>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Games of Long Ago', subtitle: 'OUT! OUT! · Let us do · B', back: '../index.html#ch2' });
+
+const QS = [
+  { e: '🎲', q: 'What game did you play as a child?', s: 'My grandmother played ________.' },
+  { e: '👫', q: 'Who did you play with?', s: 'She played with her ________.' },
+  { e: '📍', q: 'Where did you play?', s: 'She played in the ________.' },
+  { e: '🧺', q: 'What things did you need to play?', s: 'She needed a ________ and a ________.' },
+  { e: '📏', q: 'How do you play the game?', s: 'First you ________. Then you ________.' },
+];
+const GAMES = [
+  { e: '🪵', n: 'Gilli-danda', d: 'Hit a small stick with a big stick.' },
+  { e: '🛞', n: 'Tyre and stick', d: 'Run after an old tyre with a stick.' },
+  { e: '🔮', n: 'Marbles', d: 'Hit a marble with another marble.' },
+  { e: '🪀', n: 'Spinning top', d: 'Wind a string and spin the top.' },
+  { e: '🔢', n: 'Hopscotch', d: 'Hop on one leg in the boxes.' },
+  { e: '🪨', n: 'Five stones', d: 'Throw a stone up and pick the others.' },
+  { e: '🏃', n: 'Kho-kho', d: 'Run and catch in a team.' },
+  { e: '🤼', n: 'Kabaddi', d: 'Touch a player and run back in one breath.' },
+  { e: '🪢', n: 'Skipping rope', d: 'Jump over the rope.' },
+  { e: '🙈', n: 'Hide and seek', d: 'Hide! Your friend comes to find you.' },
+];
+const area = G.$('#area');
+
+function ask() {
+  area.innerHTML = `<p class="hint">Ask your grandparents or parents these questions at home. Tomorrow, tell the class!</p>
+    <div class="ask">${QS.map((q, i) => `<button class="card" data-i="${i}"><span class="e">${q.e}</span>
+      <span class="qq">${q.q}<span class="st">💬 ${q.s}</span></span></button>`).join('')}</div>`;
+  G.$$('.ask .card').forEach((b) => (b.onclick = () => {
+    G.$$('.ask .card').forEach((x) => x.classList.toggle('on', x === b));
+    G.say(QS[b.dataset.i].q);
+  }));
+}
+
+function games() {
+  area.innerHTML = `<p class="hint">Did your grandparents play any of these games? Tap a game to hear about it.</p>
+    <div class="grid">${GAMES.map((g, i) => `<button class="gm" data-i="${i}"><span class="e">${g.e}</span><b>${g.n}</b><em>${g.d}</em></button>`).join('')}</div>`;
+  G.$$('.gm').forEach((b) => (b.onclick = () => {
+    G.$$('.gm').forEach((x) => x.classList.toggle('on', x === b));
+    const g = GAMES[b.dataset.i];
+    G.say(g.n + '. ' + g.d);
+  }));
+}
+
+G.$('#mAsk').onclick = ask;
+G.$('#mGames').onclick = games;
+G.$('#told').onclick = () => { G.star(2); G.sfx('win'); G.confetti(20); G.say('Thank you for telling us about the game!'); };
+ask();
+</script>
+</body>
+</html>

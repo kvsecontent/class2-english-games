@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .table { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; width: 100%; max-width: 80rem; }
+  .tile { background: #fff; border: 0.25rem solid var(--line); border-radius: 1.4rem; box-shadow: var(--shadow);
+    padding: 0.8rem; display: flex; flex-direction: column; align-items: center; font-family: var(--read); font-size: 2.4rem; }
+  .tile .e { font-size: 6rem; line-height: 1.1; height: 7rem; display: flex; align-items: center; }
+  .tile .e svg { height: 6rem; }
+  .tile b { color: var(--orange); }
+  .tile.an b { color: var(--purple); }
+  .rule { font-size: 1.6rem; font-weight: 700; margin: 1rem 0; }
+  .rule .v { color: var(--purple); font-size: 2rem; }
+  .q .e { font-size: 10rem; line-height: 1; height: 11rem; display: flex; align-items: center; justify-content: center; }
+  .q .e svg { height: 9rem; }
+  .q .sent { font-family: var(--read); font-size: 3.4rem; margin: 0.4rem 0 1.2rem; }
+  .q .sent .blank { display: inline-block; min-width: 4.5rem; border-bottom: 0.3rem dashed var(--orange); color: var(--orange); }
+  .q .sent .first { color: var(--purple); text-decoration: underline; }
+  .choice { font-family: var(--read); font-size: 3rem; min-width: 10rem; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mRead">📖 Read the words</button>
+    <button class="big-btn orange" id="mGame">🎯 a or an?</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'a or an?', subtitle: 'OUT! OUT! · Vowel sound "e" as in pen', back: '../index.html#ch2' });
+
+const WELL = `<svg viewBox="0 0 200 200"><path d="M40 60 H160 M50 60 V120 M150 60 V120" stroke="#8b5a2b" stroke-width="10" stroke-linecap="round"/>
+  <path d="M30 60 L100 20 L170 60 Z" fill="#e63946"/><line x1="100" y1="60" x2="100" y2="105" stroke="#555" stroke-width="3"/>
+  <rect x="88" y="105" width="24" height="20" rx="3" fill="#9aa0ad"/>
+  <rect x="30" y="120" width="140" height="60" rx="8" fill="#b0b6c3" stroke="#6b6280" stroke-width="4"/>
+  <path d="M30 140 H170 M30 160 H170 M75 120 V140 M125 120 V140 M55 140 V160 M100 140 V160 M145 140 V160 M75 160 V180 M125 160 V180" stroke="#6b6280" stroke-width="3"/></svg>`;
+const BOOK = [
+  { w: 'egg', e: '🥚' }, { w: 'engine', e: '🚂' }, { w: 'elephant', e: '🐘' },
+  { w: 'pen', e: '🖊️' }, { w: 'pencil', e: '✏️' }, { w: 'bell', e: '🔔' },
+  { w: 'kettle', e: '🫖' }, { w: 'hen', e: '🐔' }, { w: 'well', e: WELL },
+];
+const EXTRA = [{ w: 'envelope', e: '✉️' }, { w: 'net', e: '🥅' }, { w: 'bed', e: '🛏️' }, { w: 'tent', e: '⛺' }, { w: 'apple', e: '🍎' }, { w: 'ant', e: '🐜' }];
+const art = (w) => (/^[aeiou]/.test(w) ? 'an' : 'a');
+const area = G.$('#area');
+
+function read() {
+  area.innerHTML = `<p class="hint">Tap a picture to hear it.</p>
+    <div class="table">${BOOK.map((x) => `<button class="tile ${art(x.w)}" data-w="${x.w}"><span class="e">${x.e}</span><span><b>${art(x.w)}</b> ${x.w}</span></button>`).join('')}</div>
+    <div class="rule">💡 We say <b class="v">an</b> before words that begin with <b class="v">a, e, i, o, u</b>: an egg, an engine, an elephant.</div>`;
+  G.$$('.tile', area).forEach((t) => (t.onclick = () => G.say(art(t.dataset.w) + ' ' + t.dataset.w)));
+}
+
+function game() {
+  area.innerHTML = `<div class="card" id="game" style="width:100%;max-width:70rem"></div>
+    <div class="rule">💡 <b class="v">an</b> comes before <b class="v">a, e, i, o, u</b> words.</div>`;
+  G.quiz({
+    el: G.$('#game'),
+    items: [...BOOK, ...EXTRA],
+    question: (it) => `<div class="e">${it.e}</div>
+      <div class="sent"><span class="blank">&nbsp;?&nbsp;</span> <span class="first">${it.w[0]}</span>${it.w.slice(1)}</div>`,
+    options: () => [{ label: 'a', value: 'a' }, { label: 'an', value: 'an' }],
+    answer: (it) => art(it.w),
+    onShow: (it, el) => {
+      G.say(it.w);
+      G.$$('.choice', el).forEach((b) => b.addEventListener('click', () => {
+        if (b.classList.contains('right')) G.$('.blank', el).textContent = art(it.w);
+      }));
+    },
+    explain: (it) => `${art(it.w)} ${it.w}`,
+    endMsg: 'You know the e sound and when to use a and an!',
+  });
+}
+
+G.$('#mRead').onclick = read;
+G.$('#mGame').onclick = game;
+read();
+</script>
+</body>
+</html>

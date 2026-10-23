@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .train { display: flex; align-items: flex-end; justify-content: center; gap: 0.5rem; margin: 1rem 0 0.4rem; }
+  .engine { font-size: 8rem; line-height: 1; }
+  .coach {
+    width: 10rem; height: 9rem; border-radius: 1.2rem 1.2rem 0.6rem 0.6rem; position: relative;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--read); font-size: 5rem; font-weight: 700; color: #fff;
+  }
+  .coach::before, .coach::after { content: ''; position: absolute; bottom: -1.4rem; width: 2.4rem; height: 2.4rem; border-radius: 50%; background: #333; border: 0.4rem solid #999; }
+  .coach::before { left: 1rem; } .coach::after { right: 1rem; }
+  .coach.empty { background: #fff; border: 0.35rem dashed var(--orange); color: var(--orange); }
+  .track { height: 0.6rem; background: repeating-linear-gradient(90deg, #6b4f3a 0 2rem, transparent 2rem 3rem); width: 70%; margin: 1.6rem auto 1rem; border-top: 0.3rem solid #888; }
+  .pic { font-size: 7rem; line-height: 1; }
+  .choice { font-family: var(--read); font-size: 3.4rem; min-width: 7rem; }
+  .moving { animation: chug 1.4s ease-in forwards; }
+  @keyframes chug { to { transform: translateX(-110vw); } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Look at the picture. Which letter comes first? Fill the train!</p>
+  <div class="card center" style="width:100%;max-width:80rem;overflow:hidden">
+    <div class="progress" id="pg"></div>
+    <div class="pic" id="pic"></div>
+    <div class="train" id="train"></div>
+    <div class="track"></div>
+    <div class="row" id="opts"></div>
+    <div class="feedback" id="fb"></div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Word Train', subtitle: 'OUT! OUT! · Sound "e" word families', back: '../index.html#ch2' });
+
+const WORDS = [
+  { w: 'hen', e: '🐔' }, { w: 'pen', e: '🖊️' }, { w: 'ten', e: '🔟' }, { w: 'men', e: '👨‍👨‍👦' },
+  { w: 'bed', e: '🛏️' }, { w: 'red', e: '🟥' }, { w: 'jet', e: '✈️' }, { w: 'net', e: '🥅' },
+  { w: 'pet', e: '🐶' }, { w: 'wet', e: '💦' }, { w: 'leg', e: '🦵' }, { w: 'web', e: '🕸️' },
+];
+const LETTERS = 'bhjlmnprtw'.split('');
+const COLS = ['#e63946', '#2f7de1', '#2bb673'];
+let list, i, firstTry;
+
+function start() { list = G.shuffle(WORDS).slice(0, 8); i = 0; round(); }
+function round() {
+  if (i >= list.length) { G.end({ title: 'Choo choo!', msg: 'You made lots of words with the "e" sound.', onReplay: start }); return; }
+  const it = list[i];
+  firstTry = true;
+  G.progress(G.$('#pg'), i, list.length);
+  G.$('#pic').textContent = it.e;
+  G.$('#fb').textContent = '';
+  const train = G.$('#train');
+  train.className = 'train';
+  train.innerHTML = `<span class="engine">🚂</span>` +
+    `<div class="coach empty">?</div>` +
+    it.w.slice(1).split('').map((ch, k) => `<div class="coach" style="background:${COLS[k + 1]}">${ch}</div>`).join('');
+  // engine faces left in most fonts, so the coaches follow behind it
+  const opts = G.shuffle([it.w[0], ...G.shuffle(LETTERS.filter((l) => l !== it.w[0] && !WORDS.some((x) => x.w === l + it.w.slice(1) && x !== it))).slice(0, 2)]);
+  const box = G.$('#opts');
+  box.innerHTML = '';
+  opts.forEach((l) => {
+    const b = document.createElement('button');
+    b.className = 'choice';
+    b.textContent = l;
+    b.onclick = () => pick(b, l, it);
+    box.append(b);
+  });
+  G.say('-' + it.w.slice(1) + '. Make the word ' + it.w);
+}
+function pick(b, l, it) {
+  if (l === it.w[0]) {
+    b.classList.add('right');
+    G.$$('.choice').forEach((x) => (x.disabled = true));
+    const c = G.$('.coach.empty');
+    c.classList.remove('empty');
+    c.style.background = COLS[0];
+    c.textContent = l;
+    if (firstTry) G.star();
+    G.sfx('good');
+    G.feedback(G.$('#fb'), true, `🎉 ${it.w[0]} + ${it.w.slice(1)} = <b>${it.w}</b>`);
+    G.say(`${it.w}`);
+    setTimeout(() => G.$('#train').classList.add('moving'), 1300);
+    i++;
+    setTimeout(round, 2900);
+  } else {
+    firstTry = false;
+    b.classList.add('wrong');
+    G.sfx('bad');
+    G.feedback(G.$('#fb'), false, `🙂 ${l}${it.w.slice(1)}? Try again!`);
+    setTimeout(() => b.classList.remove('wrong'), 500);
+  }
+}
+start();
+</script>
+</body>
+</html>

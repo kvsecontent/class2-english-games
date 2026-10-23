@@ -108,7 +108,43 @@ const CHAPTERS = [
       ]},
     ],
   },
-  ...Array.from({ length: 12 }, (_, i) => ({ n: i + 2, title: 'Coming soon', sections: [] })),
+  {
+    n: 2, unit: 'Unit 1 · Fun with Friends', title: 'OUT! OUT!',
+    sections: [
+      { key: 'speak', name: '🖼️ Picture reading', games: [
+        { href: 'ch2/picture-talk.html', ic: '🙈', t: 'Picture Talk', d: 'Find the hiding children. What do you see?' },
+      ]},
+      { key: 'recite', name: '📖 Let us read', games: [
+        { href: 'ch2/story.html', ic: '🏏', t: 'Story Time', d: 'Listen, read and say "OUT! OUT!"' },
+        { href: 'ch2/true-false.html', ic: '✅', t: 'Tick or Cross', d: 'Is it right? Check the story' },
+      ]},
+      { key: 'read', name: '👀 Words', games: [
+        { href: 'ch2/sight-words.html', ic: '🎈', t: 'Pop the Sight Word', d: 'This · a · how · also · they · after · and · of' },
+        { href: 'ch2/new-words.html', ic: '🃏', t: 'New Word Cards', d: 'skipped · threw · courtyard · gathered …' },
+      ]},
+      { key: 'speak', name: '🗣️ Let us speak', games: [
+        { href: 'ch2/talk-wheel.html', ic: '🎡', t: 'Talk Wheel', d: 'Spin and answer: What games do you play?' },
+        { href: 'ch2/story-order.html', ic: '🔢', t: 'Story in Order', d: 'Number the sentences in the right order' },
+      ]},
+      { key: 'read', name: '🔤 Sound "e" (a / an)', games: [
+        { href: 'ch2/a-or-an.html', ic: '🥚', t: 'a or an?', d: 'an egg · an engine · a pen · a hen' },
+        { href: 'ch2/word-train.html', ic: '🚂', t: 'Word Train', d: 'Make words: h + en = hen' },
+      ]},
+      { key: 'write', name: '✏️ Let us write', games: [
+        { href: 'ch2/names-things.html', ic: '🧶', t: 'Names and Things', d: 'Children in the story · things to make a ball' },
+        { href: 'ch2/opposites.html', ic: '↕️', t: 'Opposites', d: 'up – down · hot – cold · small – big' },
+        { href: 'ch2/join-and.html', ic: '🔗', t: 'Join with "and"', d: 'The cat and the dog sat on the mat.' },
+      ]},
+      { key: 'think', name: '🎭 Let us do', games: [
+        { href: 'ch2/act-it-out.html', ic: '🎭', t: 'Act It Out', d: 'Be Babli and Jeet – act the story' },
+        { href: 'ch2/old-games.html', ic: '👵', t: 'Games of Long Ago', d: 'Ask grandparents about their games' },
+      ]},
+      { key: 'play', name: '🏁 Class challenge', games: [
+        { href: 'ch2/ball-race.html', ic: '🏆', t: 'Bat and Ball Race', d: 'Team A vs Team B – whole chapter quiz' },
+      ]},
+    ],
+  },
+  ...Array.from({ length: 11 }, (_, i) => ({ n: i + 3, title: 'Coming soon', sections: [] })),
 ];
 
 const tabs = document.getElementById('tabs');

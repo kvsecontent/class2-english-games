@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .q .e { font-size: 7rem; line-height: 1; }
+  .q .st { font-family: var(--read); font-size: 3rem; margin: 0.6rem 0 1.4rem; }
+  .choice { font-size: 5rem; min-width: 12rem; min-height: 9rem; }
+  .choice.tick { color: var(--green); }
+  .choice.cross { color: var(--red); }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Is the sentence correct? Tap ✓ for correct and ✘ for incorrect.</p>
+  <div class="card" id="game" style="width:100%;max-width:76rem"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Tick or Cross', subtitle: 'OUT! OUT! · Story check', back: '../index.html#ch2' });
+
+const ITEMS = [
+  { e: '🏖️', s: 'It was a school day.', ok: false, fix: 'It was a <b>holiday</b>.' },
+  { e: '🪢', s: 'Jeet and Babli skipped the rope.', ok: true, fix: 'Both of them skipped the rope.' },
+  { e: '🏡', s: 'The ball went into Mohit’s garden.', ok: true, fix: 'Yes, into Mohit’s garden.' },
+  { e: '🔒', s: 'Mohit’s house was open.', ok: false, fix: 'His house was <b>locked</b>.' },
+  { e: '🧶', s: 'Babli made a ball with rags, paper and wool.', ok: true, fix: 'She rolled rags, paper and wool.' },
+  { e: '🎀', s: 'Babli tied the ball with a ribbon.', ok: false, fix: 'She tied it with a <b>string</b>.' },
+  { e: '🏏', s: 'This time Jeet picked the bat.', ok: true, fix: 'Babli picked the ball. Jeet picked the bat.' },
+  { e: '🙌', s: 'Jeet caught a piece of rag.', ok: false, fix: '<b>Babli</b> caught a piece of rag.' },
+];
+
+G.quiz({
+  el: G.$('#game'),
+  items: ITEMS,
+  shuffleItems: false,
+  question: (it) => `<div class="e">${it.e}</div><div class="st">${it.s}</div>`,
+  options: () => [{ label: '✓', value: true }, { label: '✘', value: false }],
+  answer: (it) => it.ok,
+  onShow: (it, el) => {
+    const [t, c] = G.$$('.choice', el);
+    t.classList.add('tick'); c.classList.add('cross');
+    G.say(it.s);
+  },
+  explain: (it) => it.fix,
+  endMsg: 'You checked all the sentences!',
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .pairs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem 1.6rem; width: 100%; max-width: 100rem; }
+  .pair { display: flex; align-items: center; gap: 0.8rem; background: #fff; border: 0.25rem solid var(--line); border-radius: 1.4rem; padding: 0.6rem 1rem; box-shadow: var(--shadow); font-family: var(--read); font-size: 2.6rem; font-weight: 700; }
+  .pair .n { font-family: var(--head); background: var(--purple); color: #fff; border-radius: 50%; width: 3rem; height: 3rem; display: inline-flex; align-items: center; justify-content: center; font-size: 1.6rem; flex: none; }
+  .pair .e { font-size: 3rem; }
+  .pair .arrow { color: var(--muted); }
+  .gap { display: inline-flex; align-items: center; justify-content: center; min-width: 9rem; height: 4.6rem; border-radius: 0.8rem; padding: 0 0.6rem;
+    border: 0.25rem dashed var(--orange); background: #fffaf0; color: var(--orange); }
+  .gap.filled { border-style: solid; border-color: var(--green); background: #d9f7e8; color: #117a4a; animation: pop 0.35s; }
+  .gap.nope { border-color: var(--red); background: #ffe1e3; animation: shake 0.4s; }
+  .bank { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 1.6rem 0 0.4rem; }
+  .chip { border: 0; border-radius: 1rem; background: var(--blue); color: #fff; font-family: var(--read); font-size: 2.4rem; font-weight: 700;
+    padding: 0.5rem 1.4rem; min-height: 4.4rem; box-shadow: 0 0.35rem 0 rgba(0, 0, 0, 0.2); }
+  .chip.used { visibility: hidden; }
+  .q .e { font-size: 7rem; line-height: 1; }
+  .q .t { font-family: var(--read); font-size: 3rem; margin: 0.4rem 0 1.2rem; }
+  .q .t b { color: var(--purple); }
+  .choice { font-family: var(--read); font-size: 2.8rem; }
+  @media (max-width: 900px) { .pairs { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mMatch">🔗 Match the opposites</button>
+    <button class="big-btn orange" id="mQuiz">🎯 Opposite quiz</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Opposites', subtitle: 'OUT! OUT! · Let us write · B', back: '../index.html#ch2' });
+
+const PAIRS = [
+  { a: 'up', b: 'down', e: '⬆️⬇️' },
+  { a: 'in', b: 'out', e: '📥📤' },
+  { a: 'open', b: 'close', e: '📖📕' },
+  { a: 'fat', b: 'thin', e: '🐷🦒' },
+  { a: 'hot', b: 'cold', e: '☕🧊' },
+  { a: 'small', b: 'big', e: '🐭🐘' },
+];
+const area = G.$('#area');
+
+function match() {
+  let done = 0;
+  area.innerHTML = `<p class="hint">Write the opposite. Drag a word to the gap (or tap the word, then tap the gap). One has been done for you.</p>
+    <div class="pairs">${PAIRS.map((p, i) => `<div class="pair"><span class="n">${i + 1}</span><span class="e">${p.e}</span>
+      <span>${p.a}</span><span class="arrow">↔</span>
+      <span class="gap ${i ? '' : 'filled'}" data-b="${p.b}">${i ? '?' : p.b}</span>
+      <button class="say" data-i="${i}">🔊</button></div>`).join('')}</div>
+    <div class="bank">${G.shuffle(PAIRS.slice(1)).map((p) => `<button class="chip" data-w="${p.b}">${p.b}</button>`).join('')}</div>
+    <div class="feedback" id="fb"></div>`;
+  G.$$('.say[data-i]').forEach((b) => (b.onclick = () => { const p = PAIRS[b.dataset.i]; G.say(`${p.a}. The opposite of ${p.a} is ${p.b}.`); }));
+  G.$$('.chip').forEach((c) => c.addEventListener('click', () => G.say(c.dataset.w)));
+  G.tapDrag(G.$$('.chip'), G.$$('.gap:not(.filled)'), (chip, gap) => {
+    if (gap.classList.contains('filled')) return;
+    if (chip.dataset.w === gap.dataset.b) {
+      gap.classList.add('filled');
+      gap.textContent = chip.dataset.w;
+      chip.classList.add('used');
+      chip.dataset.locked = 1;
+      G.sfx('good');
+      G.star();
+      const p = PAIRS.find((x) => x.b === chip.dataset.w);
+      G.say(`${p.a}, ${p.b}`);
+      if (++done === PAIRS.length - 1) setTimeout(() => G.end({ title: 'Well done!', msg: 'You know all the opposites.', onReplay: match }), 1800);
+    } else {
+      gap.classList.add('nope');
+      G.sfx('bad');
+      G.feedback(G.$('#fb'), false, '🙂 Try again!');
+      setTimeout(() => gap.classList.remove('nope'), 500);
+    }
+  });
+}
+
+function quiz() {
+  const items = PAIRS.flatMap((p) => [{ w: p.a, o: p.b, e: p.e }, { w: p.b, o: p.a, e: p.e }]);
+  const all = items.map((x) => x.w);
+  area.innerHTML = `<div class="card" id="game" style="width:100%;max-width:70rem"></div>`;
+  G.quiz({
+    el: G.$('#game'),
+    items: G.shuffle(items).slice(0, 8),
+    question: (it) => `<div class="e">${it.e}</div><div class="t">What is the opposite of <b>${it.w}</b>?</div>`,
+    options: (it) => G.shuffle([it.o, ...G.shuffle(all.filter((x) => x !== it.o && x !== it.w)).slice(0, 2)]).map((x) => ({ label: x, value: x })),
+    answer: (it) => it.o,
+    onShow: (it) => G.say('What is the opposite of ' + it.w + '?'),
+    explain: (it) => `The opposite of ${it.w} is <b>${it.o}</b>.`,
+    endMsg: 'You are an opposites star!',
+  });
+}
+
+G.$('#mMatch').onclick = match;
+G.$('#mQuiz').onclick = quiz;
+match();
+</script>
+</body>
+</html>

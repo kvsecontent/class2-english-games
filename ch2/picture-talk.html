@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .wrap { display: grid; grid-template-columns: 1fr 26rem; gap: 1.2rem; align-items: start; }
+  .scene { position: relative; height: calc(100vh - 10rem); min-height: 28rem; border-radius: var(--radius); overflow: hidden;
+    background: linear-gradient(#bfe6ff 0 30%, #9be38a 30% 100%); border: 0.25rem solid var(--line); }
+  .scene .deco { position: absolute; line-height: 1; pointer-events: none; }
+  .spot { position: absolute; border: 0; background: none; padding: 0; line-height: 1; transform: translate(-50%, -50%); }
+  .spot .cover { font-size: 8rem; display: block; transition: transform 0.4s; }
+  .spot .kid { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0); font-size: 5rem; transition: transform 0.4s; }
+  .spot.found .cover { transform: translateX(-3.5rem) scale(0.8); }
+  .spot.found .kid { transform: translate(10%, -60%) scale(1); }
+  .spot.empty.found .cover { animation: shake 0.4s; transform: none; }
+  .count { position: absolute; left: 1rem; top: 1rem; background: #fff; border-radius: 1rem; padding: 0.4rem 1.2rem; font-size: 1.8rem; font-weight: 800; box-shadow: var(--shadow); }
+  .side { display: flex; flex-direction: column; gap: 0.6rem; }
+  .qbtn { text-align: left; font-family: var(--read); font-size: 1.35rem; font-weight: 700; display: flex; gap: 0.6rem; align-items: center; padding: 0.35rem 0.9rem; }
+  .qbtn span { font-size: 1.9rem; }
+  .qbtn.on { background: #fff4cc; border-color: var(--yellow); }
+  .starter { font-family: var(--read); font-size: 1.35rem; background: #e7f1ff; border-radius: 1rem; padding: 0.6rem 1rem; min-height: 3.4rem; }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <div class="scene" id="scene">
+      <span class="deco" style="left:44%;top:5%;font-size:6rem">🏫</span>
+      <span class="deco" style="left:84%;top:3%;font-size:5rem">☀️</span>
+      <span class="deco" style="left:32%;top:6%;font-size:4rem">☁️</span>
+      <span class="deco" style="left:30%;top:58%;font-size:4.5rem">👧🏽🪨👦🏽</span>
+      <span class="deco" style="left:62%;top:66%;font-size:3rem">👟👟</span>
+      <div class="count">🙈 Found: <span id="found">0</span> / <span id="total">0</span></div>
+    </div>
+    <div class="side">
+      <div class="prompt" style="font-size:1.4rem;margin:0">🔍 Children are hiding! Tap the trees, bushes and door.</div>
+      <button class="card qbtn" data-q="What do you see?" data-s="I see children playing in a school ground."><span>👀</span> What do you see?</button>
+      <button class="card qbtn" data-q="How many children are there in the picture?" data-s="There are ____ children in the picture."><span>🔢</span> How many children?</button>
+      <button class="card qbtn" data-q="What are the children doing?" data-s="The children are playing hide and seek."><span>🙈</span> What are they doing?</button>
+      <button class="card qbtn" data-q="How are children having fun?" data-s="They are running, hiding and playing with stones."><span>😄</span> How are they having fun?</button>
+      <button class="card qbtn" data-q="What games do you play?" data-s="I play ____ with my friends."><span>⚽</span> What games do you play?</button>
+      <div class="starter" id="starter">💬 Tap a question. Answer in English.</div>
+      <button class="big-btn green" id="good">⭐ Good answer!</button>
+    </div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Picture Talk', subtitle: 'OUT! OUT! · Picture reading', back: '../index.html#ch2' });
+
+/* Hiding places in the playground. kid: '' means nobody is hiding there. */
+const SPOTS = [
+  { x: 18, y: 45, c: '🌳', k: '🧒🏽' },
+  { x: 48, y: 40, c: '🌳', k: '' },
+  { x: 86, y: 42, c: '🌳', k: '👧🏽' },
+  { x: 14, y: 82, c: '🌿', k: '👦🏽' },
+  { x: 50, y: 85, c: '🌿', k: '' },
+  { x: 82, y: 82, c: '🌿', k: '👧🏻' },
+  { x: 73, y: 21, c: '🚪', k: '👦🏻' },
+];
+const scene = G.$('#scene');
+let found = 0;
+const total = SPOTS.filter((s) => s.k).length;
+G.$('#total').textContent = total;
+
+SPOTS.forEach((s) => {
+  const b = document.createElement('button');
+  b.className = 'spot' + (s.k ? '' : ' empty');
+  b.style.left = s.x + '%';
+  b.style.top = s.y + '%';
+  b.innerHTML = `<span class="kid">${s.k}</span><span class="cover">${s.c}</span>`;
+  b.onclick = () => {
+    if (!s.k) { b.classList.add('found'); G.sfx('bad'); G.say('Nobody here!'); setTimeout(() => b.classList.remove('found'), 500); return; }
+    if (b.classList.contains('found')) return;
+    b.classList.add('found');
+    found++;
+    G.$('#found').textContent = found;
+    G.sfx('good'); G.star();
+    if (found === total) { G.say('You found all the hiding children! They are playing hide and seek.'); G.confetti(20); }
+    else G.say('Found you!');
+  };
+  scene.append(b);
+});
+
+G.$$('.qbtn').forEach((b) => (b.onclick = () => {
+  G.$$('.qbtn').forEach((x) => x.classList.toggle('on', x === b));
+  G.$('#starter').textContent = '💬 ' + b.dataset.s;
+  G.say(b.dataset.q);
+}));
+G.$('#good').onclick = () => { G.star(); G.sfx('good'); G.confetti(12); };
+</script>
+</body>
+</html>

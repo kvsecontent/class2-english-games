@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .q .e { font-size: 5rem; line-height: 1; }
+  .two { display: flex; flex-direction: column; gap: 0.5rem; align-items: center; margin: 0.6rem 0 1rem; }
+  .two div { font-family: var(--read); font-size: 2.4rem; background: #f4f0ff; border-radius: 1rem; padding: 0.3rem 1.2rem; }
+  .two .plus { background: none; font-family: var(--head); font-size: 2rem; font-weight: 800; color: var(--orange); }
+  .opts { flex-direction: column; }
+  .choice { font-family: var(--read); font-size: 2.2rem; text-align: left; width: min(64rem, 92vw); }
+  .choice .and { color: var(--orange); }
+  .ex { font-family: var(--read); font-size: 1.6rem; background: #fff4cc; border-radius: 1rem; padding: 0.6rem 1.2rem; margin-bottom: 1rem; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="ex">💡 Suresh went to school. + Gopal went to school. → <b>Suresh <span style="color:var(--orange)">and</span> Gopal went to school.</b></div>
+  <p class="hint">Join the two sentences using <b>and</b>. Tap the right sentence.</p>
+  <div class="card" id="game" style="width:100%;max-width:80rem"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Join with "and"', subtitle: 'OUT! OUT! · Let us write · C', back: '../index.html#ch2' });
+
+/* o[0] is the right answer. */
+const ITEMS = [
+  { e: '🏫', a: 'Suresh went to school.', b: 'Gopal went to school.', o: ['Suresh and Gopal went to school.', 'Suresh went to school and school.', 'Gopal and went to school.'] },
+  { e: '🥭🍇', a: 'I like to eat mangoes.', b: 'I like to eat grapes.', o: ['I like to eat mangoes and grapes.', 'I like and to eat grapes.', 'I like to eat mangoes and mangoes.'] },
+  { e: '🐈🐕', a: 'The cat sat on the mat.', b: 'The dog sat on the mat.', o: ['The cat and the dog sat on the mat.', 'The cat sat and on the mat.', 'The dog sat on the mat and the mat.'] },
+  { e: '🟡🟢', a: 'This ball has yellow dots on it.', b: 'This ball also has green dots on it.', o: ['This ball has yellow and green dots on it.', 'This ball and has yellow dots on it.', 'This ball has yellow dots and on it.'] },
+  { e: '🪑', a: 'There are tables in my classroom.', b: 'There are chairs in my classroom.', o: ['There are tables and chairs in my classroom.', 'There are tables in and my classroom.', 'There are chairs and in my classroom.'] },
+];
+const hi = (s) => s.replace(/\band\b/g, '<span class="and">and</span>');
+
+G.quiz({
+  el: G.$('#game'),
+  items: ITEMS,
+  shuffleItems: false,
+  question: (it) => `<div class="e">${it.e}</div><div class="two"><div>${it.a}</div><div class="plus">+ and +</div><div>${it.b}</div></div>`,
+  options: (it) => G.shuffle(it.o).map((x) => ({ label: hi(x), value: x })),
+  answer: (it) => it.o[0],
+  onShow: (it) => G.say(it.a + ' ' + it.b),
+  explain: (it) => `<b>${it.o[0]}</b>`,
+  endMsg: 'You can join sentences with “and”.',
+});
+</script>
+</body>
+</html>
