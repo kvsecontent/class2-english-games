@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .bins { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; width: 100%; max-width: 110rem; }
+  .bin { min-height: 19rem; border-radius: var(--radius); border: 0.3rem dashed var(--line); padding: 0.8rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+  .bin h3 { margin: 0; font-family: var(--read); font-size: 4rem; }
+  .bin.land { background: #f3ead9; border-color: #b07a3c; } .bin.air { background: #e6f4ff; border-color: var(--blue); } .bin.water { background: #e0f7f6; border-color: var(--teal); }
+  .bin .got { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+  .bin .got span { font-family: var(--read); font-size: 1.7rem; font-weight: 700; background: #fff; border-radius: 0.8rem; padding: 0.2rem 0.8rem; animation: pop 0.35s; }
+  .bin.nope { animation: shake 0.4s; box-shadow: 0 0 0 0.3rem var(--red); }
+  .bank { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; margin: 1.2rem 0 0.4rem; max-width: 110rem; }
+  .chip { border: 0; border-radius: 1rem; background: var(--purple); color: #fff; font-family: var(--read); font-size: 2rem; font-weight: 700;
+    padding: 0.4rem 1.1rem; min-height: 4.2rem; box-shadow: 0 0.35rem 0 rgba(0, 0, 0, 0.2); }
+  .chip.used { visibility: hidden; }
+  @media (max-width: 900px) { .bins { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Read the words. Does it start with <b>fl</b> or <b>cl</b>? Drag each word to the right box (or tap it, then tap the box). Tap a word to hear it.</p>
+  <div class="bins">
+    <div class="bin air" id="fl"><h3>fl</h3><div class="got"></div></div>
+    <div class="bin land" id="cl"><h3>cl</h3><div class="got"></div></div>
+  </div>
+  <div class="bank" id="bank"></div>
+  <div class="feedback" id="fb"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'fl or cl?', subtitle: 'The Smart Monkey · Let us speak · Blends', back: '../index.html#ch11' });
+
+/* The first six words are from the book. */
+const ITEMS = [
+  { w: 'flag', e: '🚩', b: 'fl' }, { w: 'flower', e: '🌸', b: 'fl' }, { w: 'floor', e: '🧹', b: 'fl' },
+  { w: 'cloud', e: '☁️', b: 'cl' }, { w: 'clap', e: '👏', b: 'cl' }, { w: 'clock', e: '🕰️', b: 'cl' },
+  { w: 'fly', e: '🪰', b: 'fl' }, { w: 'flute', e: '🪈', b: 'fl' }, { w: 'clown', e: '🤡', b: 'cl' }, { w: 'climb', e: '🧗', b: 'cl' },
+];
+const art = (w) => (/^[aeiou]/.test(w) ? 'an ' : 'a ') + w;
+
+function build() {
+  let done = 0;
+  G.$$('.got').forEach((g) => (g.innerHTML = ''));
+  G.$('#fb').textContent = '';
+  G.$('#bank').innerHTML = G.shuffle(ITEMS).map((x) => `<button class="chip" data-w="${x.w}" data-b="${x.b}">${x.e} ${x.w}</button>`).join('');
+  G.$$('.chip').forEach((c) => c.addEventListener('click', () => G.say(c.dataset.w)));
+  G.tapDrag(G.$$('.chip'), G.$$('.bin'), (chip, bin) => {
+    if (chip.dataset.b === bin.id) {
+      chip.classList.add('used');
+      chip.dataset.locked = 1;
+      G.$('.got', bin).insertAdjacentHTML('beforeend', `<span>${chip.textContent}</span>`);
+      G.sfx('good');
+      G.star();
+      G.say(chip.dataset.w);
+      if (++done === ITEMS.length) setTimeout(() => G.end({ title: 'Well done!', msg: 'flag · flower · floor · cloud · clap · clock', onReplay: build }), 2000);
+    } else {
+      bin.classList.add('nope');
+      G.sfx('bad');
+      G.feedback(G.$('#fb'), false, `🙂 Listen: ${chip.dataset.w}. Try the other box!`);
+      setTimeout(() => bin.classList.remove('nope'), 500);
+    }
+  });
+}
+build();
+</script>
+</body>
+</html>

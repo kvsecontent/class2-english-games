@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .sents { display: flex; flex-direction: column; gap: 1.4rem; width: 100%; max-width: 86rem; }
+  .sent { font-family: var(--read); font-size: 2.6rem; line-height: 2; display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+  .sent .n { font-family: var(--head); background: var(--purple); color: #fff; border-radius: 50%; width: 3.4rem; height: 3.4rem; display: inline-flex; align-items: center; justify-content: center; font-size: 1.8rem; flex: none; }
+  .blank {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 10rem; height: 4rem; border-radius: 0.8rem; padding: 0 0.6rem;
+    border: 0.25rem dashed var(--orange); background: #fffaf0; color: var(--orange);
+  }
+  .blank.filled { border-style: solid; border-color: var(--green); background: #d9f7e8; color: #117a4a; font-weight: 700; animation: pop 0.35s; }
+  .blank.nope { border-color: var(--red); background: #ffe1e3; animation: shake 0.4s; }
+  .bank { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 1.6rem 0 0.4rem; }
+  .chip { border: 0; border-radius: 1rem; background: var(--blue); color: #fff; font-family: var(--read); font-size: 2.2rem; font-weight: 700;
+    padding: 0.5rem 1.4rem; min-height: 4.2rem; box-shadow: 0 0.35rem 0 rgba(0, 0, 0, 0.2); }
+  .chip.used { visibility: hidden; }
+  .sents { gap: 0.6rem !important; }
+  .sent { line-height: 1.5 !important; font-size: 1.9rem !important; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Complete the sentences. Drag a word to the gap (or tap the word, then tap the gap).</p>
+  <div class="card sents" id="sents"></div>
+  <div class="bank" id="bank"></div>
+  <button class="big-btn ghost" id="reset">🔁 Start again</button>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Complete the Sentence', subtitle: 'The Smart Monkey · Let us write · B', back: '../index.html#ch11' });
+
+/* Each gap lists the words it accepts; gaps sharing a group accept either word once. */
+const SENTS = [
+  { e: '🪑', parts: ['Farida and Anju sat on', { ok: ['a bench'] }, 'under the tree to rest.'] },
+  { e: '🐒', parts: ['There was a monkey sitting', { ok: ['on the branch'] }, 'of the tree.'] },
+  { e: '🥜', parts: ['The two girls had a', { ok: ['packet of groundnuts'] }, 'and a bottle of juice.'] },
+  { e: '🗑️', parts: ['The monkey threw the', { ok: ['banana peel'] }, 'into', { ok: ['the dustbin'] }, '.'] },
+];
+const WORDS = ['a bench', 'on the branch', 'packet of groundnuts', 'banana peel', 'the dustbin', 'a water bottle'];
+
+function build() {
+  let need = 0, done = 0, mistakes = 0;
+  G.$('#sents').innerHTML = SENTS.map((s, i) => `<div class="sent"><span class="n">${i + 1}</span>` +
+    s.parts.map((p) => {
+      if (typeof p === 'string') return `<span>${p}</span>`;
+      need++;
+      return `<span class="blank" data-ok="${p.ok.join(',')}" data-g="${p.g || ''}">?</span>`;
+    }).join('') + `<span style="font-size:3rem">${s.e}</span><button class="say" data-i="${i}">🔊</button></div>`).join('');
+  G.$$('.say[data-i]').forEach((b) => (b.onclick = () => {
+    const s = SENTS[b.dataset.i];
+    G.say(s.parts.map((p) => (typeof p === 'string' ? p : 'blank')).join(' '));
+  }));
+  G.$('#bank').innerHTML = G.shuffle(WORDS).map((w) => `<button class="chip" data-w="${w}">${w}</button>`).join('');
+
+  G.tapDrag(G.$$('.chip'), G.$$('.blank'), (chip, gap) => {
+    if (gap.classList.contains('filled')) return;
+    const w = chip.dataset.w;
+    if (gap.dataset.ok.split(',').includes(w)) {
+      gap.classList.add('filled');
+      gap.textContent = w;
+      chip.classList.add('used');
+      chip.dataset.locked = 1;
+      // The other gap in the same group now only accepts the remaining word.
+      if (gap.dataset.g) G.$$(`.blank[data-g="${gap.dataset.g}"]:not(.filled)`).forEach((o) => (o.dataset.ok = o.dataset.ok.split(',').filter((x) => x !== w).join(',')));
+      G.sfx('good');
+      G.star();
+      const sent = gap.closest('.sent');
+      if (!G.$('.blank:not(.filled)', sent)) G.say(sent.innerText.replace(/[🔊🪑🐒🥜🗑️]/gu, '').replace(/^\d+/, ''));
+      if (++done === need) setTimeout(() => G.end({ title: 'Well done!', msg: 'You completed all the sentences.', onReplay: build }), 2500);
+    } else {
+      mistakes++;
+      gap.classList.add('nope');
+      G.sfx('bad');
+      setTimeout(() => gap.classList.remove('nope'), 500);
+    }
+  });
+}
+G.$('#reset').onclick = build;
+build();
+</script>
+</body>
+</html>

@@ -415,7 +415,42 @@ const CHAPTERS = [
       ]},
     ],
   },
-  ...Array.from({ length: 3 }, (_, i) => ({ n: i + 11, title: 'Coming soon', sections: [] })),
+  {
+    n: 11, unit: 'Unit 4 · Life Around Us', title: 'The Smart Monkey',
+    sections: [
+      { key: 'recite', name: '📖 Let us read', games: [
+        { href: 'ch11/story.html', ic: '🐒', t: 'Story Time', d: 'Listen, read and say "The Smart Monkey"' },
+        { href: 'ch11/clean-up.html', ic: '🗑️', t: 'Keep It Clean!', d: 'Put the rubbish in the dustbin' },
+      ]},
+      { key: 'read', name: '👀 Words', games: [
+        { href: 'ch11/sight-words.html', ic: '🎈', t: 'Pop the Sight Word', d: 'then · down · on · with · them · under …' },
+        { href: 'ch11/new-words.html', ic: '🃏', t: 'New Word Cards', d: 'groundnuts · branch · peel · dustbin …' },
+      ]},
+      { key: 'speak', name: '🗣️ Let us speak', games: [
+        { href: 'ch11/talk-wheel.html', ic: '🎡', t: 'Talk Wheel', d: 'What do you do with the wrapper?' },
+        { href: 'ch11/fl-cl.html', ic: '🚩', t: 'fl or cl?', d: 'flag · flower · floor · cloud · clap · clock' },
+        { href: 'ch11/blend-sentences.html', ic: '📝', t: 'Make Sentences', d: 'There is a clock in the classroom.' },
+      ]},
+      { key: 'think', name: '🎨 Let us draw', games: [
+        { href: 'ch11/draw-clean.html', ic: '🧹', t: 'Things to Clean With', d: 'Draw three things that clean your house' },
+      ]},
+      { key: 'listen', name: '👂 Let us listen', games: [
+        { href: 'ch11/syllables.html', ic: '👏', t: 'Clap the Parts', d: 'mar-ket · mon-key · ba-na-na · Fa-ri-da' },
+      ]},
+      { key: 'write', name: '✏️ Let us write', games: [
+        { href: 'ch11/true-false.html', ic: '✅', t: 'Tick or Cross', d: 'The book’s five sentences' },
+        { href: 'ch11/fill-blanks.html', ic: '📝', t: 'Complete the Sentence', d: 'They sat on a bench under the tree.' },
+        { href: 'ch11/keep-clean.html', ic: '🧽', t: 'How I Keep Clean', d: 'Things we do to keep clean' },
+      ]},
+      { key: 'think', name: '🛒 Project work', games: [
+        { href: 'ch11/shop.html', ic: '🏪', t: 'Going Shopping', d: 'What did you like in the shop?' },
+      ]},
+      { key: 'play', name: '🏁 Class challenge', games: [
+        { href: 'ch11/monkey-race.html', ic: '🏆', t: 'Monkey Race', d: 'Team A vs Team B – whole chapter quiz' },
+      ]},
+    ],
+  },
+  ...Array.from({ length: 2 }, (_, i) => ({ n: i + 12, title: 'Coming soon', sections: [] })),
 ];
 
 const tabs = document.getElementById('tabs');

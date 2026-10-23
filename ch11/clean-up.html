@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .park { position: relative; height: calc(100vh - 13rem); min-height: 26rem; border-radius: var(--radius); overflow: hidden; background: linear-gradient(#bfe6ff 0 30%, #9be38a 30%); border: 0.25rem solid var(--line); }
+  .park .deco { position: absolute; line-height: 1; pointer-events: none; }
+  .thing { position: absolute; border: 0; background: none; padding: 0; font-size: 4.4rem; line-height: 1; transform: translate(-50%, -50%); }
+  .thing.gone { visibility: hidden; }
+  .thing.no { animation: shake 0.4s; }
+  .bin { position: absolute; right: 3%; bottom: 4%; width: 13rem; height: 15rem; border-radius: 1.4rem; border: 0.35rem dashed var(--green); background: rgba(255, 255, 255, 0.55); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 8rem; line-height: 1; }
+  .bin small { font-size: 1.4rem; font-weight: 800; color: var(--green); }
+  .bin.yum { animation: pop 0.35s; }
+  .count { position: absolute; left: 1rem; top: 1rem; background: #fff; border-radius: 1rem; padding: 0.4rem 1.2rem; font-size: 1.8rem; font-weight: 800; box-shadow: var(--shadow); }
+</style>
+</head>
+<body>
+<main class="stage">
+  <p class="hint" style="text-align:center">Be smart like the monkey! Drag the rubbish into the dustbin (or tap it, then tap the dustbin). Leave the flowers and animals alone!</p>
+  <div class="park" id="park">
+    <span class="deco" style="left:4%;top:4%;font-size:9rem">🌳</span>
+    <span class="deco" style="left:40%;top:6%;font-size:4rem">☁️</span>
+    <span class="deco" style="left:70%;top:3%;font-size:5rem">☀️</span>
+    <span class="deco" style="left:10%;top:44%;font-size:4rem">🪑</span>
+    <span class="deco" style="left:8%;top:18%;font-size:3.6rem">🐒</span>
+    <div class="count">🗑️ <span id="n">0</span> / <span id="t">0</span></div>
+    <div class="bin" id="bin">🗑️<small>DUSTBIN</small></div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Keep It Clean!', subtitle: 'The Smart Monkey · Keep our park clean', back: '../index.html#ch11' });
+
+/* r = rubbish (goes in the dustbin); the others belong in the park. */
+const THINGS = [
+  { e: '🍌', n: 'banana peel', r: true, x: 30, y: 62 }, { e: '🧃', n: 'empty bottle', r: true, x: 48, y: 78 },
+  { e: '🥜', n: 'groundnut packet', r: true, x: 62, y: 55 }, { e: '🍬', n: 'wrapper', r: true, x: 20, y: 84 },
+  { e: '🥤', n: 'paper cup', r: true, x: 74, y: 82 }, { e: '📰', n: 'old paper', r: true, x: 40, y: 48 },
+  { e: '🌸', n: 'flower', x: 55, y: 40 }, { e: '🐦', n: 'bird', x: 85, y: 34 }, { e: '🐕', n: 'dog', x: 26, y: 40 }, { e: '🍂', n: 'leaf', x: 66, y: 70 },
+];
+const park = G.$('#park'), bin = G.$('#bin');
+let n = 0;
+const total = THINGS.filter((t) => t.r).length;
+G.$('#t').textContent = total;
+
+const chips = THINGS.map((t) => {
+  const b = document.createElement('button');
+  b.className = 'thing';
+  b.style.left = t.x + '%';
+  b.style.top = t.y + '%';
+  b.textContent = t.e;
+  b.dataset.n = t.n;
+  if (!t.r) {
+    b.dataset.locked = 1;
+    b.onclick = () => { b.classList.remove('no'); void b.offsetWidth; b.classList.add('no'); G.sfx('bad'); G.say(`A ${t.n} is not rubbish. Leave it!`); };
+  }
+  park.append(b);
+  return b;
+});
+G.tapDrag(chips.filter((c, i) => THINGS[i].r), [bin], (chip) => {
+  chip.classList.add('gone');
+  chip.dataset.locked = 1;
+  bin.classList.remove('yum'); void bin.offsetWidth; bin.classList.add('yum');
+  G.sfx('good'); G.star();
+  G.say(`The ${chip.dataset.n} goes in the dustbin.`);
+  G.$('#n').textContent = ++n;
+  if (n === total) setTimeout(() => G.end({ title: 'Clean and green!', msg: 'You are as smart as the monkey!', onReplay: () => location.reload() }), 1500);
+});
+</script>
+</body>
+</html>
