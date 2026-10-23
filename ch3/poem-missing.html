@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .q { font-family: var(--read); font-size: 2.8rem; margin: 1rem 0 1.6rem; line-height: 1.4; }
+  .q .blank { display: inline-block; min-width: 7rem; border-bottom: 0.3rem dashed var(--orange); color: var(--orange); }
+  .q .pic { font-size: 5rem; display: block; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Read the line from the poem. Tap the missing word.</p>
+  <div class="card" id="game" style="width:100%;max-width:70rem"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Missing Word', subtitle: 'It is Fun · What can the child in the poem do?', back: '../index.html#ch3' });
+
+const ITEMS = [
+  { pic: '😄', a: 'It’s', w: 'fun', b: 'to be this,', opts: ['fun', 'sad', 'hot'] },
+  { pic: '🐑', a: 'To leap like a', w: 'lamb,', b: '', opts: ['lamb,', 'fish,', 'cat,'] },
+  { pic: '🐈', a: 'To', w: 'climb', b: 'like a cat.', opts: ['climb', 'swim', 'trot'] },
+  { pic: '🐸', a: 'To hop like a', w: 'frog,', b: '', opts: ['frog,', 'horse,', 'bird,'] },
+  { pic: '🐟', a: 'To', w: 'swim', b: 'like a fish,', opts: ['swim', 'fly', 'leap'] },
+  { pic: '🐎', a: 'To trot like a', w: 'horse,', b: '', opts: ['horse,', 'lamb,', 'frog,'] },
+  { pic: '🐦', a: 'To', w: 'fly', b: 'like a bird.', opts: ['fly', 'hop', 'climb'] },
+  { pic: '🎭', a: 'I can act', w: 'Just', b: 'like them all,', opts: ['Just', 'Run', 'Sing'] },
+];
+
+G.quiz({
+  el: G.$('#game'),
+  items: ITEMS,
+  shuffleItems: false,
+  question: (it) => `<span class="pic">${it.pic}</span>${it.a} <span class="blank">&nbsp;?&nbsp;</span> ${it.b}`,
+  options: (it) => G.shuffle(it.opts).map((o) => ({ label: o, value: o })),
+  answer: (it) => it.w,
+  onShow: (it, el) => {
+    const s = el.querySelector('.q');
+    G.$$('.choice', el).forEach((b) => b.addEventListener('click', () => {
+      if (b.classList.contains('right')) s.querySelector('.blank').textContent = it.w;
+    }));
+  },
+  explain: (it) => `${it.a} ${it.w} ${it.b}`,
+  endMsg: 'The child can leap, climb, hop, swim, trot and fly!',
+});
+</script>
+</body>
+</html>

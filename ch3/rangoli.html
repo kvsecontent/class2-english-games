@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .wrap { display: grid; grid-template-columns: 1fr 26rem; gap: 1.4rem; align-items: center; }
+  .board { background: #fff; border-radius: var(--radius); border: 0.25rem solid var(--line); padding: 1rem; display: flex; justify-content: center; }
+  #rg { width: min(100%, calc(100vh - 11rem)); aspect-ratio: 1; }
+  #rg .pc { cursor: pointer; stroke: #2b2140; stroke-width: 1.4; transition: fill 0.2s; }
+  #rg .step { opacity: 0; transition: opacity 0.6s; pointer-events: none; }
+  #rg .step.on { opacity: 1; pointer-events: all; }
+  .steps { display: flex; flex-direction: column; gap: 0.6rem; }
+  .st { font-size: 1.5rem; font-weight: 800; border: 0.25rem solid var(--line); border-radius: 1rem; padding: 0.5rem 0.8rem; background: #fff; text-align: left; }
+  .st.on { background: #fff4cc; border-color: var(--yellow); }
+  .st.done { color: var(--green); }
+  .palette { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; }
+  .sw { aspect-ratio: 1; border-radius: 50%; border: 0.35rem solid #fff; box-shadow: 0 0 0 0.2rem var(--line); }
+  .sw.on { box-shadow: 0 0 0 0.4rem var(--ink); }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <div class="board"><svg id="rg" viewBox="-100 -100 200 200"></svg></div>
+    <div class="center" style="gap:0.8rem">
+      <p class="hint" style="margin:0">Follow the steps to draw a rangoli. Then colour it!</p>
+      <div class="steps">
+        <button class="st on" data-s="1">Step 1 · Draw a circle and four petals</button>
+        <button class="st" data-s="2">Step 2 · Add four more petals</button>
+        <button class="st" data-s="3">Step 3 · Add the dots and the border</button>
+        <button class="st" data-s="4">🎨 Colour your rangoli</button>
+      </div>
+      <div class="palette" id="pal"></div>
+      <div class="row"><button class="big-btn green" id="next">Next step ▶</button><button class="big-btn ghost" id="reset">🔁</button></div>
+    </div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Rangoli', subtitle: 'It is Fun · Let us draw', back: '../index.html#ch3' });
+
+const COLS = ['#e63946', '#ff8a3d', '#ffc93c', '#2bb673', '#2f7de1', '#8a5cf6', '#ff6fa8', '#13b5b1'];
+const SAY = {
+  1: 'Step 1. Draw a circle in the middle. Draw four petals around it.',
+  2: 'Step 2. Draw four more petals between them.',
+  3: 'Step 3. Add small dots and a border around the flower.',
+  4: 'Now pick a colour and tap the rangoli to colour it.',
+};
+let step = 1, pick = COLS[0];
+
+const petal = (ang, len, w, cls) => `<ellipse class="pc ${cls}" cx="0" cy="${-len / 2 - 16}" rx="${w}" ry="${len / 2}" transform="rotate(${ang})" fill="#fff"/>`;
+const grid = [];
+for (let x = -80; x <= 80; x += 20) for (let y = -80; y <= 80; y += 20) grid.push(`<circle cx="${x}" cy="${y}" r="1.2" fill="#c9bfae"/>`);
+
+function build() {
+  step = 1;
+  G.$('#rg').innerHTML = `<g>${grid.join('')}</g>
+    <g class="step on" data-s="1">${[0, 90, 180, 270].map((a) => petal(a, 46, 13, 'big')).join('')}<circle class="pc" r="16" fill="#fff"/></g>
+    <g class="step" data-s="2">${[45, 135, 225, 315].map((a) => petal(a, 34, 10, 'small')).join('')}</g>
+    <g class="step" data-s="3">
+      ${[0, 45, 90, 135, 180, 225, 270, 315].map((a) => `<circle class="pc" cx="0" cy="-74" r="6" transform="rotate(${a})" fill="#fff"/>`).join('')}
+      <path class="pc" d="M0 -96 L96 0 L0 96 L-96 0 Z M0 -86 L86 0 L0 86 L-86 0 Z" fill-rule="evenodd" fill="#fff"/>
+    </g>`;
+  // the small petals sit behind the big ones
+  const rg = G.$('#rg');
+  rg.insertBefore(G.$('[data-s="2"]', rg), G.$('[data-s="1"]', rg));
+  G.$$('.pc').forEach((p) => p.addEventListener('click', () => {
+    if (step < 4) return;
+    p.setAttribute('fill', pick);
+    G.sfx('pop');
+    if (G.$$('.pc').every((x) => x.getAttribute('fill') !== '#fff')) {
+      G.star(3);
+      setTimeout(() => G.end({ title: 'Beautiful rangoli!', msg: 'Now draw it in your notebook and colour it.', onReplay: build }), 600);
+    }
+  }));
+  show();
+}
+function show() {
+  G.$$('.st').forEach((b) => { const s = +b.dataset.s; b.classList.toggle('on', s === step); b.classList.toggle('done', s < step); });
+  G.$$('#rg .step').forEach((g) => g.classList.toggle('on', +g.dataset.s <= Math.min(step, 3)));
+  G.$('#pal').style.visibility = step === 4 ? 'visible' : 'hidden';
+  G.$('#next').disabled = step === 4;
+  G.say(SAY[step]);
+}
+G.$('#pal').innerHTML = COLS.map((c, i) => `<button class="sw ${i ? '' : 'on'}" data-c="${c}" style="background:${c}"></button>`).join('');
+G.$('#pal').onclick = (e) => {
+  const b = e.target.closest('.sw');
+  if (!b) return;
+  pick = b.dataset.c;
+  G.$$('.sw').forEach((x) => x.classList.toggle('on', x === b));
+};
+G.$('#next').onclick = () => { if (step < 4) { step++; G.sfx('good'); show(); } };
+G.$$('.st').forEach((b) => (b.onclick = () => { step = +b.dataset.s; show(); }));
+G.$('#reset').onclick = build;
+build();
+</script>
+</body>
+</html>

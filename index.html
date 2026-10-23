@@ -144,7 +144,50 @@ const CHAPTERS = [
       ]},
     ],
   },
-  ...Array.from({ length: 11 }, (_, i) => ({ n: i + 3, title: 'Coming soon', sections: [] })),
+  {
+    n: 3, unit: 'Unit 2 · Welcome to My World', title: 'It is Fun',
+    sections: [
+      { key: 'recite', name: '🎤 Let us recite', games: [
+        { href: 'ch3/poem.html', ic: '📖', t: 'Poem Time', d: 'Listen, read and say "It is Fun"' },
+        { href: 'ch3/poem-missing.html', ic: '🧩', t: 'Missing Word', d: 'What can the child in the poem do?' },
+      ]},
+      { key: 'read', name: '👀 Words', games: [
+        { href: 'ch3/sight-words.html', ic: '🎈', t: 'Pop the Sight Word', d: 'this · that · like · to · them · all · none' },
+        { href: 'ch3/new-words.html', ic: '🃏', t: 'New Word Cards', d: 'fun · climb · leap · swim · trot · fly' },
+      ]},
+      { key: 'listen', name: '👂 Let us listen', games: [
+        { href: 'ch3/animal-sounds.html', ic: '🐸', t: 'Who Is Making That Sound?', d: 'Croak, quack, baa, cluck…' },
+      ]},
+      { key: 'speak', name: '🗣️ Let us speak', games: [
+        { href: 'ch3/if-i-were.html', ic: '🎡', t: 'If I Were…', d: 'If you were a cat, what would you do?' },
+        { href: 'ch3/word-sentences.html', ic: '💬', t: 'Say the Words', d: 'Monkeys climb trees. Fish swim…' },
+      ]},
+      { key: 'write', name: '✏️ Let us write', games: [
+        { href: 'ch3/act-like.html', ic: '🎭', t: 'I Can Act', d: 'Act it! I can hop like a frog.' },
+        { href: 'ch3/who-can.html', ic: '🌊', t: 'Swim or Tree?', d: 'Who can swim? Who lives on trees?' },
+      ]},
+      { key: 'speak', name: '🖼️ Picture reading', games: [
+        { href: 'ch3/picture-talk.html', ic: '🐒', t: 'Picture Talk', d: 'What do you see? Make sentences' },
+      ]},
+      { key: 'think', name: '💭 Let us think', games: [
+        { href: 'ch3/match-actions.html', ic: '🐍', t: 'Match the Actions', d: 'The horse trots. The snake crawls.' },
+      ]},
+      { key: 'read', name: '🔤 Sound "i" (a / an)', games: [
+        { href: 'ch3/a-or-an.html', ic: '📌', t: 'a or an?', d: 'a pin · a ship · an inch · an igloo' },
+        { href: 'ch3/word-train.html', ic: '🚂', t: 'Word Train', d: 'Make words: p + ig = pig' },
+      ]},
+      { key: 'recite', name: '🎵 Let us sing', games: [
+        { href: 'ch3/song-of-i.html', ic: '👏', t: 'Song of I', d: 'Sing, clap and use "I"' },
+      ]},
+      { key: 'think', name: '🎨 Let us draw', games: [
+        { href: 'ch3/rangoli.html', ic: '🌸', t: 'Rangoli', d: 'Follow the steps and colour' },
+      ]},
+      { key: 'play', name: '🏁 Class challenge', games: [
+        { href: 'ch3/animal-race.html', ic: '🏆', t: 'Animal Race', d: 'Team A vs Team B – whole chapter quiz' },
+      ]},
+    ],
+  },
+  ...Array.from({ length: 10 }, (_, i) => ({ n: i + 4, title: 'Coming soon', sections: [] })),
 ];
 
 const tabs = document.getElementById('tabs');

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .wrap { display: grid; grid-template-columns: 1fr 30rem; gap: 1.2rem; align-items: start; }
+  .scene { position: relative; height: calc(100vh - 10rem); min-height: 28rem; border-radius: var(--radius); overflow: hidden;
+    background: linear-gradient(#bfe6ff 0 35%, #9be38a 35% 78%, #6cc3ff 78%); border: 0.25rem solid var(--line); }
+  .scene .deco { position: absolute; line-height: 1; pointer-events: none; }
+  .ani { position: absolute; border: 0; background: none; padding: 0; font-size: 5.4rem; line-height: 1; transform: translate(-50%, -50%); }
+  .ani.seen::after { content: '✓'; position: absolute; right: -0.6rem; top: -0.6rem; font-size: 1.6rem; color: #fff; background: var(--green); border-radius: 50%; width: 2.2rem; height: 2.2rem; display: flex; align-items: center; justify-content: center; }
+  .ani.hi { animation: pop 0.4s 2; }
+  .side { display: flex; flex-direction: column; gap: 0.7rem; }
+  .side .prompt { font-size: 1.6rem; margin: 0; }
+  .notes { font-family: var(--read); font-size: 1.7rem; min-height: 14rem; }
+  .notes ol { margin: 0; padding-left: 2rem; }
+  .notes li { margin: 0.2rem 0; }
+  .notes .empty { color: var(--muted); font-size: 1.4rem; }
+  .starter { font-family: var(--read); font-size: 1.4rem; background: #e7f1ff; border-radius: 1rem; padding: 0.6rem 1rem; }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <div class="scene" id="scene">
+      <span class="deco" style="left:80%;top:4%;font-size:5rem">☀️</span>
+      <span class="deco" style="left:30%;top:6%;font-size:4rem">☁️</span>
+      <span class="deco" style="left:4%;top:18%;font-size:9rem">🌳</span>
+      <span class="deco" style="left:62%;top:38%;font-size:3rem">🌼🌸🌼</span>
+    </div>
+    <div class="side">
+      <div class="prompt">👀 What do you see in the picture? Tap an animal or a bird and talk about it.</div>
+      <div class="card notes"><b style="font-family:var(--head)">✏️ Sentences about the picture</b><div id="notes"><p class="empty">Tap the animals to make sentences.</p></div></div>
+      <div class="starter">💬 I see a ______. The ______ is ______.</div>
+      <div class="row">
+        <button class="big-btn green" id="read">🔊 Read all</button>
+        <button class="big-btn ghost" id="clear">🔁 Clear</button>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Picture Talk', subtitle: 'It is Fun · Picture reading · Talk and write', back: '../index.html#ch3' });
+
+const ANIMALS = [
+  { e: '🐒', x: 16, y: 32, s: 'The monkey is swinging on the tree.' },
+  { e: '🐿️', x: 9, y: 52, s: 'The squirrel is running up the tree.' },
+  { e: '🐦', x: 50, y: 14, s: 'The bird is flying in the sky.' },
+  { e: '🐑', x: 40, y: 55, s: 'The lamb is leaping on the grass.' },
+  { e: '🐎', x: 70, y: 58, s: 'The horse is trotting.' },
+  { e: '🐈', x: 28, y: 68, s: 'The cat is sleeping.' },
+  { e: '🐸', x: 52, y: 76, s: 'The frog is hopping near the pond.' },
+  { e: '🐟', x: 32, y: 90, s: 'The fish is swimming in the water.' },
+  { e: '🦆', x: 68, y: 88, s: 'The duck is swimming in the pond.' },
+  { e: '🐍', x: 88, y: 72, s: 'The snake is crawling.' },
+];
+const scene = G.$('#scene');
+let notes = [];
+
+function drawNotes() {
+  G.$('#notes').innerHTML = notes.length ? `<ol>${notes.map((n) => `<li>${n}</li>`).join('')}</ol>` : '<p class="empty">Tap the animals to make sentences.</p>';
+}
+ANIMALS.forEach((a) => {
+  const b = document.createElement('button');
+  b.className = 'ani';
+  b.style.left = a.x + '%';
+  b.style.top = a.y + '%';
+  b.textContent = a.e;
+  b.onclick = () => {
+    b.classList.remove('hi'); void b.offsetWidth; b.classList.add('hi');
+    G.say(a.s);
+    if (!notes.includes(a.s)) {
+      notes.push(a.s);
+      if (notes.length > 6) notes.shift();
+      b.classList.add('seen');
+      G.star(); G.sfx('pop');
+      drawNotes();
+      if (G.$$('.ani.seen').length === ANIMALS.length) { G.confetti(20); G.say('You found everyone! Now write a few sentences in your notebook.'); }
+    }
+  };
+  scene.append(b);
+});
+G.$('#read').onclick = () => notes.length && G.say(notes.join(' '));
+G.$('#clear').onclick = () => { notes = []; G.$$('.ani').forEach((b) => b.classList.remove('seen')); drawNotes(); };
+</script>
+</body>
+</html>

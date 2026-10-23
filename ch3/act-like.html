@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .act { width: 100%; max-width: 70rem; min-height: 22rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.8rem; }
+  .act .e { font-size: 8rem; line-height: 1; animation: bob 1.4s ease-in-out infinite; }
+  .act .t { font-family: var(--read); font-size: 4rem; font-weight: 700; }
+  .act .t b { color: var(--purple); }
+  .sent { font-family: var(--read); font-size: 3rem; display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; justify-content: center; margin: 1rem 0; }
+  .gap { display: inline-flex; align-items: center; justify-content: center; min-width: 11rem; height: 5rem; border-radius: 0.8rem; padding: 0 0.8rem;
+    border: 0.25rem dashed var(--orange); background: #fffaf0; color: var(--orange); }
+  .gap.filled { border-style: solid; border-color: var(--green); background: #d9f7e8; color: #117a4a; font-weight: 700; animation: pop 0.35s; }
+  .gap.nope { border-color: var(--red); background: #ffe1e3; animation: shake 0.4s; }
+  .bank { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; margin: 0.6rem 0; max-width: 100rem; }
+  .bank-label { font-size: 1.4rem; font-weight: 800; color: var(--muted); }
+  .chip { border: 0; border-radius: 1rem; color: #fff; font-family: var(--read); font-size: 2.2rem; font-weight: 700;
+    padding: 0.4rem 1.2rem; min-height: 4.2rem; box-shadow: 0 0.35rem 0 rgba(0, 0, 0, 0.2); }
+  .chip.v { background: var(--blue); } .chip.n { background: var(--pink); }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mAct">🎭 Act like an animal</button>
+    <button class="big-btn orange" id="mWrite">✏️ I can … like a …</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'I Can Act', subtitle: 'It is Fun · Let us write · A', back: '../index.html#ch3' });
+
+const ACTS = [
+  { v: 'leap', n: 'lamb', e: '🐑' }, { v: 'climb', n: 'cat', e: '🐈' }, { v: 'hop', n: 'frog', e: '🐸' },
+  { v: 'swim', n: 'fish', e: '🐟' }, { v: 'trot', n: 'horse', e: '🐎' }, { v: 'fly', n: 'bird', e: '🐦' },
+];
+/* Which animals can do each action (for the sentence builder). */
+const CAN = {
+  leap: ['lamb', 'frog', 'monkey'], climb: ['cat', 'monkey', 'squirrel'], hop: ['frog', 'rabbit'],
+  swim: ['fish', 'duck', 'frog'], trot: ['horse'], fly: ['bird', 'butterfly', 'duck'], run: ['dog', 'horse', 'cat', 'squirrel'],
+};
+const NOUNS = ['lamb', 'cat', 'frog', 'fish', 'horse', 'bird', 'monkey', 'rabbit', 'duck', 'dog', 'squirrel', 'butterfly'];
+const area = G.$('#area');
+
+function act() {
+  let i = 0;
+  area.innerHTML = `<p class="hint">Read the card. Everyone stand up and act it out! Then tap ⭐.</p>
+    <div class="card act" id="card"></div>
+    <div class="row" style="margin-top:1rem">
+      <button class="big-btn ghost" id="prev">◀</button>
+      <button class="say" id="hear">🔊</button>
+      <button class="big-btn green" id="good">⭐ Great acting!</button>
+      <button class="big-btn ghost" id="next">▶</button>
+    </div>
+    <p class="hint" style="margin-top:1rem">💬 Which one do you like the most? Say: “I like to <b>hop</b> like a <b>frog</b>.”</p>`;
+  const draw = () => {
+    const a = ACTS[i];
+    G.$('#card').innerHTML = `<div class="e">${a.e}</div><div class="t"><b>${a.v[0].toUpperCase() + a.v.slice(1)}</b> like a ${a.n}!</div>`;
+    G.$('#good').disabled = false;
+    G.say(`${a.v} like a ${a.n}!`);
+  };
+  G.$('#prev').onclick = () => { i = (i + ACTS.length - 1) % ACTS.length; draw(); };
+  G.$('#next').onclick = () => { i = (i + 1) % ACTS.length; draw(); };
+  G.$('#hear').onclick = () => G.say(`${ACTS[i].v} like a ${ACTS[i].n}!`);
+  G.$('#good').onclick = (e) => { G.star(); G.sfx('good'); G.confetti(12); e.currentTarget.disabled = true; };
+  draw();
+}
+
+function write() {
+  let made = 0;
+  function build() {
+    const verbs = Object.keys(CAN);
+    area.innerHTML = `<p class="hint">What can you do like an animal or a bird? Drag a word to each gap (or tap the word, then the gap).</p>
+      <div class="card" style="width:100%;max-width:90rem">
+        <div class="sent"><span>I can</span><span class="gap" id="gv">?</span><span>like a</span><span class="gap" id="gn">?</span><span>.</span></div>
+        <div class="feedback" id="fb"></div>
+      </div>
+      <div class="bank-label">Action words</div>
+      <div class="bank">${verbs.map((v) => `<button class="chip v" data-w="${v}">${v}</button>`).join('')}</div>
+      <div class="bank-label">Animals and birds</div>
+      <div class="bank">${NOUNS.map((n) => `<button class="chip n" data-w="${n}">${n}</button>`).join('')}</div>
+      <button class="big-btn ghost" id="again" style="margin-top:0.6rem">🔁 Make another sentence</button>`;
+    const gv = G.$('#gv'), gn = G.$('#gn');
+    G.$('#again').onclick = build;
+    G.tapDrag(G.$$('.chip'), [gv, gn], (chip, gap) => {
+      const w = chip.dataset.w, isVerb = chip.classList.contains('v');
+      const fb = G.$('#fb');
+      const bad = (msg) => { gap.classList.add('nope'); G.sfx('bad'); G.feedback(fb, false, msg); setTimeout(() => gap.classList.remove('nope'), 500); };
+      if ((gap === gv) !== isVerb) return bad(isVerb ? '🙂 Put an animal here.' : '🙂 Put an action word here.');
+      const v = gap === gv ? w : gv.dataset.w, n = gap === gn ? w : gn.dataset.w;
+      if (v && n && !CAN[v].includes(n)) return bad(`🙂 Can a ${n} ${v}? Try another word!`);
+      gap.dataset.w = w;
+      gap.textContent = w;
+      gap.classList.add('filled');
+      G.sfx('pop');
+      if (gv.dataset.w && gn.dataset.w) {
+        const s = `I can ${gv.dataset.w} like a ${gn.dataset.w}.`;
+        G.star(); G.sfx('good');
+        G.feedback(fb, true, '🎉 ' + s);
+        G.say(s);
+        if (++made === 3) setTimeout(() => G.end({ title: 'Well done!', msg: 'You wrote three sentences.', onReplay: () => { made = 0; build(); } }), 2200);
+      }
+    });
+  }
+  build();
+}
+
+G.$('#mAct').onclick = act;
+G.$('#mWrite').onclick = write;
+act();
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .bins { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; width: 100%; max-width: 100rem; }
+  .bin { min-height: 20rem; border-radius: var(--radius); border: 0.3rem dashed var(--line); background: #fff; padding: 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
+  .bin h3 { margin: 0; font-size: 2rem; }
+  .bin .big { font-size: 5rem; line-height: 1; transition: transform 0.4s; }
+  .bin .got { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; }
+  .bin .got span { font-family: var(--read); font-size: 2.2rem; font-weight: 700; background: #d9f7e8; color: #117a4a; border-radius: 0.8rem; padding: 0.2rem 1rem; animation: pop 0.35s; }
+  .bin.kids { border-color: var(--blue); } .bin.ball { border-color: var(--orange); }
+  .bin.nope { background: #ffe1e3; animation: shake 0.4s; }
+  .bank { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 1.4rem 0 0.4rem; max-width: 100rem; }
+  .chip { border: 0; border-radius: 1rem; background: var(--purple); color: #fff; font-family: var(--read); font-size: 2.3rem; font-weight: 700;
+    padding: 0.5rem 1.4rem; min-height: 4.4rem; box-shadow: 0 0.35rem 0 rgba(0, 0, 0, 0.2); }
+  .chip.used { visibility: hidden; }
+  .chip.gone { opacity: 0.3; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Which animals and birds can swim (not fish)? Which animals live on trees? Drag each one to the right box (or tap it, then tap the box). Some do not belong!</p>
+  <div class="bins">
+    <div class="bin kids" id="kids"><h3>🌊 They can swim</h3><div class="big" id="kidsPic">💧</div><div class="got"></div></div>
+    <div class="bin ball" id="ball"><h3>🌳 They live on trees</h3><div class="big" id="ballPic">🌳</div><div class="got"></div></div>
+  </div>
+  <div class="bank" id="bank"></div>
+  <div class="feedback" id="fb"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Swim or Tree?', subtitle: 'It is Fun · Let us write · B and C', back: '../index.html#ch3' });
+
+const ITEMS = [
+  { w: 'duck', e: '🦆', b: 'kids' }, { w: 'frog', e: '🐸', b: 'kids' }, { w: 'turtle', e: '🐢', b: 'kids' }, { w: 'swan', e: '🦢', b: 'kids' },
+  { w: 'monkey', e: '🐒', b: 'ball' }, { w: 'squirrel', e: '🐿️', b: 'ball' }, { w: 'koala', e: '🐨', b: 'ball' }, { w: 'sloth', e: '🦥', b: 'ball' },
+  { w: 'hen', e: '🐔', b: '' }, { w: 'giraffe', e: '🦒', b: '' },
+];
+const NEED = ITEMS.filter((x) => x.b).length;
+
+function build() {
+  let done = 0;
+  G.$$('.got').forEach((g) => (g.innerHTML = ''));
+  G.$('#fb').textContent = '';
+  G.$('#bank').innerHTML = G.shuffle(ITEMS).map((x) => `<button class="chip" data-w="${x.w}" data-b="${x.b}">${x.e} ${x.w}</button>`).join('');
+  G.$$('.chip').forEach((c) => c.addEventListener('click', () => G.say(c.dataset.w)));
+
+  G.tapDrag(G.$$('.chip'), [G.$('#kids'), G.$('#ball')], (chip, bin) => {
+    if (chip.dataset.b === bin.id) {
+      chip.classList.add('used');
+      chip.dataset.locked = 1;
+      G.$('.got', bin).insertAdjacentHTML('beforeend', `<span>${chip.textContent}</span>`);
+      G.sfx('good');
+      G.star();
+      G.say(chip.dataset.w);
+      if (++done === NEED) {
+        G.$$('.chip:not(.used)').forEach((c) => c.classList.add('gone'));
+        G.feedback(G.$('#fb'), true, '🎉 Ducks, frogs, turtles and swans can swim. Monkeys, squirrels, koalas and sloths live on trees.');
+        G.say('Ducks, frogs, turtles and swans can swim. Monkeys, squirrels, koalas and sloths live on trees.');
+        setTimeout(() => G.end({ title: 'Well done!', msg: 'You know who can swim and who lives on trees.', onReplay: build }), 5500);
+      }
+    } else {
+      bin.classList.add('nope');
+      G.sfx('bad');
+      G.feedback(G.$('#fb'), false, chip.dataset.b ? '🙂 Try the other box!' : `🙂 A ${chip.dataset.w} does not belong here.`);
+      setTimeout(() => bin.classList.remove('nope'), 500);
+    }
+  });
+}
+build();
+</script>
+</body>
+</html>

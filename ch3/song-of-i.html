@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .song { font-family: var(--read); font-size: 2.4rem; line-height: 1.35; width: 100%; max-width: 86rem; }
+  .song .line { display: block; padding: 0.2rem 0.8rem; border-radius: 0.8rem; transition: background 0.2s; }
+  .song .line.now { background: #ffd34d; }
+  .song .line b { color: var(--purple); font-size: 3rem; }
+  .song .clap { font-family: var(--head); font-size: 1.8rem; color: var(--orange); }
+  .hands { font-size: 4rem; line-height: 1; height: 4.4rem; }
+  .hands.go { animation: pop 0.25s 3; }
+  .q .who { font-size: 6rem; line-height: 1; }
+  .q .t { font-family: var(--read); font-size: 3rem; margin: 0.4rem 0 1.2rem; }
+  .q .blank { display: inline-block; min-width: 5rem; border-bottom: 0.3rem dashed var(--orange); color: var(--orange); }
+  .choice { font-family: var(--read); font-size: 3rem; min-width: 10rem; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mSing">🎵 Sing the song</button>
+    <button class="big-btn orange" id="mQuiz">🙋 Who am I? Use “I”</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Song of I', subtitle: 'It is Fun · Let us sing', back: '../index.html#ch3' });
+
+const SONG = [
+  { t: '<b>I</b> is both a letter and a word', clap: true },
+  { t: '<b>I</b> is both a letter and a word', clap: true },
+  { t: 'Even though they look the same', clap: false },
+  { t: 'You use <b>I</b> and not your name', clap: false },
+  { t: '<b>I</b> is both a letter and a word.', clap: true },
+];
+const area = G.$('#area');
+
+/* A short burst of noise sounds like a hand clap. */
+function clap(at = 0) {
+  if (G.isMuted()) return;
+  const c = G.ctx();
+  const buf = c.createBuffer(1, c.sampleRate * 0.15, c.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 4);
+  const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+  src.buffer = buf; f.type = 'bandpass'; f.frequency.value = 1500; g.gain.value = 0.9;
+  src.connect(f).connect(g).connect(c.destination);
+  src.start(c.currentTime + at);
+}
+function claps(n = 3) {
+  for (let k = 0; k < n; k++) clap(k * 0.45);
+  const h = G.$('#hands');
+  if (h) { h.classList.remove('go'); void h.offsetWidth; h.classList.add('go'); }
+}
+
+function sing() {
+  let token = 0;
+  area.innerHTML = `<div class="hands" id="hands">👏</div>
+    <div class="card song" id="song">${SONG.map((l) => `<span class="line">${l.t}${l.clap ? ' <span class="clap">(clap clap clap)</span>' : ''}</span>`).join('')}</div>
+    <div class="row" style="margin-top:1rem">
+      <button class="big-btn green" id="play">▶ Sing with me</button>
+      <button class="big-btn orange" id="clapBtn">👏 Clap clap clap</button>
+      <button class="big-btn ghost" id="stop">⏹ Stop</button>
+    </div>
+    <p class="hint" style="margin-top:1rem">💡 When we talk about ourselves, we say <b>I</b>, not our name: “<b>I</b> am Riya.” <b>I</b> is always a capital letter.</p>`;
+  const lines = G.$$('.line', area);
+  const mark = (i) => lines.forEach((l, k) => l.classList.toggle('now', k === i));
+  function go(i, my) {
+    if (my !== token) return;
+    if (i >= SONG.length) { mark(-1); G.star(2); G.confetti(20); return; }
+    mark(i);
+    G.say(SONG[i].t.replace(/<[^>]+>/g, ''), {
+      rate: 0.85,
+      onend: () => {
+        if (my !== token) return;
+        if (SONG[i].clap) { claps(); setTimeout(() => go(i + 1, my), 1600); } else setTimeout(() => go(i + 1, my), 300);
+      },
+    });
+  }
+  G.$('#play').onclick = () => { token++; speechSynthesis.cancel(); go(0, token); };
+  G.$('#stop').onclick = () => { token++; speechSynthesis.cancel(); mark(-1); };
+  G.$('#clapBtn').onclick = () => claps();
+}
+
+function quiz() {
+  area.innerHTML = `<p class="hint">The child is talking about himself or herself. Which word fits?</p>
+    <div class="card" id="game" style="width:100%;max-width:76rem"></div>`;
+  const ITEMS = [
+    { who: '👧🏽', n: 'Riya', s: 'am Riya.' },
+    { who: '👦🏽', n: 'Aman', s: 'can hop like a frog.' },
+    { who: '👧🏻', n: 'Sara', s: 'like to swim like a fish.' },
+    { who: '👦🏻', n: 'Kabir', s: 'can climb like a cat.' },
+    { who: '👧🏾', n: 'Meena', s: 'have a red bicycle.' },
+    { who: '👦🏾', n: 'Jeet', s: 'hit the ball hard.' },
+  ];
+  G.quiz({
+    el: G.$('#game'),
+    items: ITEMS,
+    question: (it) => `<div class="who">${it.who}</div><div class="t">${it.n} says: “<span class="blank">&nbsp;?&nbsp;</span> ${it.s}”</div>`,
+    options: (it) => G.shuffle([{ label: 'I', value: 'I' }, { label: 'i', value: 'i' }, { label: it.n, value: it.n }]),
+    answer: () => 'I',
+    onShow: (it, el) => {
+      G.say(it.n + ' says: blank ' + it.s);
+      G.$$('.choice', el).forEach((b) => b.addEventListener('click', () => {
+        if (b.classList.contains('right')) G.$('.blank', el).textContent = 'I';
+      }));
+    },
+    explain: (it) => `“<b>I</b> ${it.s}” We use capital <b>I</b>, not our name.`,
+    endMsg: 'You know how to use “I”!',
+  });
+}
+
+G.$('#mSing').onclick = sing;
+G.$('#mQuiz').onclick = quiz;
+sing();
+</script>
+</body>
+</html>
