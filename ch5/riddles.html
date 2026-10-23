@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .q .t { font-family: var(--read); font-size: 2.8rem; line-height: 1.4; margin: 0.6rem 0 1.2rem; }
+  .q .who { font-size: 4rem; }
+  .choice { font-size: 2rem; min-width: 14rem; display: flex; flex-direction: column; align-items: center; }
+  .choice .e { font-size: 5rem; line-height: 1.1; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Listen to the riddle. Which vehicle is it? Tap it!</p>
+  <div class="card" id="game" style="width:100%;max-width:80rem"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Guess the Vehicle', subtitle: 'Come Back Soon · Riddles', back: '../index.html#ch5' });
+
+const V = { bus: '🚌', train: '🚆', boat: '⛵', plane: '✈️', taxi: '🚕', car: '🚗', rocket: '🚀', bicycle: '🚲', ship: '🚢', helicopter: '🚁', tractor: '🚜', truck: '🚚' };
+const ITEMS = [
+  { t: 'I have wings. I fly high in the sky.', a: 'plane', o: ['plane', 'bus', 'boat'] },
+  { t: 'I can take you to the moon!', a: 'rocket', o: ['rocket', 'taxi', 'train'] },
+  { t: 'I run on a railway track. I have many coaches.', a: 'train', o: ['train', 'car', 'ship'] },
+  { t: 'I move on water. I am small.', a: 'boat', o: ['boat', 'truck', 'plane'] },
+  { t: 'I am yellow and black. You pay to ride in me.', a: 'taxi', o: ['taxi', 'boat', 'rocket'] },
+  { t: 'I have two wheels. You push the pedals.', a: 'bicycle', o: ['bicycle', 'bus', 'ship'] },
+  { t: 'Many children go to school in me.', a: 'bus', o: ['bus', 'rocket', 'boat'] },
+  { t: 'I fly. I have no wings but I have big blades on top.', a: 'helicopter', o: ['helicopter', 'train', 'car'] },
+  { t: 'I am very big. I carry people across the sea.', a: 'ship', o: ['ship', 'taxi', 'bicycle'] },
+  { t: 'Farmers use me in the fields.', a: 'tractor', o: ['tractor', 'plane', 'boat'] },
+];
+
+G.quiz({
+  el: G.$('#game'),
+  items: ITEMS,
+  question: (it) => `<div class="who">🤔</div><div class="t">${it.t}<br>What am I?</div>`,
+  options: (it) => G.shuffle(it.o).map((x) => ({ label: `<span class="e">${V[x]}</span>${x}`, value: x })),
+  answer: (it) => it.a,
+  onShow: (it) => G.say(it.t + ' What am I?'),
+  explain: (it) => `I am a <b>${it.a}</b>!`,
+  endMsg: 'You know your vehicles!',
+});
+</script>
+</body>
+</html>

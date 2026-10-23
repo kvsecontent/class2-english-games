@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .flip { perspective: 120rem; width: min(48rem, 90vw); height: 26rem; margin: 0 auto; }
+  .flip .inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
+  .flip.turned .inner { transform: rotateY(180deg); }
+  .face {
+    position: absolute; inset: 0; backface-visibility: hidden; border-radius: 2rem;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.6rem;
+    background: #fff; border: 0.3rem solid var(--line); box-shadow: 0 0.6rem 0 rgba(0, 0, 0, 0.1); padding: 1.4rem;
+  }
+  .face.back { transform: rotateY(180deg); background: #fff8d6; }
+  .face .emo { font-size: 8rem; line-height: 1; }
+  .face .word { font-family: var(--read); font-size: 4.4rem; font-weight: 700; color: var(--purple); }
+  .face .mean { font-size: 1.8rem; font-weight: 700; }
+  .face .line { font-family: var(--read); font-size: 1.7rem; color: var(--muted); }
+  .face .line b { color: var(--red); }
+  .nav { margin-top: 1.2rem; }
+  .q .emo { font-size: 8rem; }
+  .q .mean { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; }
+  .choice { font-family: var(--read); }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mCards">🃏 Word cards</button>
+    <button class="big-btn orange" id="mGame">🎯 Match game</button>
+  </div>
+  <div id="area" style="width:100%"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'New Word Cards', subtitle: 'Come Back Soon · New words', back: '../index.html#ch5' });
+
+const WORDS = [
+  { w: 'train', e: '🚆', m: 'Many coaches that run on a railway track.', l: 'Take a bus or take a <b>train</b>.' },
+  { w: 'boat', e: '⛵', m: 'It takes people across water.', l: 'Take a <b>boat</b> or take a plane.' },
+  { w: 'plane', e: '✈️', m: 'It has wings and flies in the sky.', l: 'Or take a <b>plane</b>.' },
+  { w: 'taxi', e: '🚕', m: 'A car you pay to ride in.', l: 'Take a <b>taxi</b>, take a car.' },
+  { w: 'near', e: '🏠', m: 'Not far away; close by.', l: 'Maybe <b>near</b> or maybe far.' },
+  { w: 'rocket', e: '🚀', m: 'It flies up into space.', l: 'Take a <b>rocket</b> to the moon.' },
+];
+const area = G.$('#area');
+
+function cards() {
+  let i = 0;
+  area.innerHTML = `
+    <p class="hint">Tap the card to turn it over. Tap 🔊 to hear the word.</p>
+    <div class="flip" id="flip"><div class="inner">
+      <div class="face front"><div class="emo"></div><div class="word"></div></div>
+      <div class="face back"><div class="word"></div><div class="mean"></div><div class="line"></div></div>
+    </div></div>
+    <div class="row nav">
+      <button class="big-btn ghost" id="prev">◀</button>
+      <button class="say" id="hear">🔊</button>
+      <span class="prompt" id="count" style="margin:0"></span>
+      <button class="big-btn ghost" id="next">▶</button>
+    </div>`;
+  const flip = G.$('#flip');
+  const draw = () => {
+    const c = WORDS[i];
+    flip.classList.remove('turned');
+    G.$('.front .emo').textContent = c.e;
+    G.$$('.word', flip).forEach((x) => (x.textContent = c.w));
+    G.$('.back .mean').textContent = c.m;
+    G.$('.back .line').innerHTML = c.l;
+    G.$('#count').textContent = `${i + 1} / ${WORDS.length}`;
+    G.say(c.w);
+  };
+  flip.onclick = () => {
+    flip.classList.toggle('turned');
+    if (flip.classList.contains('turned')) G.say(WORDS[i].w + '. ' + WORDS[i].m + ' ' + WORDS[i].l.replace(/<[^>]+>/g, ''));
+  };
+  G.$('#prev').onclick = () => { i = (i + WORDS.length - 1) % WORDS.length; draw(); };
+  G.$('#next').onclick = () => { i = (i + 1) % WORDS.length; draw(); };
+  G.$('#hear').onclick = () => G.say(WORDS[i].w, { rate: 0.65 });
+  draw();
+}
+
+function game() {
+  area.innerHTML = `<p class="hint">Look at the picture and the meaning. Tap the right word!</p>
+    <div class="card" id="game" style="max-width:70rem;margin:0 auto"></div>`;
+  G.quiz({
+    el: G.$('#game'),
+    items: WORDS,
+    question: (it) => `<div class="emo">${it.e}</div><div class="mean">${it.m}</div>`,
+    options: (it) => G.shuffle([it, ...G.shuffle(WORDS.filter((x) => x !== it)).slice(0, 2)]).map((x) => ({ label: x.w, value: x.w })),
+    answer: (it) => it.w,
+    onShow: (it) => G.say(it.m),
+    explain: (it) => it.l,
+    endMsg: 'You learnt all the new words!',
+  });
+}
+
+G.$('#mCards').onclick = cards;
+G.$('#mGame').onclick = game;
+cards();
+</script>
+</body>
+</html>

@@ -223,7 +223,40 @@ const CHAPTERS = [
       ]},
     ],
   },
-  ...Array.from({ length: 9 }, (_, i) => ({ n: i + 5, title: 'Coming soon', sections: [] })),
+  {
+    n: 5, unit: 'Unit 3 · Going Places', title: 'Come Back Soon',
+    sections: [
+      { key: 'recite', name: '🎤 Let us recite', games: [
+        { href: 'ch5/poem.html', ic: '📖', t: 'Poem Time', d: 'Listen, read and say "Come Back Soon"' },
+        { href: 'ch5/poem-missing.html', ic: '🧩', t: 'Missing Word', d: 'Find the word that fits the poem' },
+        { href: 'ch5/riddles.html', ic: '🤔', t: 'Guess the Vehicle', d: 'I have wings. I fly. What am I?' },
+      ]},
+      { key: 'read', name: '👀 Words', games: [
+        { href: 'ch5/sight-words.html', ic: '🎈', t: 'Pop the Sight Word', d: 'take · is · the · or · two · maybe' },
+        { href: 'ch5/new-words.html', ic: '🃏', t: 'New Word Cards', d: 'train · boat · plane · taxi · near · rocket' },
+      ]},
+      { key: 'speak', name: '🗣️ Let us speak', games: [
+        { href: 'ch5/talk-wheel.html', ic: '🎡', t: 'Talk Wheel', d: 'Have you travelled by bus or train?' },
+      ]},
+      { key: 'listen', name: '👂 Let us listen', games: [
+        { href: 'ch5/action-poem.html', ic: '🤸', t: 'Everybody Jump!', d: 'Listen and do: jump, run, stop, sit' },
+      ]},
+      { key: 'think', name: '🎨 Let us draw', games: [
+        { href: 'ch5/draw-vehicle.html', ic: '🚀', t: 'Draw a Vehicle', d: 'Draw the vehicle you like the most' },
+      ]},
+      { key: 'write', name: '✏️ Let us write', games: [
+        { href: 'ch5/transport-sort.html', ic: '🚢', t: 'Land, Air or Water?', d: 'Make a list: sort 15 vehicles' },
+      ]},
+      { key: 'read', name: '🔤 Sound "u" (a / an)', games: [
+        { href: 'ch5/a-or-an.html', ic: '☂️', t: 'a or an?', d: 'an umbrella · a truck · a duck · a hut' },
+        { href: 'ch5/word-train.html', ic: '🚂', t: 'Word Train', d: 'Make words: b + us = bus' },
+      ]},
+      { key: 'play', name: '🏁 Class challenge', games: [
+        { href: 'ch5/vehicle-race.html', ic: '🏆', t: 'Vehicle Race', d: 'Team A vs Team B – whole chapter quiz' },
+      ]},
+    ],
+  },
+  ...Array.from({ length: 8 }, (_, i) => ({ n: i + 6, title: 'Coming soon', sections: [] })),
 ];
 
 const tabs = document.getElementById('tabs');

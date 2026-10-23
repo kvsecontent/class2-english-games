@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; width: 100%; max-width: 110rem; align-items: center; }
+  .poem { font-family: var(--read); font-size: 2.4rem; line-height: 1.45; }
+  .poem .line { display: block; padding: 0 0.6rem; border-radius: 0.6rem; transition: background 0.2s; }
+  .poem .line.now { background: #ffd34d; }
+  .poem .gap { height: 1rem; }
+  .stage-box { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
+  .kid { font-size: 11rem; line-height: 1; height: 13rem; display: flex; align-items: flex-end; }
+  .kid.jump { animation: jump 0.5s 3; } .kid.run { animation: run 0.3s 6; } .kid.stop { animation: none; }
+  .kid.stand { animation: pop 0.4s; } .kid.sit { transform: scaleY(0.75); transform-origin: bottom; } .kid.hand { animation: pop 0.4s 2; }
+  @keyframes jump { 50% { transform: translateY(-3rem); } }
+  @keyframes run { 50% { transform: translateX(1.5rem); } }
+  .cmd { font-size: 3.4rem; font-weight: 800; color: var(--purple); min-height: 4.6rem; }
+  .hidden-cmd { filter: blur(0.6rem); }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mPoem">🎵 Listen and do the poem</button>
+    <button class="big-btn orange" id="mGame">👂 Everybody… game</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Everybody Jump!', subtitle: 'Come Back Soon · Let us listen', back: '../index.html#ch5' });
+
+const POEM = [
+  ['Everybody jump,', 'jump'], ['Everybody run,', 'run'], ['Everybody stop,', 'stop'], ['Oh! What fun.', 'fun'],
+  null,
+  ['Everybody stop,', 'stop'], ['Everybody stand,', 'stand'], ['Everybody sit,', 'sit'], ['and raise your hand.', 'hand'],
+];
+const POSE = { jump: '🤸', run: '🏃', stop: '🧍', fun: '😄', stand: '🧍', sit: '🧎', hand: '🙋' };
+const area = G.$('#area');
+let token = 0;
+
+function pose(k) {
+  const kid = G.$('#kid');
+  kid.className = 'kid';
+  void kid.offsetWidth;
+  kid.textContent = POSE[k];
+  kid.classList.add(k);
+}
+
+function poem() {
+  token++;
+  area.innerHTML = `<p class="hint">Listen to the poem and do the actions with your friends!</p>
+    <div class="wrap">
+      <div class="card poem" id="poem">${POEM.map((l) => (l ? `<span class="line">${l[0]}</span>` : '<span class="gap"></span>')).join('')}</div>
+      <div class="stage-box"><div class="kid" id="kid">🧍</div>
+        <div class="row"><button class="big-btn green" id="play">▶ Read and act</button><button class="big-btn ghost" id="stop">⏹ Stop</button></div></div>
+    </div>`;
+  const items = POEM.filter(Boolean), lines = G.$$('.line');
+  function go(i, my) {
+    if (my !== token) return;
+    lines.forEach((l, k) => l.classList.toggle('now', k === i));
+    if (i >= items.length) { pose('stop'); G.star(2); G.confetti(15); return; }
+    pose(items[i][1]);
+    G.say(items[i][0], { rate: 0.8, onend: () => setTimeout(() => go(i + 1, my), 1500) });
+  }
+  G.$('#play').onclick = () => { token++; go(0, token); };
+  G.$('#stop').onclick = () => { token++; speechSynthesis.cancel(); lines.forEach((l) => l.classList.remove('now')); pose('stop'); };
+  lines.forEach((l, k) => (l.onclick = () => { token++; pose(items[k][1]); G.say(items[k][0]); }));
+}
+
+/* Teacher plays: the board calls out an action, children do it. The picture shows after a pause so everyone listens first. */
+function game() {
+  token++;
+  const CMDS = [['Everybody jump!', 'jump'], ['Everybody run!', 'run'], ['Everybody stop!', 'stop'], ['Everybody stand!', 'stand'], ['Everybody sit!', 'sit'], ['Raise your hand!', 'hand']];
+  let n = 0, last = null;
+  area.innerHTML = `<p class="hint">Listen carefully and do what you hear! The picture comes after.</p>
+    <div class="stage-box card" style="width:100%;max-width:60rem">
+      <div class="cmd hidden-cmd" id="cmd">👂 Listen…</div>
+      <div class="kid" id="kid">🧍</div>
+      <div class="row"><button class="big-btn green" id="next">▶ Next action</button><button class="big-btn ghost" id="again">🔊 Again</button></div>
+      <div class="hint" id="count"></div>
+    </div>`;
+  const say = () => last && G.say(last[0], { rate: 0.85 });
+  G.$('#next').onclick = () => {
+    const my = ++token;
+    let c;
+    do { c = CMDS[Math.floor(Math.random() * CMDS.length)]; } while (c === last);
+    last = c;
+    G.$('#cmd').textContent = '👂 Listen…';
+    G.$('#cmd').classList.add('hidden-cmd');
+    pose('stop');
+    say();
+    setTimeout(() => {
+      if (my !== token) return;
+      G.$('#cmd').textContent = c[0];
+      G.$('#cmd').classList.remove('hidden-cmd');
+      pose(c[1]);
+      G.sfx('good');
+      G.$('#count').textContent = `Actions done: ${++n}`;
+      if (n % 5 === 0) { G.star(); G.confetti(10); }
+    }, 3000);
+  };
+  G.$('#again').onclick = say;
+}
+
+G.$('#mPoem').onclick = poem;
+G.$('#mGame').onclick = game;
+poem();
+</script>
+</body>
+</html>

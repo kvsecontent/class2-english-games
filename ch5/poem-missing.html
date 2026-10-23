@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .q { font-family: var(--read); font-size: 2.8rem; margin: 1rem 0 1.6rem; line-height: 1.4; }
+  .q .blank { display: inline-block; min-width: 7rem; border-bottom: 0.3rem dashed var(--orange); color: var(--orange); }
+  .q .pic { font-size: 5rem; display: block; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Read the line from the poem. Tap the missing word.</p>
+  <div class="card" id="game" style="width:100%;max-width:70rem"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Missing Word', subtitle: 'Come Back Soon · Let us recite', back: '../index.html#ch5' });
+
+const ITEMS = [
+  { pic: '🚌', a: 'Take a', w: 'bus', b: '', opts: ['bus', 'bat', 'bun'] },
+  { pic: '🚆', a: 'Or take a', w: 'train,', b: '', opts: ['train,', 'tree,', 'rain,'] },
+  { pic: '⛵', a: 'Take a', w: 'boat', b: '', opts: ['boat', 'goat', 'coat'] },
+  { pic: '✈️', a: 'Or take a', w: 'plane,', b: '', opts: ['plane,', 'plate,', 'plant,'] },
+  { pic: '🚕', a: 'Take a', w: 'taxi,', b: '', opts: ['taxi,', 'tiger,', 'table,'] },
+  { pic: '🚗', a: 'Take a', w: 'car,', b: '', opts: ['car,', 'cat,', 'cap,'] },
+  { pic: '🏠🏔️', a: 'Maybe near', w: 'Or', b: 'maybe far,', opts: ['Or', 'And', 'To'] },
+  { pic: '🚀', a: 'Take a', w: 'rocket', b: '', opts: ['rocket', 'pocket', 'basket'] },
+  { pic: '🌙', a: 'To the', w: 'moon,', b: '', opts: ['moon,', 'sun,', 'sea,'] },
+  { pic: '🏡', a: 'But be sure', w: 'To come back soon.', b: '', opts: ['To come back soon.', 'To stay there.', 'To go to sleep.'] },
+];
+
+G.quiz({
+  el: G.$('#game'),
+  items: ITEMS,
+  shuffleItems: false,
+  question: (it) => `<span class="pic">${it.pic}</span>${it.a} <span class="blank">&nbsp;?&nbsp;</span> ${it.b}`,
+  options: (it) => G.shuffle(it.opts).map((o) => ({ label: o, value: o })),
+  answer: (it) => it.w,
+  onShow: (it, el) => {
+    const s = el.querySelector('.q');
+    G.$$('.choice', el).forEach((b) => b.addEventListener('click', () => {
+      if (b.classList.contains('right')) s.querySelector('.blank').textContent = it.w;
+    }));
+  },
+  explain: (it) => `${it.a} ${it.w} ${it.b}`,
+  endMsg: 'You know the poem "Come Back Soon"!',
+});
+</script>
+</body>
+</html>
