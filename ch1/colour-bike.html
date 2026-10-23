@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .wrap { display: grid; grid-template-columns: 1fr 24rem; gap: 1.4rem; align-items: center; }
+  .bike-box { background: #fff; border-radius: var(--radius); border: 0.25rem solid var(--line); padding: 1rem; }
+  .bike [data-paint] { cursor: pointer; }
+  .palette { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
+  .sw { aspect-ratio: 1; border-radius: 50%; border: 0.35rem solid #fff; box-shadow: 0 0 0 0.2rem var(--line); font-size: 1.1rem; font-weight: 800; color: #fff; text-shadow: 0 1px 2px #000; }
+  .sw.on { box-shadow: 0 0 0 0.4rem var(--ink); }
+  .task { font-family: var(--read); font-size: 1.6rem; line-height: 1.5; }
+  .task li.ok { color: var(--green); }
+  .task li.ok::marker { content: '✅ '; }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <div class="bike-box" id="bike"></div>
+    <div class="center" style="gap:1rem">
+      <p class="hint" style="margin:0">Pick a colour, then tap a part of the bicycle.</p>
+      <div class="palette" id="pal"></div>
+      <div class="card task">
+        <b>Colour it like the poem:</b>
+        <ul id="tasks">
+          <li data-k="frame">I have a <b>red</b> bicycle.</li>
+          <li data-k="seat">The seat is <b>blue</b> in colour.</li>
+          <li data-k="tyre">The tyres are <b>black</b>.</li>
+          <li data-k="pedal">The pedals are <b>black</b>.</li>
+        </ul>
+      </div>
+      <button class="big-btn ghost" id="reset">🔁 Clear colours</button>
+    </div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Colour the Bicycle', subtitle: 'My Bicycle · Read and colour' });
+
+const COLS = { red: '#e63946', blue: '#2f7de1', black: '#222222', yellow: '#ffc93c', green: '#2bb673', pink: '#ff6fa8', orange: '#ff8a3d', purple: '#8a5cf6', brown: '#8b5a2b' };
+const GOAL = { frame: 'red', seat: 'blue', tyre: 'black', pedal: 'black' };
+let pick = 'red';
+const state = {};
+
+G.$('#pal').innerHTML = Object.entries(COLS).map(([n, c]) => `<button class="sw ${n === pick ? 'on' : ''}" data-n="${n}" style="background:${c}">${n}</button>`).join('');
+G.$('#pal').onclick = (e) => {
+  const b = e.target.closest('.sw');
+  if (!b) return;
+  pick = b.dataset.n;
+  G.$$('.sw').forEach((x) => x.classList.toggle('on', x === b));
+  G.say(pick);
+};
+
+function build() {
+  Object.keys(state).forEach((k) => delete state[k]);
+  G.$('#bike').innerHTML = G.bikeSVG({ plain: true });
+  G.$$('#tasks li').forEach((li) => li.classList.remove('ok'));
+  G.$$('[data-paint]').forEach((el) => {
+    el.style.pointerEvents = 'all'; // whole wheel / frame area is tappable, easier for small fingers
+    el.addEventListener('click', () => paint(el.dataset.paint));
+  });
+}
+function paint(k) {
+  state[k] = pick;
+  G.$$(`[data-paint="${k}"]`).forEach((el) => {
+    if (k === 'tyre' || k === 'frame') el.setAttribute('stroke', COLS[pick]);
+    else el.setAttribute('fill', COLS[pick]);
+  });
+  G.sfx('pop');
+  const li = G.$(`#tasks li[data-k="${k}"]`);
+  const ok = state[k] === GOAL[k];
+  if (ok && !li.classList.contains('ok')) { G.star(); G.sfx('good'); G.say(li.textContent); }
+  li.classList.toggle('ok', ok);
+  if (Object.keys(GOAL).every((g) => state[g] === GOAL[g])) setTimeout(() => G.end({ title: 'Beautiful!', msg: 'Your bicycle looks just like the one in the poem.', onReplay: build }), 900);
+}
+G.$('#reset').onclick = build;
+build();
+</script>
+</body>
+</html>

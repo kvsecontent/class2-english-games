@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .q { font-family: var(--read); font-size: 2.8rem; margin: 1rem 0 1.6rem; line-height: 1.4; }
+  .q .blank { display: inline-block; min-width: 7rem; border-bottom: 0.3rem dashed var(--orange); color: var(--orange); }
+  .q .pic { font-size: 5rem; display: block; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Read the line from the poem. Tap the missing word.</p>
+  <div class="card" id="game" style="width:100%;max-width:70rem"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Missing Word', subtitle: 'My Bicycle · Let us recite' });
+
+const ITEMS = [
+  { pic: '🚲', a: 'I have a', w: 'red', b: 'bicycle.', opts: ['red', 'blue', 'big'] },
+  { pic: '🦶', a: 'I', w: 'pedal', b: 'and I ride.', opts: ['pedal', 'run', 'sing'] },
+  { pic: '🔔', a: 'Trin… trin… trin… goes the', w: 'bell.', b: '', opts: ['bell.', 'ball.', 'bus.'] },
+  { pic: '🧍‍♀️🧍', a: 'Makes my friends move', w: 'aside.', b: '', opts: ['aside.', 'up.', 'inside.'] },
+  { pic: '💺', a: 'The seat is', w: 'blue', b: 'in colour,', opts: ['blue', 'red', 'green'] },
+  { pic: '⚫', a: 'The tyres and pedals are', w: 'black.', b: '', opts: ['black.', 'white.', 'pink.'] },
+  { pic: '🐇🐢', a: 'Sometimes fast, sometimes', w: 'slow,', b: '', opts: ['slow,', 'tall,', 'hot,'] },
+  { pic: '🛤️', a: 'But my bicycle is always on', w: 'track.', b: '', opts: ['track.', 'tree.', 'bed.'] },
+  { pic: '💨', a: 'All I need is some', w: 'air.', b: '', opts: ['air.', 'water.', 'milk.'] },
+  { pic: '⛑️', a: 'I put on my little', w: 'helmet,', b: '', opts: ['helmet,', 'shoe,', 'bag,'] },
+  { pic: '🌍', a: 'And go happily', w: 'everywhere.', b: '', opts: ['everywhere.', 'nowhere.', 'to bed.'] },
+];
+
+G.quiz({
+  el: G.$('#game'),
+  items: ITEMS,
+  shuffleItems: false,
+  question: (it) => `<span class="pic">${it.pic}</span>${it.a} <span class="blank">&nbsp;?&nbsp;</span> ${it.b}`,
+  options: (it) => G.shuffle(it.opts).map((o) => ({ label: o, value: o })),
+  answer: (it) => it.w,
+  onShow: (it, el) => {
+    const s = el.querySelector('.q');
+    G.$$('.choice', el).forEach((b) => b.addEventListener('click', () => {
+      if (b.classList.contains('right')) s.querySelector('.blank').textContent = it.w;
+    }));
+  },
+  explain: (it) => `${it.a} ${it.w} ${it.b}`,
+  endMsg: 'You know the poem "My Bicycle"!',
+});
+</script>
+</body>
+</html>

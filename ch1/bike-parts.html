@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  /* fit board + word bank on one screen */
+  .board { position: relative; width: min(100%, 78rem, calc((100vh - 17rem) * 1.43)); margin: 0 auto; aspect-ratio: 800 / 560; }
+  .board .bike { position: absolute; left: 6%; top: 6%; width: 88%; }
+  .board svg.lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .zone {
+    position: absolute; margin: -1.8rem 0 0 -4.75rem; /* centred on its point; leaves transform free for animations */
+    width: 9.5rem; height: 3.6rem; border-radius: 1rem;
+    border: 0.25rem dashed var(--orange); background: #fffaf0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--read); font-size: 1.8rem; font-weight: 700; color: var(--muted);
+  }
+  .zone.filled { border-style: solid; border-color: var(--green); background: #d9f7e8; color: #117a4a; animation: pop 0.35s; }
+  .zone.nope { border-color: var(--red); background: #ffe1e3; animation: shake 0.4s; }
+  .bank { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; margin-top: 1rem; min-height: 4.5rem; }
+  .chip {
+    border: 0; border-radius: 1rem; background: var(--blue); color: #fff;
+    font-family: var(--read); font-size: 2rem; font-weight: 700; padding: 0.5rem 1.4rem; min-height: 4rem;
+    box-shadow: 0 0.35rem 0 rgba(0, 0, 0, 0.2);
+  }
+  .chip.used { visibility: hidden; }
+  .bike [data-part].glow { filter: drop-shadow(0 0 10px #ffd34d) drop-shadow(0 0 6px #ffd34d); }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Drag a word to its box on the bicycle (or tap a word, then tap the box).</p>
+  <div class="board" id="board"></div>
+  <div class="bank" id="bank"></div>
+  <div class="row"><button class="big-btn ghost" id="reset">🔁 Start again</button></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Name the Parts', subtitle: 'My Bicycle · Let us write' });
+
+/* Box positions are % of the board; the line points at the part (bike drawn at 6% left, 6% top, 88% wide). */
+const PARTS = [
+  { p: 'bell', box: [52, 4], at: [520, 102] },
+  { p: 'handle', box: [86, 10], at: [585, 124] },
+  { p: 'brake', box: [92, 34], at: [600, 154] },
+  { p: 'seat', box: [32, 8], at: [318, 165] },
+  { p: 'carrier', box: [9, 22], at: [180, 205] },
+  { p: 'pedal', box: [56, 92], at: [436, 404] },
+  { p: 'wheel', box: [12, 92], at: [140, 420] },
+];
+const board = G.$('#board');
+
+function build() {
+  board.innerHTML = G.bikeSVG() + `<svg class="lines" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>`;
+  const lines = G.$('svg.lines', board);
+  // Bike coordinate -> board % (board is 800 x 560 units; bike scaled by 0.88).
+  const pt = ([x, y]) => [6 + (x / 800) * 88, ((0.06 * 560 + y * 0.88) / 560) * 100];
+  PARTS.forEach((it) => {
+    const [px, py] = pt(it.at);
+    lines.insertAdjacentHTML('beforeend',
+      `<line x1="${it.box[0]}" y1="${it.box[1]}" x2="${px}" y2="${py}" stroke="#ff8a3d" stroke-width="0.35" stroke-dasharray="1 0.8"/>
+       <circle cx="${px}" cy="${py}" r="0.8" fill="#ff8a3d"/>`);
+    const z = document.createElement('div');
+    z.className = 'zone';
+    z.dataset.p = it.p;
+    z.style.left = it.box[0] + '%';
+    z.style.top = it.box[1] + '%';
+    z.textContent = '?';
+    board.append(z);
+  });
+  const bank = G.$('#bank');
+  bank.innerHTML = G.shuffle(PARTS).map((it) => `<button class="chip" data-p="${it.p}">${it.p}</button>`).join('');
+  let done = 0, mistakes = 0;
+  G.tapDrag(G.$$('.chip'), G.$$('.zone', board), (chip, zone) => {
+    if (zone.classList.contains('filled')) return;
+    if (chip.dataset.p === zone.dataset.p) {
+      zone.classList.add('filled');
+      zone.textContent = chip.dataset.p;
+      chip.classList.add('used');
+      chip.dataset.locked = 1;
+      G.sfx('good');
+      G.star();
+      G.say(chip.dataset.p);
+      const part = G.$$(`.bike [data-part="${chip.dataset.p}"]`, board);
+      part.forEach((p) => p.classList.add('glow'));
+      setTimeout(() => part.forEach((p) => p.classList.remove('glow')), 1500);
+      if (++done === PARTS.length) setTimeout(() => G.end({ title: 'Bicycle expert!', msg: mistakes ? 'You named all the parts.' : 'All parts right on the first try!', onReplay: build }), 900);
+    } else {
+      mistakes++;
+      zone.classList.add('nope');
+      G.sfx('bad');
+      G.say('Not ' + chip.dataset.p + '. Try again.');
+      setTimeout(() => zone.classList.remove('nope'), 500);
+    }
+  });
+}
+G.$('#reset').onclick = build;
+build();
+</script>
+</body>
+</html>

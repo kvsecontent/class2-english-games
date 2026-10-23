@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .table { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; width: 100%; max-width: 80rem; }
+  .tile { background: #fff; border: 0.25rem solid var(--line); border-radius: 1.4rem; box-shadow: var(--shadow);
+    padding: 0.8rem; display: flex; flex-direction: column; align-items: center; font-family: var(--read); font-size: 2.4rem; }
+  .tile .e { font-size: 6rem; line-height: 1.1; height: 7rem; display: flex; align-items: center; }
+  .tile .e svg { height: 6rem; }
+  .tile b { color: var(--orange); }
+  .tile.an b { color: var(--purple); }
+  .rule { font-size: 1.6rem; font-weight: 700; margin: 1rem 0; }
+  .rule .v { color: var(--purple); font-size: 2rem; }
+  .q .e { font-size: 10rem; line-height: 1; height: 11rem; display: flex; align-items: center; justify-content: center; }
+  .q .e svg { height: 9rem; }
+  .q .sent { font-family: var(--read); font-size: 3.4rem; margin: 0.4rem 0 1.2rem; }
+  .q .sent .blank { display: inline-block; min-width: 4.5rem; border-bottom: 0.3rem dashed var(--orange); color: var(--orange); }
+  .q .sent .first { color: var(--purple); text-decoration: underline; }
+  .choice { font-family: var(--read); font-size: 3rem; min-width: 10rem; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mRead">📖 Read the words</button>
+    <button class="big-btn orange" id="mGame">🎯 a or an?</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'a or an?', subtitle: 'My Bicycle · Vowel sound "a" as in pan' });
+
+const MAT = `<svg viewBox="0 0 200 120"><rect x="10" y="20" width="180" height="80" rx="8" fill="#ff8a3d"/>
+  <path d="M10 45 H190 M10 75 H190" stroke="#ffd34d" stroke-width="10"/>
+  <path d="M10 30 v60 M190 30 v60" stroke="#c45a1a" stroke-width="6" stroke-dasharray="6 6"/></svg>`;
+const BOOK = [
+  { w: 'rat', e: '🐀' }, { w: 'cat', e: '🐈' }, { w: 'mat', e: MAT },
+  { w: 'ant', e: '🐜' }, { w: 'axe', e: '🪓' }, { w: 'apple', e: '🍎' },
+  { w: 'pan', e: '🍳' }, { w: 'man', e: '👨' }, { w: 'cap', e: '🧢' },
+];
+const EXTRA = [{ w: 'egg', e: '🥚' }, { w: 'owl', e: '🦉' }, { w: 'umbrella', e: '☂️' }, { w: 'bat', e: '🦇' }, { w: 'hat', e: '👒' }];
+const art = (w) => (/^[aeiou]/.test(w) ? 'an' : 'a');
+const area = G.$('#area');
+
+function read() {
+  area.innerHTML = `<p class="hint">Tap a picture to hear it.</p>
+    <div class="table">${BOOK.map((x) => `<button class="tile ${art(x.w)}" data-w="${x.w}"><span class="e">${x.e}</span><span><b>${art(x.w)}</b> ${x.w}</span></button>`).join('')}</div>
+    <div class="rule">💡 We say <b class="v">an</b> before words that begin with <b class="v">a, e, i, o, u</b>: an ant, an axe, an apple.</div>`;
+  G.$$('.tile', area).forEach((t) => (t.onclick = () => G.say(art(t.dataset.w) + ' ' + t.dataset.w)));
+}
+
+function game() {
+  area.innerHTML = `<div class="card" id="game" style="width:100%;max-width:70rem"></div>
+    <div class="rule">💡 <b class="v">an</b> comes before <b class="v">a, e, i, o, u</b> words.</div>`;
+  G.quiz({
+    el: G.$('#game'),
+    items: [...BOOK, ...EXTRA],
+    question: (it) => `<div class="e">${it.e}</div>
+      <div class="sent"><span class="blank">&nbsp;?&nbsp;</span> <span class="first">${it.w[0]}</span>${it.w.slice(1)}</div>`,
+    options: () => [{ label: 'a', value: 'a' }, { label: 'an', value: 'an' }],
+    answer: (it) => art(it.w),
+    onShow: (it, el) => {
+      G.say(it.w);
+      G.$$('.choice', el).forEach((b) => b.addEventListener('click', () => {
+        if (b.classList.contains('right')) G.$('.blank', el).textContent = art(it.w);
+      }));
+    },
+    explain: (it) => `${art(it.w)} ${it.w}`,
+    endMsg: 'You know when to use a and an!',
+  });
+}
+
+G.$('#mRead').onclick = read;
+G.$('#mGame').onclick = game;
+read();
+</script>
+</body>
+</html>

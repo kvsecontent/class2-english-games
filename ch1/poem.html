@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .poem-wrap { display: grid; grid-template-columns: 1fr 22rem; gap: 1.4rem; align-items: start; }
+  .poem { font-family: var(--read); font-size: 2.3rem; line-height: 1.55; }
+  .stanza { margin: 0 0 1.2rem; padding: 0.4rem 1rem; border-radius: 1rem; }
+  .stanza.now { background: #fff4cc; }
+  .line { display: block; border-radius: 0.6rem; padding: 0 0.3rem; transition: background 0.2s; }
+  .line.now { background: #ffd34d; }
+  .w { cursor: pointer; border-radius: 0.4rem; }
+  .w:active { background: #cfe3ff; }
+  .show-tags .w.sight { background: #d9f7e8; color: #117a4a; font-weight: 700; }
+  .show-tags .w.new { background: #ffe1ec; color: #b4235a; font-weight: 700; }
+  .side { display: flex; flex-direction: column; gap: 0.8rem; position: sticky; top: 6rem; }
+  .side .big-btn { width: 100%; }
+  .key { font-size: 1.1rem; display: flex; flex-direction: column; gap: 0.4rem; }
+  .key span { padding: 0.2rem 0.6rem; border-radius: 0.5rem; display: inline-block; }
+  .pic { font-size: 5rem; text-align: center; }
+  @media (max-width: 900px) { .poem-wrap { grid-template-columns: 1fr; } .side { position: static; } }
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="poem-wrap">
+    <div class="card poem" id="poem"></div>
+    <div class="side">
+      <div class="pic">🚲</div>
+      <button class="big-btn green" id="readAll">▶ Read the poem</button>
+      <button class="big-btn orange" id="echo">🗣️ My turn, your turn</button>
+      <button class="big-btn ghost" id="stop">⏹ Stop</button>
+      <button class="big-btn purple" id="tags">🎨 Show special words</button>
+      <div class="key card">
+        <b>Tap any word to hear it.</b>
+        <div><span style="background:#d9f7e8;color:#117a4a">Sight words</span> I, and, is, in, my</div>
+        <div><span style="background:#ffe1ec;color:#b4235a">New words</span> pedal, aside, sometimes, track, helmet, everywhere</div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Poem Time: My Bicycle', subtitle: 'Let us recite' });
+
+const POEM = [
+  ['I have a red bicycle.', 'I pedal and I ride.', 'Trin… trin… trin… goes the bell.', 'Makes my friends move aside.'],
+  ['The seat is blue in colour,', 'The tyres and pedals are black.', 'Sometimes fast, sometimes slow,', 'But my bicycle is always on track.'],
+  ['To keep my bicycle moving,', 'All I need is some air.', 'I put on my little helmet,', 'And go happily everywhere.'],
+];
+const SIGHT = ['i', 'and', 'is', 'in', 'my'];
+const NEW = ['pedal', 'aside', 'sometimes', 'track', 'helmet', 'everywhere'];
+
+const poemEl = G.$('#poem');
+poemEl.innerHTML = POEM.map((st, s) => `<div class="stanza" data-s="${s}">` + st.map((ln, l) =>
+  `<span class="line" data-s="${s}" data-l="${l}">` + ln.split(' ').map((w) => {
+    const bare = w.toLowerCase().replace(/[^a-z]/g, '');
+    const cls = SIGHT.includes(bare) ? 'sight' : NEW.includes(bare) ? 'new' : '';
+    return `<span class="w ${cls}" data-w="${bare}">${w}</span>`;
+  }).join(' ') + '</span>').join('') + '</div>').join('');
+
+poemEl.addEventListener('click', (e) => {
+  const w = e.target.closest('.w');
+  if (!w) return;
+  stopAll();
+  if (w.dataset.w === 'trin') G.sfx('trin'); else G.say(w.dataset.w, { rate: 0.7 });
+});
+
+const lines = G.$$('.line');
+let token = 0;
+function clearMarks() { G.$$('.now').forEach((e) => e.classList.remove('now')); }
+function stopAll() { token++; speechSynthesis.cancel(); clearMarks(); }
+
+function mark(i) {
+  clearMarks();
+  const ln = lines[i];
+  ln.classList.add('now');
+  ln.parentElement.classList.add('now');
+  ln.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/* Read each line in turn. pauseMs > 0 leaves time for the class to repeat (echo reading). */
+function readFrom(i, pauseMs) {
+  const my = token;
+  if (i >= lines.length) { clearMarks(); if (pauseMs) { G.star(3); G.confetti(20); } return; }
+  mark(i);
+  const text = lines[i].textContent;
+  if (/Trin/.test(text)) G.sfx('trin');
+  setTimeout(() => {
+    if (my !== token) return;
+    G.say(text.replace(/Trin… trin… trin…/, 'Trin, trin, trin,'), {
+      rate: 0.75,
+      onend: () => { if (my === token) setTimeout(() => readFrom(i + 1, pauseMs), pauseMs || 350); },
+    });
+  }, /Trin/.test(text) ? 600 : 0);
+}
+
+G.$('#readAll').onclick = () => { stopAll(); readFrom(0, 0); };
+G.$('#echo').onclick = () => { stopAll(); readFrom(0, 3200); };
+G.$('#stop').onclick = stopAll;
+G.$('#tags').onclick = () => poemEl.classList.toggle('show-tags');
+</script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1.2rem; }
+  .bells { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; width: 100%; }
+  .bell {
+    border: 0.3rem solid var(--line); background: #fff; border-radius: 1.6rem; padding: 1rem 0.5rem;
+    display: flex; flex-direction: column; align-items: center; gap: 0.3rem; box-shadow: var(--shadow);
+    font-size: 1.5rem; font-weight: 800; min-height: 13rem; justify-content: center;
+  }
+  .bell .e { font-size: 5.5rem; line-height: 1; }
+  .bell.ringing .e { animation: ring 0.25s 6; }
+  .bell.right { border-color: var(--green); background: #d9f7e8; }
+  .bell.wrong { border-color: var(--red); background: #ffe1e3; animation: shake 0.4s; }
+  @keyframes ring { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-14deg); } 75% { transform: rotate(14deg); } }
+  .mystery { font-size: 8rem; border: 0; background: #fff4cc; border-radius: 50%; width: 13rem; height: 13rem; box-shadow: var(--shadow); margin: 0.6rem 0 1rem; }
+  .mystery:active { transform: scale(0.95); }
+  @media (max-width: 900px) { .bells { grid-template-columns: repeat(3, 1fr); } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mExplore">👂 Listen to the bells</button>
+    <button class="big-btn orange" id="mGame">❓ Guess the bell</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Which Bell?', subtitle: 'My Bicycle · Let us listen' });
+
+/* All bell sounds are made by the browser, so no sound files or internet are needed. */
+function partial(freq, at, dur, vol, type = 'sine') { G.tone(freq, at, dur, type, vol); }
+function lfoRing(freq, dur, rate, vol, type = 'triangle') {
+  const c = G.ctx();
+  const o = c.createOscillator(), g = c.createGain(), lfo = c.createOscillator(), lg = c.createGain();
+  o.type = type; o.frequency.value = freq;
+  lfo.type = 'square'; lfo.frequency.value = rate;
+  lg.gain.value = vol / 2; g.gain.value = vol / 2;
+  lfo.connect(lg).connect(g.gain);
+  o.connect(g).connect(c.destination);
+  const t = c.currentTime;
+  g.gain.setTargetAtTime(0, t + dur, 0.05);
+  o.start(t); lfo.start(t); o.stop(t + dur + 0.3); lfo.stop(t + dur + 0.3);
+}
+const BELLS = [
+  { id: 'bicycle', e: '🚲', n: 'Bicycle bell', play: () => { G.sfx('trin'); setTimeout(() => G.sfx('trin'), 650); } },
+  { id: 'school', e: '🏫', n: 'School bell', play: () => lfoRing(950, 2.2, 22, 0.22) },
+  { id: 'temple', e: '🛕', n: 'Temple bell', play: () => [0, 1.6].forEach((at) =>
+      [[220, 0.25], [440, 0.2], [528, 0.12], [1056, 0.08], [1390, 0.05]].forEach(([f, v]) => partial(f, at, 3.2, v))) },
+  { id: 'door', e: '🚪', n: 'Door bell', play: () => { partial(659, 0, 1.2, 0.3); partial(523, 0.6, 1.6, 0.3); } },
+  { id: 'alarm', e: '⏰', n: 'Alarm clock', play: () => lfoRing(2000, 2, 14, 0.12, 'square') },
+];
+const area = G.$('#area');
+const bellBtn = (b) => `<button class="bell" data-id="${b.id}"><span class="e">${b.e}</span>${b.n}</button>`;
+function ringAnim(btn) { btn.classList.remove('ringing'); void btn.offsetWidth; btn.classList.add('ringing'); }
+
+function explore() {
+  area.innerHTML = `<p class="hint">Tap a bell to hear it. Say its name: "This is a school bell."</p>
+    <div class="bells">${BELLS.map(bellBtn).join('')}</div>`;
+  G.$$('.bell', area).forEach((btn) => (btn.onclick = () => {
+    const b = BELLS.find((x) => x.id === btn.dataset.id);
+    ringAnim(btn);
+    b.play();
+  }));
+}
+
+function game() {
+  let order = [], i = 0, firstTry = true;
+  const start = () => { order = G.shuffle([...BELLS, ...BELLS]).slice(0, 8); i = 0; round(); };
+  function round() {
+    if (i >= order.length) { G.end({ title: 'Super listening!', msg: 'You know the sounds of the bells.', onReplay: start }); return; }
+    firstTry = true;
+    area.innerHTML = `<div class="progress" id="pg"></div>
+      <button class="mystery" id="play">🔊</button>
+      <div class="prompt">Which bell is ringing?</div>
+      <div class="bells">${G.shuffle(BELLS).map(bellBtn).join('')}</div>
+      <div class="feedback" id="fb"></div>`;
+    G.progress(G.$('#pg'), i, order.length);
+    const cur = order[i];
+    const play = () => { ringAnim(G.$('#play')); cur.play(); };
+    G.$('#play').onclick = play;
+    setTimeout(play, 500);
+    G.$$('.bell', area).forEach((btn) => (btn.onclick = () => {
+      if (btn.dataset.id === cur.id) {
+        btn.classList.add('right');
+        G.$$('.bell', area).forEach((x) => (x.disabled = true));
+        if (firstTry) G.star();
+        G.sfx('good');
+        G.feedback(G.$('#fb'), true, `🎉 Yes! It is the ${cur.n.toLowerCase()}.`);
+        G.say(`Yes! It is the ${cur.n}.`);
+        i++;
+        setTimeout(round, 2200);
+      } else {
+        firstTry = false;
+        btn.classList.add('wrong');
+        G.sfx('bad');
+        G.feedback(G.$('#fb'), false, '🙂 Listen again!');
+        setTimeout(() => btn.classList.remove('wrong'), 500);
+      }
+    }));
+  }
+  start();
+}
+
+G.$('#mExplore').onclick = explore;
+G.$('#mGame').onclick = game;
+explore();
+</script>
+</body>
+</html>

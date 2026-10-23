@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .q .pic { height: 16rem; display: flex; align-items: center; justify-content: center; font-size: 12rem; line-height: 1; }
+  .q .pic svg { height: 16rem; }
+  .q .name { font-family: var(--read); font-size: 2.6rem; font-weight: 700; margin: 0.4rem 0; }
+  .q .ask { font-size: 1.8rem; font-weight: 700; color: var(--muted); margin-bottom: 1rem; }
+  .choice { font-size: 3rem; min-width: 7rem; }
+  .note { font-size: 1.4rem; font-weight: 700; color: var(--teal); max-width: 60rem; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Look at the picture. How many wheels does it have?</p>
+  <div class="card" id="game" style="width:100%;max-width:70rem"></div>
+  <p class="note">🌟 Wheels help us move! Wheelchairs help senior citizens, injured people and people with disabilities move around.</p>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Wheels Around Us', subtitle: 'My Bicycle · Let us speak' });
+
+const TRICYCLE = `<svg viewBox="0 0 300 220"><circle cx="70" cy="165" r="40" fill="none" stroke="#222" stroke-width="12"/>
+  <circle cx="230" cy="165" r="40" fill="none" stroke="#222" stroke-width="12"/>
+  <circle cx="150" cy="120" r="55" fill="none" stroke="#222" stroke-width="12"/>
+  <path d="M70 165 L230 165 M150 120 L150 55 M120 50 H180 M150 120 L110 165 M150 120 L190 165" stroke="#e63946" stroke-width="10" stroke-linecap="round"/>
+  <ellipse cx="95" cy="110" rx="28" ry="10" fill="#2f7de1"/><path d="M95 118 L110 165" stroke="#e63946" stroke-width="8"/></svg>`;
+
+const ITEMS = [
+  { pic: G.bikeSVG(), name: 'bicycle', n: 2, why: 'A <b>bi</b>cycle has 2 wheels.' },
+  { pic: TRICYCLE, name: 'tricycle', n: 3, why: 'A <b>tri</b>cycle has 3 wheels.' },
+  { pic: '🦽', name: 'wheelchair', n: 4, why: 'A wheelchair has 2 big wheels and 2 small wheels.' },
+  { pic: '🛵', name: 'scooter', n: 2, why: 'A scooter has 2 wheels.' },
+  { pic: '🛺', name: 'auto rickshaw', n: 3, why: 'An auto rickshaw has 3 wheels.' },
+  { pic: '🚗', name: 'car', n: 4, why: 'A car has 4 wheels.' },
+  { pic: '🚌', name: 'bus', n: 4, why: 'A bus has 4 or more wheels.' },
+];
+
+const art = (w) => (/^[aeiou]/.test(w) ? 'an ' : 'a ') + w;
+
+G.quiz({
+  el: G.$('#game'),
+  items: ITEMS,
+  question: (it) => `<div class="pic">${it.pic}</div><div class="name">${art(it.name)}</div><div class="ask">How many wheels?</div>`,
+  options: () => [2, 3, 4].map((n) => ({ label: n, value: n })),
+  answer: (it) => it.n,
+  onShow: (it) => G.say('This is ' + art(it.name) + '. How many wheels does it have?'),
+  explain: (it) => it.why,
+  endMsg: 'You can count wheels!',
+});
+</script>
+</body>
+</html>
