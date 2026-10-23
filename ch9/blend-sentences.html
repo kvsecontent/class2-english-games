@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .head { display: flex; align-items: center; gap: 1rem; justify-content: center; }
+  .head .pic { font-size: 5.5rem; line-height: 1; }
+  .head .key { font-family: var(--read); font-size: 3.4rem; font-weight: 700; color: var(--purple); }
+  .built { min-height: 6rem; display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; align-items: center; margin: 1rem 0; padding: 0.6rem; border-radius: 1.2rem; border: 0.25rem dashed var(--orange); background: #fffaf0; }
+  .built span { font-family: var(--read); font-size: 2.8rem; font-weight: 700; color: #117a4a; background: #d9f7e8; border-radius: 0.8rem; padding: 0.1rem 0.8rem; animation: pop 0.3s; }
+  .tiles { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
+  .tile { border: 0; border-radius: 1rem; background: var(--blue); color: #fff; font-family: var(--read); font-size: 2.6rem; font-weight: 700; padding: 0.4rem 1.2rem; min-height: 4.8rem; box-shadow: 0 0.35rem 0 rgba(0, 0, 0, 0.2); }
+  .tile.used { visibility: hidden; }
+  .tile.wrong { background: var(--red); animation: shake 0.4s; }
+  .own { font-size: 1.5rem; color: var(--muted); margin-top: 0.8rem; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Make a sentence with the word. Tap the words in the right order.</p>
+  <div class="card center" style="width:100%;max-width:90rem">
+    <div class="progress" id="pg"></div>
+    <div class="head"><span class="pic" id="pic"></span><span class="key" id="key"></span><button class="say" id="hear">🔊</button></div>
+    <div class="built" id="built"></div>
+    <div class="tiles" id="tiles"></div>
+    <div class="feedback" id="fb"></div>
+    <div class="own" id="own"></div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Make Sentences', subtitle: 'My Name · Write sentences with bl and pl words', back: '../index.html#ch9' });
+
+/* Words from the book; the first sentence is the book's example, the rest are ours. */
+const ITEMS = [
+  { k: 'blue', e: '🔵', s: 'Rohit has a blue blanket.' },
+  { k: 'black', e: '⚫', s: 'My cat is black.' },
+  { k: 'plum', e: '🫐', s: 'The plum is sweet.' },
+  { k: 'plate', e: '🍽️', s: 'Put the rice on the plate.' },
+  { k: 'plant', e: '🪴', s: 'I water the plant every day.' },
+];
+let i = 0, pos = 0, firstTry = true;
+
+function round() {
+  if (i >= ITEMS.length) { G.end({ title: 'Well done!', msg: 'Now write your own sentences in your notebook.', onReplay: () => { i = 0; round(); } }); return; }
+  const it = ITEMS[i], words = it.s.split(' ');
+  pos = 0; firstTry = true;
+  G.progress(G.$('#pg'), i, ITEMS.length);
+  G.$('#pic').textContent = it.e;
+  G.$('#key').textContent = it.k;
+  G.$('#built').innerHTML = '';
+  G.$('#fb').textContent = '';
+  G.$('#own').textContent = '';
+  let order;
+  do { order = G.shuffle(words.map((w, k) => ({ w, k }))); } while (order.every((o, k) => o.k === k));
+  G.$('#tiles').innerHTML = order.map((o) => `<button class="tile" data-w="${o.w}">${o.w}</button>`).join('');
+  G.say('Make a sentence with the word ' + it.k);
+  G.$$('.tile').forEach((b) => (b.onclick = () => {
+    if (b.dataset.w === words[pos]) {
+      pos++;
+      b.classList.add('used');
+      G.$('#built').insertAdjacentHTML('beforeend', `<span>${b.dataset.w}</span>`);
+      G.sfx('pop');
+      if (pos === words.length) {
+        if (firstTry) G.star();
+        G.sfx('good');
+        G.feedback(G.$('#fb'), true, '🎉 ' + it.s);
+        G.say(it.s);
+        G.$('#own').innerHTML = `💬 Now say your own sentence with “<b>${it.k}</b>”!`;
+        i++;
+        setTimeout(round, 3600);
+      }
+    } else {
+      firstTry = false;
+      b.classList.add('wrong');
+      G.sfx('bad');
+      setTimeout(() => b.classList.remove('wrong'), 450);
+    }
+  }));
+}
+G.$('#hear').onclick = () => ITEMS[i] && G.say(ITEMS[i].k);
+round();
+</script>
+</body>
+</html>

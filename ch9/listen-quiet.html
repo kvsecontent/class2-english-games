@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .timer { width: 18rem; height: 18rem; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: conic-gradient(var(--green) var(--p, 0%), #e9f6ff 0); box-shadow: var(--shadow); }
+  .timer .in { width: 14rem; height: 14rem; border-radius: 50%; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .timer .n { font-size: 5rem; font-weight: 800; line-height: 1; }
+  .timer .e { font-size: 3rem; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; width: 100%; max-width: 100rem; margin-top: 1rem; }
+  .snd { background: #fff; border: 0.25rem solid var(--line); border-radius: 1.4rem; box-shadow: var(--shadow); padding: 0.5rem; font-family: var(--read); font-size: 1.8rem; font-weight: 700; display: flex; flex-direction: column; align-items: center; min-height: 8rem; justify-content: center; }
+  .snd .e { font-size: 3.6rem; line-height: 1.1; }
+  .snd.on { background: #d9f7e8; border-color: var(--green); }
+  .said { font-family: var(--read); font-size: 2rem; min-height: 3rem; margin-top: 0.8rem; text-align: center; }
+  @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Sit down under a tree (or in the classroom). Close your eyes. Sit quietly and listen. What do you hear?</p>
+  <div class="row">
+    <div class="timer" id="timer"><div class="in"><span class="e">🤫</span><span class="n" id="n">60</span></div></div>
+    <div style="display:flex;flex-direction:column;gap:0.8rem">
+      <button class="big-btn green" id="go">▶ Start quiet time</button>
+      <button class="big-btn ghost" id="stop">⏹ Stop</button>
+    </div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="said" id="said">Tap the sounds you heard.</div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Sit Quietly and Listen', subtitle: 'My Name · Let us listen · A', back: '../index.html#ch9' });
+
+const SOUNDS = [
+  ['🐦', 'birds'], ['🍃', 'leaves'], ['💨', 'the wind'], ['🐝', 'insects'],
+  ['🚗', 'vehicles'], ['🗣️', 'people talking'], ['🐕', 'a dog'], ['🔔', 'a bell'],
+];
+let timer = null, left = 60;
+
+G.$('#grid').innerHTML = SOUNDS.map(([e, n]) => `<button class="snd" data-n="${n}"><span class="e">${e}</span>${n}</button>`).join('');
+G.$$('.snd').forEach((b) => (b.onclick = () => {
+  b.classList.toggle('on');
+  const heard = G.$$('.snd.on').map((x) => x.dataset.n);
+  const s = heard.length ? 'I heard ' + (heard.length > 1 ? heard.slice(0, -1).join(', ') + ' and ' + heard.at(-1) : heard[0]) + '.' : 'Tap the sounds you heard.';
+  G.$('#said').textContent = s;
+  if (heard.length) { G.say(s); G.sfx('pop'); }
+}));
+
+function show() { G.$('#n').textContent = left; G.$('#timer').style.setProperty('--p', ((60 - left) / 60) * 100 + '%'); }
+G.$('#go').onclick = () => {
+  clearInterval(timer);
+  left = 60; show();
+  G.say('Close your eyes. Sit quietly and listen.');
+  timer = setInterval(() => {
+    left--; show();
+    if (left <= 0) { clearInterval(timer); G.sfx('trin'); G.say('Open your eyes. What did you hear?'); G.star(2); }
+  }, 1000);
+};
+G.$('#stop').onclick = () => { clearInterval(timer); left = 60; show(); };
+show();
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .story-wrap { display: grid; grid-template-columns: 1fr 22rem; gap: 1.4rem; align-items: start; }
+  .story { font-family: var(--read); font-size: 2.2rem; line-height: 1.6; }
+  .story h2 { font-family: var(--head); font-size: 3rem; margin: 0 0 0.6rem; color: var(--red); text-align: center; }
+  .page { margin: 0 0 1.2rem; padding: 0.6rem 1rem; border-radius: 1rem; display: grid; grid-template-columns: 7rem 1fr; gap: 1rem; align-items: start; }
+  .page .pic { font-size: 4.2rem; line-height: 1.2; text-align: center; }
+  .page.now { background: #fff4cc; }
+  .line { border-radius: 0.6rem; padding: 0 0.2rem; transition: background 0.2s; }
+  .line.now { background: #ffd34d; }
+  .w { cursor: pointer; border-radius: 0.4rem; }
+  .w:active { background: #cfe3ff; }
+  .show-tags .w.sight { background: #d9f7e8; color: #117a4a; font-weight: 700; }
+  .show-tags .w.new { background: #ffe1ec; color: #b4235a; font-weight: 700; }
+  .side { display: flex; flex-direction: column; gap: 0.8rem; position: sticky; top: 6rem; }
+  .side .big-btn { width: 100%; }
+  .key { font-size: 1.1rem; display: flex; flex-direction: column; gap: 0.4rem; }
+  .key span { padding: 0.2rem 0.6rem; border-radius: 0.5rem; display: inline-block; }
+  .side .pic { font-size: 5rem; text-align: center; }
+  @media (max-width: 900px) { .story-wrap { grid-template-columns: 1fr; } .side { position: static; } }
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="story-wrap">
+    <div class="card story" id="story"></div>
+    <div class="side">
+      <div class="pic">🪰🍃</div>
+      <button class="big-btn green" id="readAll">▶ Read the story</button>
+      <button class="big-btn orange" id="echo">🗣️ My turn, your turn</button>
+      <button class="big-btn ghost" id="stop">⏹ Stop</button>
+      <button class="big-btn purple" id="tags">🎨 Show special words</button>
+      <div class="key card">
+        <b>Tap any word to hear it.</b>
+        <div><span style="background:#d9f7e8;color:#117a4a">Sight words</span> his, do you, it, my, one, when, about</div>
+        <div><span style="background:#ffe1ec;color:#b4235a">New words</span> little, ant, shade, dear, grass, wind, remembered</div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Story Time: My Name', subtitle: 'Let us read', back: '../index.html#ch9' });
+
+/* Each page is the book text; it is split into sentences for reading aloud. */
+/* Book text; a page with `text` is split into sentences for reading aloud. */
+/* Book text, in story order; each page is split into sentences for reading aloud. */
+const PAGES = [
+  { pic: '🪰<br>❓', text: 'Once there was a little fly. One day, he could not remember his name! He tried and tried to remember it, but it was of no use. He had forgotten his name.' },
+  { pic: '🐜', text: 'He asked an ant, “Ant, do you know my name?” The ant said, “I don’t know. You may ask the tree I climb.”' },
+  { pic: '🌳', text: 'The fly said, “Dear tree, do you know my name?” The tree said, “I don’t know. You may ask the cow sleeping in my shade.”' },
+  { pic: '🐄<br>🌱', text: 'The fly went near the cow and asked, “Dear cow, do you know my name?” The cow said, “I don’t know. You may ask the grass I eat.” The fly went to the grass and asked, “Dear grass, do you know my name?” The grass said, “I don’t know. You may ask the leaves fallen on me.”' },
+  { pic: '🍃<br>💨', text: 'The fly asked a leaf fallen on the grass, “Dear leaf, do you know my name?” The leaf was about to answer, when the wind blew. The leaf began to fly. Seeing this, the fly remembered his name! “My name is Fly! My name is Fly!” he said happily.' },
+].map((p) => ({ pic: p.pic, lines: p.lines || p.text.split(/(?<=[.!?”])\s+(?=[“A-Z])/) }));
+const SIGHT = ['his', 'do', 'you', 'it', 'my', 'one', 'when', 'about'];
+const NEW = ['little', 'ant', 'shade', 'dear', 'grass', 'wind', 'remembered'];
+
+const storyEl = G.$('#story');
+storyEl.innerHTML = '<h2>My Name</h2>' + PAGES.map((p, s) => `<div class="page" data-s="${s}"><div class="pic">${p.pic}</div><div>` +
+  p.lines.map((ln) => `<span class="line">` + ln.split(' ').map((w) => {
+    const bare = w.toLowerCase().replace(/’s$/, '').replace(/[^a-z]/g, '');
+    const cls = SIGHT.includes(bare) ? 'sight' : NEW.includes(bare) ? 'new' : '';
+    return `<span class="w ${cls}" data-w="${bare}">${w}</span>`;
+  }).join(' ') + '</span>').join(' ') + '</div></div>').join('');
+
+storyEl.addEventListener('click', (e) => {
+  const w = e.target.closest('.w');
+  if (!w) return;
+  stopAll();
+  G.say(w.dataset.w, { rate: 0.7 });
+});
+
+const lines = G.$$('.line');
+let token = 0;
+function clearMarks() { G.$$('.now').forEach((e) => e.classList.remove('now')); }
+function stopAll() { token++; speechSynthesis.cancel(); clearMarks(); }
+
+function mark(i) {
+  clearMarks();
+  const ln = lines[i];
+  ln.classList.add('now');
+  ln.closest('.page').classList.add('now');
+  ln.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/* Read each sentence in turn. pauseMs > 0 leaves time for the class to repeat (echo reading). */
+function readFrom(i, pauseMs) {
+  const my = token;
+  if (i >= lines.length) { clearMarks(); if (pauseMs) { G.star(3); G.confetti(20); } return; }
+  mark(i);
+  if (/Trin/.test(lines[i].textContent)) G.sfx('trin');
+  G.say(lines[i].textContent.replace(/…/g, ', ').replace(/^— /, ''), {
+    rate: 0.75,
+    onend: () => { if (my === token) setTimeout(() => readFrom(i + 1, pauseMs), pauseMs || 350); },
+  });
+}
+
+G.$('#readAll').onclick = () => { stopAll(); readFrom(0, 0); };
+G.$('#echo').onclick = () => { stopAll(); readFrom(0, 3200); };
+G.$('#stop').onclick = stopAll;
+G.$('#tags').onclick = () => storyEl.classList.toggle('show-tags');
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .board { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; width: 100%; max-width: 110rem; align-items: start; }
+  .slots, .pile { display: flex; flex-direction: column; gap: 0.8rem; }
+  .slot { display: flex; align-items: center; gap: 0.8rem; min-height: 5.6rem; border-radius: 1.2rem; border: 0.25rem dashed var(--orange); background: #fffaf0; padding: 0.4rem 0.8rem; font-family: var(--read); font-size: 2rem; }
+  .slot .n { font-family: var(--head); background: var(--purple); color: #fff; border-radius: 50%; width: 3.6rem; height: 3.6rem; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; flex: none; }
+  .slot.filled { border-style: solid; border-color: var(--green); background: #d9f7e8; animation: pop 0.35s; }
+  .slot.nope { border-color: var(--red); background: #ffe1e3; animation: shake 0.4s; }
+  .chip { border: 0; border-radius: 1.2rem; background: var(--blue); color: #fff; font-family: var(--read); font-size: 2rem; font-weight: 700; text-align: left;
+    padding: 0.6rem 1.2rem; min-height: 5.6rem; box-shadow: 0 0.35rem 0 rgba(0, 0, 0, 0.2); }
+  .chip.used { visibility: hidden; }
+  @media (max-width: 900px) { .board { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="m1">🪰 Who did the fly ask?</button>
+    <button class="big-btn orange" id="m2">🍃 How did the fly remember?</button>
+  </div>
+  <p class="hint">Put the sentences in the right order. Drag a sentence to its number (or tap the sentence, then tap the number).</p>
+  <div class="board">
+    <div class="slots card" id="slots"></div>
+    <div class="pile" id="pile"></div>
+  </div>
+  <div class="feedback" id="fb"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Story in Order', subtitle: 'My Name · Let us write · A3', back: '../index.html#ch9' });
+
+const SETS = {
+  m1: ['The fly asked the ant.', 'The fly asked the tree.', 'The fly asked the cow.', 'The fly asked the grass.', 'The fly asked the leaf.'],
+  m2: ['The fly asked a leaf, “Do you know my name?”', 'The leaf was about to answer.', 'The wind blew.', 'The leaf began to fly.', '“My name is Fly!” he said happily.'],
+};
+
+function build(key) {
+  const list = SETS[key];
+  let done = 0;
+  G.$('#fb').textContent = '';
+  G.$('#slots').innerHTML = list.map((_, i) => `<div class="slot" data-i="${i}"><span class="n">${i + 1}</span><span class="t"></span></div>`).join('');
+  G.$('#pile').innerHTML = G.shuffle(list.map((s, i) => ({ s, i }))).map((o) => `<button class="chip" data-i="${o.i}">${o.s}</button>`).join('');
+  G.$$('.chip').forEach((c) => c.addEventListener('click', () => G.say(c.textContent)));
+  G.say('Put the sentences in the right order.');
+
+  G.tapDrag(G.$$('.chip'), G.$$('.slot'), (chip, slot) => {
+    if (slot.classList.contains('filled')) return;
+    if (chip.dataset.i === slot.dataset.i) {
+      slot.classList.add('filled');
+      G.$('.t', slot).textContent = chip.textContent;
+      chip.classList.add('used');
+      chip.dataset.locked = 1;
+      G.sfx('good');
+      G.star();
+      G.say(chip.textContent);
+      if (++done === list.length) {
+        G.feedback(G.$('#fb'), true, '🎉 The story is in order!');
+        setTimeout(() => G.end({ title: 'Well done!', msg: 'You put the story in the right order.', onReplay: () => build(key) }), 2500);
+      }
+    } else {
+      slot.classList.add('nope');
+      G.sfx('bad');
+      G.feedback(G.$('#fb'), false, '🙂 What happened first? Try again!');
+      setTimeout(() => slot.classList.remove('nope'), 500);
+    }
+  });
+}
+G.$('#m1').onclick = () => build('m1');
+G.$('#m2').onclick = () => build('m2');
+build('m1');
+</script>
+</body>
+</html>

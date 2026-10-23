@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .story { font-family: var(--read); font-size: 2rem; line-height: 1.5; width: 100%; max-width: 100rem; }
+  .story p { margin: 0.2rem 0; display: flex; gap: 0.6rem; align-items: baseline; flex-wrap: wrap; }
+  .story .n { font-family: var(--head); background: var(--purple); color: #fff; border-radius: 50%; width: 2.8rem; height: 2.8rem; display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; flex: none; align-self: center; }
+  .story p.now { background: #fff4cc; border-radius: 0.8rem; }
+  .leaf { border: 0; background: #d9f7e8; border-radius: 1rem; font-size: 2.2rem; padding: 0 0.6rem; min-height: 3.4rem; min-width: 5.4rem; box-shadow: var(--shadow); font-family: var(--read); }
+  .leaf.open { background: #fff; color: var(--green); font-weight: 700; font-size: 2.3rem; box-shadow: none; border: 0.2rem dashed var(--green); animation: pop 0.35s; }
+  .who { font-size: 3rem; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">This is a story. Can you see the leaf 🍃 in the story? Say the words “<b>give me</b>” when you see the leaf! Tap the leaf to write “give me”.</p>
+  <div class="card story" id="story"></div>
+  <div class="row" style="margin-top:1rem">
+    <button class="big-btn green" id="read">🔊 Read the story</button>
+    <button class="big-btn ghost" id="reset">🔁 Start again</button>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Give Me!', subtitle: 'My Name · Let us do', back: '../index.html#ch9' });
+
+/* The cat and the cow story from the book. Each {} is a leaf that stands for “give me”. */
+const LINES = [
+  ['🐈', 'A cat said to a cow, “Please {} some milk.”'],
+  ['🐄', '“What will you {}?” asked the cow. “Will you {} grass?”'],
+  ['🐈', '“I have no grass,” said the cat.'],
+  ['🐄', '“Will you {} water?” asked the cow.'],
+  ['🐈', '“I have no water,” said the cat. “But I will say ‘Thank you’ if you {} milk!”'],
+  ['🐄', '“Good,” said the cow. “Then I will give you milk.”'],
+];
+let open = 0, total = 0, token = 0;
+
+function build() {
+  open = 0; total = 0; token++;
+  G.$('#story').innerHTML = LINES.map(([who, t], i) => `<p data-i="${i}"><span class="n">${i + 1}</span><span class="who">${who}</span>` +
+    t.split('{}').map((part, k, arr) => part + (k < arr.length - 1 ? (total++, '<button class="leaf">🍃</button>') : '')).join('') + '</p>').join('');
+  G.$$('.leaf').forEach((b) => (b.onclick = () => {
+    G.say('give me');
+    if (b.classList.contains('open')) return;
+    b.classList.add('open');
+    b.textContent = 'give me';
+    G.sfx('pop');
+    if (++open === total) { G.star(3); G.sfx('win'); G.confetti(15); G.say('Well done! Now read the whole story.'); }
+  }));
+}
+const text = (i) => LINES[i][1].replace(/\{\}/g, 'give me');
+G.$('#read').onclick = () => {
+  const my = ++token, ps = G.$$('#story p');
+  const go = (i) => {
+    ps.forEach((p, k) => p.classList.toggle('now', k === i));
+    if (my !== token || i >= ps.length) { ps.forEach((p) => p.classList.remove('now')); return; }
+    G.say(text(i), { onend: () => setTimeout(() => go(i + 1), 400) });
+  };
+  go(0);
+};
+G.$('#reset').onclick = build;
+build();
+</script>
+</body>
+</html>

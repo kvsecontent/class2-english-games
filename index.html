@@ -352,7 +352,39 @@ const CHAPTERS = [
       ]},
     ],
   },
-  ...Array.from({ length: 5 }, (_, i) => ({ n: i + 9, title: 'Coming soon', sections: [] })),
+  {
+    n: 9, unit: 'Unit 4 · Life Around Us', title: 'My Name',
+    sections: [
+      { key: 'recite', name: '📖 Let us read', games: [
+        { href: 'ch9/story.html', ic: '🪰', t: 'Story Time', d: 'Listen, read and say "My Name"' },
+        { href: 'ch9/story-order.html', ic: '🔢', t: 'Story in Order', d: 'Who did the fly ask? ant, tree, cow…' },
+      ]},
+      { key: 'read', name: '👀 Words', games: [
+        { href: 'ch9/sight-words.html', ic: '🎈', t: 'Pop the Sight Word', d: 'his · do you · it · my · one · when · about' },
+        { href: 'ch9/new-words.html', ic: '🃏', t: 'New Word Cards', d: 'little · ant · shade · dear · grass · wind …' },
+      ]},
+      { key: 'speak', name: '🗣️ Let us speak', games: [
+        { href: 'ch9/talk-wheel.html', ic: '🎡', t: 'Talk Wheel', d: 'How did the fly find his name?' },
+        { href: 'ch9/bl-pl.html', ic: '🔵', t: 'bl or pl?', d: 'blue · black · blanket · plum · plate · plant' },
+        { href: 'ch9/blend-sentences.html', ic: '📝', t: 'Make Sentences', d: 'Rohit has a blue blanket.' },
+      ]},
+      { key: 'listen', name: '👂 Let us listen', games: [
+        { href: 'ch9/listen-quiet.html', ic: '🤫', t: 'Sit Quietly and Listen', d: 'Close your eyes. What do you hear?' },
+        { href: 'ch9/make-sounds.html', ic: '🦁', t: 'Can You Make the Sound?', d: 'caw · chirp · roar · meow · buzz · quack' },
+      ]},
+      { key: 'write', name: '✏️ Let us write', games: [
+        { href: 'ch9/fill-blanks.html', ic: '📝', t: 'Complete the Sentence', d: 'Help box: leaf · tree · grass · cow · fly' },
+      ]},
+      { key: 'think', name: '🤸 Let us do · Project', games: [
+        { href: 'ch9/give-me.html', ic: '🍃', t: 'Give Me!', d: 'Say “give me” when you see the leaf' },
+        { href: 'ch9/my-name.html', ic: '🙋', t: 'My Name', d: 'What does your name mean?' },
+      ]},
+      { key: 'play', name: '🏁 Class challenge', games: [
+        { href: 'ch9/fly-race.html', ic: '🏆', t: 'Fly Race', d: 'Team A vs Team B – whole chapter quiz' },
+      ]},
+    ],
+  },
+  ...Array.from({ length: 4 }, (_, i) => ({ n: i + 10, title: 'Coming soon', sections: [] })),
 ];
 
 const tabs = document.getElementById('tabs');

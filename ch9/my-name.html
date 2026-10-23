@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .namebox { display: flex; gap: 0.8rem; align-items: center; justify-content: center; flex-wrap: wrap; }
+  .namebox input { font-family: var(--read); font-size: 2.6rem; padding: 0.4rem 1rem; border-radius: 1rem; border: 0.25rem solid var(--line); width: 24rem; min-height: 5rem; }
+  .tiles { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; min-height: 9rem; margin: 1.2rem 0; }
+  .tile { width: 7rem; height: 8rem; border-radius: 1.2rem; display: flex; align-items: center; justify-content: center; font-family: var(--read); font-size: 5rem; font-weight: 700; color: #fff; box-shadow: 0 0.4rem 0 rgba(0, 0, 0, 0.18); animation: pop 0.4s backwards; border: 0; }
+  .qs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; width: 100%; max-width: 100rem; }
+  .qs .card { font-size: 1.6rem; font-weight: 700; text-align: center; }
+  .qs .card span { display: block; font-size: 3rem; }
+  .qs .card small { display: block; font-family: var(--read); font-weight: 400; color: var(--muted); margin-top: 0.3rem; }
+  @media (max-width: 900px) { .qs { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">The fly forgot his name. Do you know yours? Type your name and tap ✨.</p>
+  <div class="namebox"><input id="nm" placeholder="My name…" maxlength="14" autocomplete="off" aria-label="Your name"><button class="big-btn green" id="go">✨ Show</button></div>
+  <div class="tiles" id="tiles"></div>
+  <div class="qs">
+    <button class="card" data-q="My name is"><span>🙋</span>What is your name?<small>My name is ____.</small></button>
+    <button class="card" data-q="What does your name mean? Ask your family and tell the class."><span>💡</span>What does your name mean?<small>My name means ____.</small></button>
+    <button class="card" data-q="Who gave you your name?"><span>👪</span>Who gave you your name?<small>My ____ gave me my name.</small></button>
+  </div>
+  <p class="hint" style="margin-top:1rem">🏠 Project work: find out the meaning of your name at home. Tell it to the class tomorrow!</p>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'My Name', subtitle: 'My Name · Project work', back: '../index.html#ch9' });
+
+/* Nothing typed here is saved, so every child can take a turn. */
+const COLS = ['#e63946', '#2f7de1', '#2bb673', '#ff8a3d', '#8a5cf6', '#ff6fa8', '#13b5b1'];
+const esc = (t) => t.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+function show() {
+  const n = G.$('#nm').value.trim();
+  if (!n) { G.$('#nm').focus(); return; }
+  G.$('#tiles').innerHTML = [...n].filter((c) => c.trim()).map((c, i) => `<button class="tile" style="background:${COLS[i % COLS.length]};animation-delay:${i * 0.08}s" data-c="${esc(c)}">${esc(c)}</button>`).join('');
+  G.$$('.tile').forEach((t) => (t.onclick = () => G.say(t.dataset.c)));
+  G.say('My name is ' + n + '!');
+  G.star(); G.confetti(12);
+}
+G.$('#go').onclick = show;
+G.$('#nm').addEventListener('keydown', (e) => e.key === 'Enter' && show());
+G.$$('.qs .card').forEach((b) => (b.onclick = () => {
+  const n = G.$('#nm').value.trim();
+  G.say(b.dataset.q === 'My name is' ? (n ? 'My name is ' + n + '.' : 'What is your name?') : b.dataset.q);
+}));
+</script>
+</body>
+</html>
