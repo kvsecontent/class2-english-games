@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .wrap { display: grid; grid-template-columns: 1fr 22rem; gap: 1.2rem; width: 100%; max-width: 120rem; align-items: center; }
+  .board { background: linear-gradient(#bfe6ff, #eaf7ff); border-radius: var(--radius); border: 0.25rem solid var(--line); padding: 0.6rem; }
+  #pic { width: 100%; max-height: calc(100vh - 12rem); display: block; }
+  #pic .dot { cursor: pointer; }
+  #pic .dot circle { fill: #fff; stroke: #2b2140; stroke-width: 2.5; }
+  #pic .dot.done circle { fill: var(--green); }
+  #pic .dot.next circle { fill: var(--yellow); animation: pulse 1s infinite; transform-box: fill-box; transform-origin: center; }
+  #pic .dot text { font: 700 15px var(--read); text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+  @keyframes pulse { 50% { transform: scale(1.25); } }
+  .side { display: flex; flex-direction: column; gap: 0.8rem; align-items: center; }
+  .palette { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+  .sw { width: 5rem; height: 5rem; border-radius: 50%; border: 0.3rem solid #fff; box-shadow: 0 0 0 0.2rem var(--line); }
+  .sw.on { box-shadow: 0 0 0 0.4rem var(--ink); }
+  .next-l { font-family: var(--read); font-size: 5rem; font-weight: 700; color: var(--orange); line-height: 1; }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Join the dots in alphabetical order: a, b, c… Then colour the picture!</p>
+  <div class="wrap">
+    <div class="board"><svg id="pic" viewBox="0 0 420 270"></svg></div>
+    <div class="side card">
+      <div id="status" class="prompt" style="font-size:1.6rem;margin:0">Next letter:</div>
+      <div class="next-l" id="nextL">a</div>
+      <div class="palette" id="pal" style="visibility:hidden"></div>
+      <button class="big-btn ghost" id="reset">🔁 Start again</button>
+    </div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Join the Dots', subtitle: 'A Show of Clouds · Picture time', back: '../index.html#ch8' });
+
+/* A cloud drawn with dots a to p (our own picture). */
+const PTS = [[60, 200], [40, 160], [60, 120], [100, 100], [130, 60], [180, 45], [225, 65], [250, 55], [295, 70], [320, 110], [355, 130], [365, 170], [340, 205], [280, 210], [200, 212], [120, 210]];
+const L = 'abcdefghijklmnopqrstuvwxyz';
+const COLS = ['#ffffff', '#d7dbe3', '#9aa0ad', '#ffd0e0', '#ffe28a', '#cfe8ff'];
+const svg = G.$('#pic');
+let n = 0, pick = COLS[0];
+
+function build() {
+  n = 0;
+  svg.innerHTML = `<path id="shape" d="" fill="none" stroke="#2b2140" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <text x="370" y="40" font-size="40">☀️</text>` +
+    PTS.map(([x, y], i) => `<g class="dot" data-i="${i}"><circle cx="${x}" cy="${y}" r="13"/><text x="${x}" y="${y}">${L[i]}</text></g>`).join('');
+  G.$('#pal').style.visibility = 'hidden';
+  G.$('#status').textContent = 'Next letter:';
+  mark();
+  G.$$('.dot').forEach((d) => (d.onclick = () => tap(+d.dataset.i)));
+}
+function mark() {
+  G.$$('.dot').forEach((d) => { const i = +d.dataset.i; d.classList.toggle('done', i < n); d.classList.toggle('next', i === n); });
+  G.$('#nextL').textContent = n < PTS.length ? L[n] : '✓';
+}
+function tap(i) {
+  if (n >= PTS.length) return;
+  if (i !== n) { G.sfx('bad'); G.say(`Find ${L[n]}`); return; }
+  n++;
+  const pts = PTS.slice(0, n).map(([x, y]) => `${x} ${y}`).join(' L ');
+  G.$('#shape').setAttribute('d', 'M ' + pts + (n === PTS.length ? ' Z' : ''));
+  G.sfx('pop');
+  G.say(L[i]);
+  mark();
+  if (n === PTS.length) {
+    G.star(3); G.sfx('win');
+    G.$('#status').textContent = 'A cloud! Now colour it:';
+    G.say('It is a cloud! Now colour it.');
+    G.$('#pal').style.visibility = 'visible';
+    G.$('#shape').style.cursor = 'pointer';
+    G.$('#shape').setAttribute('fill', '#fff');
+    G.$('#shape').onclick = () => { G.$('#shape').setAttribute('fill', pick); G.sfx('pop'); };
+  }
+}
+G.$('#pal').innerHTML = COLS.map((c, i) => `<button class="sw ${i ? '' : 'on'}" data-c="${c}" style="background:${c}"></button>`).join('');
+G.$('#pal').onclick = (e) => {
+  const b = e.target.closest('.sw');
+  if (!b) return;
+  pick = b.dataset.c;
+  G.$$('.sw').forEach((x) => x.classList.toggle('on', x === b));
+  if (n === PTS.length) G.$('#shape').setAttribute('fill', pick);
+};
+G.$('#reset').onclick = build;
+build();
+</script>
+</body>
+</html>

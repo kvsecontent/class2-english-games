@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  body { background: linear-gradient(#bfe6ff, #eaf7ff 70%, #c9f0c4); }
+  .sky { position: relative; height: calc(100vh - 13rem); overflow: hidden; border-radius: var(--radius); }
+  .balloon {
+    position: absolute; bottom: -12rem; width: 9rem; height: 11rem;
+    border: 0; background: none; padding: 0;
+  }
+  .balloon .b {
+    width: 9rem; height: 10rem; border-radius: 50% 50% 48% 48%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--read); font-size: 2.8rem; font-weight: 700; color: #fff;
+    text-shadow: 0 0.15rem 0 rgba(0, 0, 0, 0.25);
+    box-shadow: inset -1rem -1rem 0 rgba(0, 0, 0, 0.1);
+  }
+  .balloon .s { width: 0.15rem; height: 3rem; background: #888; margin: 0 auto; }
+  .balloon.popped .b { animation: burst 0.3s forwards; }
+  @keyframes burst { to { transform: scale(1.6); opacity: 0; } }
+  @keyframes rise { to { transform: translateY(calc(-100vh - 14rem)); } }
+  .bar { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 0.8rem; }
+  .target { font-size: 2rem; font-weight: 800; background: #fff; border-radius: 1.2rem; padding: 0.4rem 1.4rem; box-shadow: var(--shadow); }
+  .target b { font-family: var(--read); color: var(--red); font-size: 2.6rem; }
+  .start { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; }
+  .words { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+  .words span { font-family: var(--read); font-size: 3rem; background: #fff; border-radius: 1rem; padding: 0.4rem 1.2rem; box-shadow: var(--shadow); }
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="bar">
+    <div class="target">Pop the word: <b id="tw">—</b></div>
+    <button class="say" id="hear">🔊</button>
+    <div class="target">Round <span id="rn">0</span>/12</div>
+  </div>
+  <div class="sky" id="sky">
+    <div class="start" id="start">
+      <div class="prompt">Sight words in the poem</div>
+      <div class="words" id="list"></div>
+      <p class="hint">Listen to the word. Pop the balloon that has the word!</p>
+      <button class="big-btn green" id="go">▶ Start</button>
+    </div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Pop the Sight Word', subtitle: 'A Show of Clouds · Sight words', back: '../index.html#ch8' });
+
+const WORDS = ['as', 'up', 'at', 'my', 'sky', 'back'];
+const EXTRA = ['us', 'an', 'am', 'by', 'sun', 'black'];
+const COLS = ['#e63946', '#2f7de1', '#2bb673', '#ff8a3d', '#8a5cf6', '#ff6fa8', '#13b5b1'];
+const sky = G.$('#sky');
+let round = 0, target = '', timers = [], firstTry = true;
+
+G.$('#list').innerHTML = WORDS.map((w) => `<span>${w}</span>`).join('');
+G.$$('#list span').forEach((s) => (s.onclick = () => G.say(s.textContent)));
+
+function clear() { timers.forEach(clearTimeout); timers = []; G.$$('.balloon').forEach((b) => b.remove()); }
+
+function nextRound() {
+  clear();
+  if (round >= 12) { G.end({ title: 'Super popping!', msg: 'You know the sight words as, up, at, my, sky, back.', onReplay: begin }); return; }
+  round++;
+  firstTry = true;
+  G.$('#rn').textContent = round;
+  target = WORDS[(round - 1) % WORDS.length];
+  if (round > WORDS.length) target = G.shuffle(WORDS)[0];
+  G.$('#tw').textContent = target;
+  G.say('Find the word ' + target);
+  // Balloon set: target twice + others, released one after another and repeated.
+  const set = G.shuffle([target, target, ...G.shuffle(WORDS.filter((w) => w !== target)).slice(0, 3), ...G.shuffle(EXTRA).slice(0, 2)]);
+  let k = 0;
+  const release = () => {
+    launch(set[k % set.length], k);
+    k++;
+    timers.push(setTimeout(release, 1100));
+  };
+  release();
+}
+
+function launch(word, k) {
+  const b = document.createElement('button');
+  b.className = 'balloon';
+  const lanes = 8;
+  b.style.left = ((k * 3) % lanes) * (100 / lanes) + 2 + '%';
+  b.innerHTML = `<div class="b" style="background:${COLS[Math.floor(Math.random() * COLS.length)]}">${word}</div><div class="s"></div>`;
+  b.style.animation = `rise ${9 + Math.random() * 3}s linear forwards`;
+  b.onclick = () => {
+    if (b.classList.contains('popped')) return;
+    if (word === target) {
+      b.classList.add('popped');
+      G.sfx('pop');
+      G.sfx('good');
+      if (firstTry) G.star();
+      G.say(G.praise());
+      clear();
+      timers.push(setTimeout(nextRound, 1400));
+    } else {
+      firstTry = false;
+      G.sfx('bad');
+      G.say('That is ' + word + '. Find ' + target);
+      b.querySelector('.b').style.animation = 'shake .4s';
+    }
+  };
+  b.addEventListener('animationend', (e) => { if (e.animationName === 'rise') b.remove(); });
+  sky.append(b);
+}
+
+function begin() { G.$('#start').style.display = 'none'; round = 0; nextRound(); }
+G.$('#go').onclick = begin;
+G.$('#hear').onclick = () => target && G.say(target);
+</script>
+</body>
+</html>

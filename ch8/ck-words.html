@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .rows { display: flex; flex-direction: column; gap: 0.6rem; width: 100%; max-width: 90rem; }
+  .wr { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
+  .wbtn { font-family: var(--read); font-size: 2.6rem; font-weight: 700; min-width: 11rem; min-height: 4.4rem; border-radius: 1.2rem; border: 0.25rem solid var(--line); background: #fff; box-shadow: var(--shadow); }
+  .wbtn b { color: var(--orange); }
+  .wbtn.top { border-color: var(--purple); background: #f4f0ff; }
+  .wbtn.now { background: #ffd34d; }
+  .q .e { font-size: 6rem; line-height: 1; }
+  .q .t { font-family: var(--read); font-size: 4rem; font-weight: 700; margin: 0.4rem 0 1rem; letter-spacing: 0.1rem; }
+  .q .t .blank { display: inline-block; min-width: 5rem; border-bottom: 0.35rem dashed var(--orange); color: var(--orange); }
+  .choice { font-family: var(--read); font-size: 3rem; min-width: 9rem; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mSay">🗣️ Repeat after me</button>
+    <button class="big-btn orange" id="mFill">✏️ Fill in the sound</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'The “ck” Sound', subtitle: 'A Show of Clouds · Let us listen', back: '../index.html#ch8' });
+
+/* The book's word lists. */
+const ROWS = [['back'], ['lack', 'pack', 'jack', 'rack'], ['tick', 'pick', 'flick', 'thick'], ['duck', 'pluck', 'muck', 'truck']];
+const area = G.$('#area');
+const mk = (w) => w.replace('ck', '<b>ck</b>');
+let token = 0;
+
+function sayMode() {
+  token++;
+  area.innerHTML = `<p class="hint">The poem has the word “back”. Tap a word to hear it, or tap ▶ and say each word after the board.</p>
+    <div class="card rows">${ROWS.map((r, i) => `<div class="wr">${r.map((w) => `<button class="wbtn ${i ? '' : 'top'}" data-w="${w}">${mk(w)}</button>`).join('')}</div>`).join('')}</div>
+    <div class="row" style="margin-top:0.8rem"><button class="big-btn green" id="play">▶ My turn, your turn</button><button class="big-btn ghost" id="stop">⏹</button>
+      <span class="prompt" id="ask" style="font-size:1.7rem;margin:0 0 0 1.4rem">❓ What sound is common?</span><span class="row" id="ans"></span></div>
+    <div class="feedback" id="fb"></div>`;
+  const btns = G.$$('.wbtn');
+  btns.forEach((b) => (b.onclick = () => { token++; G.say(b.dataset.w, { rate: 0.7 }); }));
+  const go = (i, my) => {
+    btns.forEach((b, k) => b.classList.toggle('now', k === i));
+    if (my !== token || i >= btns.length) { btns.forEach((b) => b.classList.remove('now')); return; }
+    G.say(btns[i].dataset.w, { rate: 0.7, onend: () => setTimeout(() => go(i + 1, my), 1800) });
+  };
+  G.$('#play').onclick = () => { token++; go(0, token); };
+  G.$('#stop').onclick = () => { token++; speechSynthesis.cancel(); btns.forEach((b) => b.classList.remove('now')); };
+  ['ck', 'sh', 'ch'].sort(() => Math.random() - 0.5).forEach((s) => {
+    const c = document.createElement('button');
+    c.className = 'choice';
+    c.textContent = s;
+    c.onclick = () => {
+      if (s === 'ck') { c.classList.add('right'); G.star(2); G.sfx('good'); G.feedback(G.$('#fb'), true, '🎉 Yes! They all end with “ck”.'); G.say('Yes! They all end with c k.'); }
+      else { c.classList.add('wrong'); G.sfx('bad'); setTimeout(() => c.classList.remove('wrong'), 450); }
+    };
+    G.$('#ans').append(c);
+  });
+}
+
+function fillMode() {
+  token++;
+  const ITEMS = [
+    // mostly ck words, with a few sh and ch words from chapters 6 and 7 so children must listen
+    { w: 'pack', e: '🎒' }, { w: 'tick', e: '✔️' }, { w: 'duck', e: '🦆' }, { w: 'truck', e: '🚚' }, { w: 'thick', e: '📚' },
+    { w: 'fish', e: '🐟' }, { w: 'brush', e: '🪥' }, { w: 'lunch', e: '🍱' }, { w: 'peach', e: '🍑' },
+  ];
+  area.innerHTML = `<p class="hint">Listen. Which sound finishes the word: ck, sh or ch? Tap it.</p><div class="card" id="game" style="width:100%;max-width:70rem"></div>`;
+  G.quiz({
+    el: G.$('#game'),
+    items: ITEMS,
+    question: (it) => `<div class="e">${it.e}</div><div class="t">${it.w.slice(0, -2)}<span class="blank">&nbsp;?&nbsp;</span></div>`,
+    options: () => G.shuffle(['ck', 'sh', 'ch']).map((x) => ({ label: x, value: x })),
+    answer: (it) => it.w.slice(-2),
+    onShow: (it, el) => {
+      G.say(it.w);
+      G.$$('.choice', el).forEach((b) => b.addEventListener('click', () => { if (b.classList.contains('right')) G.$('.blank', el).textContent = it.w.slice(-2); }));
+    },
+    explain: (it) => it.w.replace(/(ck|sh|ch)$/, '<b>$1</b>'),
+    endMsg: 'duck · truck · pack · tick end with “ck”!',
+  });
+}
+
+G.$('#mSay').onclick = sayMode;
+G.$('#mFill').onclick = fillMode;
+sayMode();
+</script>
+</body>
+</html>

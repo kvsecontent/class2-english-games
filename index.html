@@ -321,7 +321,38 @@ const CHAPTERS = [
       ]},
     ],
   },
-  ...Array.from({ length: 6 }, (_, i) => ({ n: i + 8, title: 'Coming soon', sections: [] })),
+  {
+    n: 8, unit: 'Unit 4 · Life Around Us', title: 'A Show of Clouds',
+    sections: [
+      { key: 'recite', name: '🎤 Let us recite', games: [
+        { href: 'ch8/poem.html', ic: '☁️', t: 'Poem Time', d: 'Listen, read and say "A Show of Clouds"' },
+        { href: 'ch8/poem-missing.html', ic: '🧩', t: 'Missing Word', d: 'Find the word that fits the poem' },
+        { href: 'ch8/cloud-shapes.html', ic: '🐻', t: 'What Do You See?', d: 'Tap a cloud: I see a bear!' },
+      ]},
+      { key: 'read', name: '👀 Words', games: [
+        { href: 'ch8/sight-words.html', ic: '🎈', t: 'Pop the Sight Word', d: 'as · up · at · my · sky · back' },
+        { href: 'ch8/new-words.html', ic: '🃏', t: 'New Word Cards', d: 'lie · bear · sea · sailing · waving' },
+      ]},
+      { key: 'speak', name: '🗣️ Let us speak', games: [
+        { href: 'ch8/talk-wheel.html', ic: '🎡', t: 'Talk Wheel', d: 'When I look up, I see…' },
+        { href: 'ch8/cloud-colours.html', ic: '🌥️', t: 'Colours of Clouds', d: 'Tick the colours clouds can be' },
+      ]},
+      { key: 'write', name: '✏️ Let us write', games: [
+        { href: 'ch8/poem-animals.html', ic: '🐘', t: 'Animals in the Clouds', d: 'What animals did the child see?' },
+        { href: 'ch8/day-night.html', ic: '🌙', t: 'Day Sky, Night Sky', d: 'Sun, clouds, moon, stars…' },
+      ]},
+      { key: 'think', name: '🎨 Picture time', games: [
+        { href: 'ch8/dot-to-dot.html', ic: '🔤', t: 'Join the Dots', d: 'a, b, c… then colour' },
+      ]},
+      { key: 'listen', name: '👂 Let us listen', games: [
+        { href: 'ch8/ck-words.html', ic: '🦆', t: 'The “ck” Sound', d: 'back · pack · tick · duck · truck' },
+      ]},
+      { key: 'play', name: '🏁 Class challenge', games: [
+        { href: 'ch8/cloud-race.html', ic: '🏆', t: 'Cloud Race', d: 'Team A vs Team B – whole chapter quiz' },
+      ]},
+    ],
+  },
+  ...Array.from({ length: 5 }, (_, i) => ({ n: i + 9, title: 'Coming soon', sections: [] })),
 ];
 
 const tabs = document.getElementById('tabs');
