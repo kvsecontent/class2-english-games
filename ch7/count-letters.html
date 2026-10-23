@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .wrap { display: grid; grid-template-columns: 1fr 26rem; gap: 1.2rem; width: 100%; max-width: 120rem; align-items: start; }
+  .poem { font-family: var(--read); font-size: 2rem; line-height: 1.5; columns: 2; column-gap: 2rem; text-align: left; }
+  .poem .ln { display: block; break-inside: avoid; }
+  .ch { border-radius: 0.3rem; cursor: pointer; }
+  .ch.mark { background: #ffd34d; box-shadow: 0 0 0 0.15rem #ff8a3d; }
+  .ch.shown { background: #d9f7e8; color: #117a4a; font-weight: 700; }
+  .ch.wrong { background: #ffe1e3; animation: shake 0.4s; }
+  .side { display: flex; flex-direction: column; gap: 0.8rem; }
+  .tabs { display: flex; gap: 0.6rem; }
+  .tabs button { flex: 1; font-size: 2.6rem; font-family: var(--read); font-weight: 700; }
+  .tabs button.on { outline: 0.35rem solid var(--ink); }
+  .counter { font-size: 2rem; font-weight: 800; text-align: center; }
+  .counter b { font-size: 4rem; color: var(--purple); display: block; line-height: 1.1; }
+  .side .big-btn { width: 100%; }
+  .q3 { font-size: 1.6rem; font-weight: 700; text-align: center; }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } .poem { columns: 1; } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Read the poem again. Tap every letter you are counting to mark it. Then tap <b>Check</b>.</p>
+  <div class="wrap">
+    <div class="card poem" id="poem"></div>
+    <div class="side card">
+      <div class="tabs"><button class="big-btn purple on" data-l="e">e</button><button class="big-btn orange" data-l="u">u</button></div>
+      <div class="counter">I marked <b id="n">0</b> letter “<span id="lt">e</span>”</div>
+      <button class="big-btn green" id="check">✅ Check</button>
+      <button class="big-btn ghost" id="show">👀 Show me all</button>
+      <button class="big-btn ghost" id="clear">🧹 Clear marks</button>
+      <div class="q3" id="q3"></div>
+    </div>
+  </div>
+  <div class="feedback" id="fb"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Count the Letters', subtitle: 'This is My Town · Let us write · e or u?', back: '../index.html#ch7' });
+
+const POEM = ['This is my town.', 'In my town, There are streets.', 'In my street, There are houses.', 'In my house, There are rooms.',
+  'In my room, There is a bed.', 'On the bed, There is a basket.', 'In the basket, There are some flowers.',
+  'Flowers in a basket.', 'Basket on the bed.', 'Bed in the room.', 'Room in the house.', 'House in the street.', 'Street in the town.'];
+let letter = 'e';
+const done = {};
+G.$('#poem').innerHTML = POEM.map((l) => `<span class="ln">${[...l].map((c) => (/[a-z]/i.test(c) ? `<span class="ch" data-c="${c.toLowerCase()}">${c}</span>` : c)).join('')}</span>`).join('');
+const total = (l) => G.$$(`.ch[data-c="${l}"]`).length;
+const marked = () => G.$$('.ch.mark').length;
+const update = () => { G.$('#n').textContent = marked(); G.$('#lt').textContent = letter; };
+
+G.$('#poem').addEventListener('click', (e) => {
+  const c = e.target.closest('.ch');
+  if (!c) return;
+  if (c.dataset.c !== letter) { c.classList.add('wrong'); G.sfx('bad'); setTimeout(() => c.classList.remove('wrong'), 450); return; }
+  c.classList.toggle('mark');
+  G.sfx('pop');
+  update();
+});
+G.$$('.tabs button').forEach((b) => (b.onclick = () => {
+  letter = b.dataset.l;
+  G.$$('.tabs button').forEach((x) => x.classList.toggle('on', x === b));
+  G.$$('.ch').forEach((c) => c.classList.remove('mark', 'shown'));
+  G.$('#fb').textContent = '';
+  update();
+  G.say('Count the letter ' + letter);
+}));
+G.$('#clear').onclick = () => { G.$$('.ch').forEach((c) => c.classList.remove('mark', 'shown')); update(); };
+G.$('#show').onclick = () => {
+  G.$$(`.ch[data-c="${letter}"]`).forEach((c) => c.classList.add('shown'));
+  G.feedback(G.$('#fb'), true, `There are ${total(letter)} letter “${letter}” in the poem.`);
+  G.say(`There are ${total(letter)} letter ${letter} in the poem.`);
+  done[letter] = true;
+  askQ3();
+};
+G.$('#check').onclick = () => {
+  const n = marked(), t = total(letter);
+  if (n === t) {
+    G.star(3); G.sfx('win'); G.confetti(20);
+    G.feedback(G.$('#fb'), true, `🎉 Yes! There are ${t} letter “${letter}” in the poem.`);
+    G.say(`Yes! ${t}`);
+    done[letter] = true;
+    askQ3();
+  } else {
+    G.sfx('bad');
+    G.feedback(G.$('#fb'), false, n < t ? `🙂 You marked ${n}. There are more! Look again.` : `🙂 You marked ${n}. That is too many!`);
+  }
+};
+function askQ3() {
+  if (!(done.e && done.u)) { G.$('#q3').textContent = done.e ? 'Now count the letter u!' : 'Now count the letter e!'; return; }
+  const more = total('e') > total('u') ? 'e' : 'u';
+  G.$('#q3').innerHTML = `Which letter do you see more? <br><span style="font-size:3rem;color:var(--green)">“${more}”</span> (${total('e')} e and ${total('u')} u)`;
+}
+update();
+</script>
+</body>
+</html>

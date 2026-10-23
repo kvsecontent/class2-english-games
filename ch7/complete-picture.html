@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .studio { display: grid; grid-template-columns: 9.4rem 1fr 24rem; gap: 1rem; height: calc(100vh - 7.5rem); }
+  .tools { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; align-content: start; justify-items: center; overflow-y: auto; }
+  .sw { width: 3.8rem; height: 3.8rem; border-radius: 50%; border: 0.3rem solid #fff; box-shadow: 0 0 0 0.2rem var(--line); flex: none; }
+  .sw.on { box-shadow: 0 0 0 0.35rem var(--ink); }
+  .tool { width: 4.2rem; height: 4rem; border-radius: 1rem; border: 0.2rem solid var(--line); background: #fff; font-size: 2rem; flex: none; }
+  .tool.on { background: #fff4cc; border-color: var(--yellow); }
+  .canvas-box { position: relative; background: #fff; border-radius: var(--radius); border: 0.25rem solid var(--line); overflow: hidden; touch-action: none; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .ask { display: flex; flex-direction: column; gap: 0.8rem; }
+  .ask .card { font-size: 1.5rem; font-weight: 700; padding: 0.5rem 0.9rem; text-align: left; }
+  .ask .card.on { background: #fff4cc; border-color: var(--yellow); }
+  .ask .card span { font-size: 2rem; }
+</style>
+</head>
+<body>
+<div class="studio stage" style="max-width:none;padding-top:0.8rem">
+  <div class="tools" id="tools"></div>
+  <div class="canvas-box" id="box"><canvas id="cv"></canvas></div>
+  <div class="ask">
+    <div class="prompt" style="font-size:1.35rem;margin:0">🏘️ This street is not finished! Add whatever you think is needed to complete it.</div>
+    <button class="card ask-q" data-q="What is missing in the picture?"><span>🔍</span> What is missing?</button>
+    <button class="card ask-q" data-q="Who lives in the houses?"><span>👨‍👩‍👧</span> Who lives here?</button>
+    <button class="card ask-q" data-q="What is there in the street?"><span>🛣️</span> What is in the street?</button>
+    <button class="card ask-q" data-q="What did you add?"><span>🖍️</span> What did you add?</button>
+    <div class="card" style="font-family:var(--read);font-size:1.4rem;font-weight:400">💬 I added <b>a door</b> and <b>two windows</b>. There is <b>a car</b> in the street.</div>
+    <button class="big-btn green" id="done">⭐ I finished!</button>
+  </div>
+</div>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Complete the Picture', subtitle: 'This is My Town · Let us draw', back: '../index.html#ch7' });
+
+const COLORS = ['#2b2140', '#e63946', '#ff8a3d', '#ffc93c', '#2bb673', '#2f7de1', '#8a5cf6', '#ff6fa8', '#8b5a2b'];
+const STAMPS = ['🌳', '🚗', '🧍', '🐕', '🌸', '☀️', '🐦', '🚲'];
+let color = COLORS[1], size = 10, mode = 'pen', stamp = '🌳';
+
+const tools = G.$('#tools');
+tools.innerHTML =
+  COLORS.map((c, i) => `<button class="sw ${i === 1 ? 'on' : ''}" data-c="${c}" style="background:${c}"></button>`).join('') +
+  `<button class="tool on" data-m="pen">✏️</button><button class="tool" data-m="fat">🖌️</button><button class="tool" data-m="eraser">🧽</button>` +
+  STAMPS.map((s) => `<button class="tool" data-m="stamp" data-s="${s}">${s}</button>`).join('') +
+  `<button class="tool" id="clear">🗑️</button>`;
+
+tools.addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.id === 'clear') { if (confirm('Clear the drawing?')) { ctx.clearRect(0, 0, cv.width, cv.height); drawBase(); } return; }
+  if (b.dataset.c) { color = b.dataset.c; G.$$('.sw').forEach((x) => x.classList.toggle('on', x === b)); if (mode === 'eraser') setMode('pen', G.$('[data-m=pen]')); return; }
+  setMode(b.dataset.m, b);
+});
+function setMode(m, b) {
+  mode = m;
+  stamp = b.dataset.s || stamp;
+  size = m === 'fat' ? 26 : m === 'eraser' ? 44 : 10;
+  G.$$('.tool').forEach((x) => x.classList.toggle('on', x === b));
+}
+
+const cv = G.$('#cv'), box = G.$('#box'), ctx = cv.getContext('2d');
+const dpr = Math.min(window.devicePixelRatio || 1, 2);
+function fit() {
+  const keep = cv.width ? ctx.getImageData(0, 0, cv.width, cv.height) : null;
+  cv.width = box.clientWidth * dpr; cv.height = box.clientHeight * dpr;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  if (keep) ctx.putImageData(keep, 0, 0);
+}
+fit();
+window.addEventListener('resize', fit);
+
+/* An unfinished street: houses without doors or windows, a bare tree and an empty road. */
+const BASE = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" fill="none" stroke="#2b2140" stroke-width="6" stroke-linejoin="round">
+  <path d="M0 640 H1200 M0 760 H1200" /><path d="M60 700 H160 M300 700 H400 M540 700 H640 M780 700 H880 M1020 700 H1120" stroke-dasharray="0" stroke-width="8"/>
+  <rect x="80" y="360" width="260" height="240"/><path d="M60 370 L210 230 L360 370"/>
+  <rect x="460" y="300" width="300" height="300"/><path d="M440 310 L610 170 L780 310"/>
+  <rect x="880" y="400" width="220" height="200"/><path d="M860 410 L990 300 L1120 410"/>
+  <path d="M1150 600 V470 M1150 520 L1120 490 M1150 500 L1180 470"/>
+</svg>`;
+function drawBase() {
+  const img = new Image();
+  img.onload = () => { const w = cv.width, h = cv.height, k = Math.min(w / 1200, h / 800); ctx.drawImage(img, (w - 1200 * k) / 2, (h - 800 * k) / 2, 1200 * k, 800 * k); };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(BASE);
+}
+drawBase();
+
+let last = null;
+const pos = (e) => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * dpr, (e.clientY - r.top) * dpr]; };
+cv.addEventListener('pointerdown', (e) => {
+  const [x, y] = pos(e);
+  if (mode === 'stamp') { ctx.font = `${70 * dpr}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.globalCompositeOperation = 'source-over'; ctx.fillText(stamp, x, y); G.sfx('pop'); return; }
+  cv.setPointerCapture(e.pointerId);
+  last = [x, y];
+  dot(x, y);
+});
+cv.addEventListener('pointermove', (e) => {
+  if (!last) return;
+  const [x, y] = pos(e);
+  ctx.globalCompositeOperation = mode === 'eraser' ? 'destination-out' : 'source-over';
+  ctx.strokeStyle = color; ctx.lineWidth = size * dpr; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.beginPath(); ctx.moveTo(...last); ctx.lineTo(x, y); ctx.stroke();
+  last = [x, y];
+});
+const stop = () => (last = null);
+cv.addEventListener('pointerup', stop);
+cv.addEventListener('pointercancel', stop);
+function dot(x, y) {
+  ctx.globalCompositeOperation = mode === 'eraser' ? 'destination-out' : 'source-over';
+  ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, (size * dpr) / 2, 0, Math.PI * 2); ctx.fill();
+}
+
+G.$$('.ask-q').forEach((b) => (b.onclick = () => { G.$$('.ask-q').forEach((x) => x.classList.toggle('on', x === b)); G.say(b.dataset.q); }));
+G.$('#done').onclick = () => { G.star(3); G.sfx('win'); G.confetti(); G.say('What a lovely street! Tell the class what you added.'); };
+</script>
+</body>
+</html>

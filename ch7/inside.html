@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .chain { display: flex; align-items: center; justify-content: center; gap: 0.4rem; flex-wrap: wrap; min-height: 9rem; margin: 0.6rem 0 1rem; }
+  .chain .step { display: flex; flex-direction: column; align-items: center; font-family: var(--read); font-size: 1.6rem; font-weight: 700; animation: pop 0.35s; }
+  .chain .step .e { font-size: 4.6rem; line-height: 1.1; }
+  .chain .arrow { font-size: 2.4rem; color: var(--muted); }
+  .cards { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.8rem; width: 100%; max-width: 110rem; }
+  .cardx { background: #fff; border: 0.25rem solid var(--line); border-radius: 1.4rem; box-shadow: var(--shadow); padding: 0.6rem; display: flex; flex-direction: column; align-items: center; font-family: var(--read); font-size: 2rem; font-weight: 700; min-height: 10rem; justify-content: center; }
+  .cardx .e { font-size: 4.6rem; line-height: 1.1; }
+  .cardx.used { visibility: hidden; }
+  .cardx.wrong { border-color: var(--red); background: #ffe1e3; animation: shake 0.4s; }
+  .q .e { font-size: 6rem; line-height: 1; }
+  .q .t { font-family: var(--read); font-size: 2.8rem; margin: 0.4rem 0 1rem; }
+  .choice { font-family: var(--read); font-size: 2.2rem; }
+  @media (max-width: 900px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mOrder">🏙️ Biggest to smallest</button>
+    <button class="big-btn orange" id="mQuiz">❓ What is in it?</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'What Is Inside?', subtitle: 'This is My Town · Read the poem', back: '../index.html#ch7' });
+
+/* From the biggest place to the smallest thing, as in the poem. */
+const CHAIN = [
+  { w: 'town', e: '🏙️' }, { w: 'street', e: '🛣️' }, { w: 'house', e: '🏠' }, { w: 'room', e: '🚪' },
+  { w: 'bed', e: '🛏️' }, { w: 'basket', e: '🧺' }, { w: 'flowers', e: '💐' },
+];
+const LINES = ['This is my town.', 'In my town, there are streets.', 'In my street, there are houses.', 'In my house, there are rooms.', 'In my room, there is a bed.', 'On the bed, there is a basket.', 'In the basket, there are some flowers.'];
+const area = G.$('#area');
+
+function order() {
+  let pos = 0;
+  area.innerHTML = `<p class="hint">Start with the biggest! Tap the pictures in order: what is in what?</p>
+    <div class="card" style="width:100%;max-width:110rem"><div class="chain" id="chain"><span class="hint">🏁 Start here</span></div></div>
+    <div class="cards">${G.shuffle(CHAIN).map((c) => `<button class="cardx" data-w="${c.w}"><span class="e">${c.e}</span>${c.w}</button>`).join('')}</div>
+    <div class="feedback" id="fb"></div>`;
+  G.$$('.cardx').forEach((b) => (b.onclick = () => {
+    const want = CHAIN[pos];
+    if (b.dataset.w === want.w) {
+      b.classList.add('used');
+      const chain = G.$('#chain');
+      if (!pos) chain.innerHTML = '';
+      chain.insertAdjacentHTML('beforeend', `${pos ? '<span class="arrow">▶</span>' : ''}<span class="step"><span class="e">${want.e}</span>${want.w}</span>`);
+      G.sfx('good');
+      G.star();
+      G.say(LINES[pos]);
+      G.feedback(G.$('#fb'), true, '');
+      if (++pos === CHAIN.length) setTimeout(() => G.end({ title: 'Well done!', msg: 'Flowers in a basket. Basket on the bed. Bed in the room. Room in the house. House in the street. Street in the town.', onReplay: order }), 2500);
+    } else {
+      b.classList.add('wrong');
+      G.sfx('bad');
+      G.feedback(G.$('#fb'), false, pos ? `🙂 What is in the ${CHAIN[pos - 1].w}?` : '🙂 Start with the biggest place!');
+      setTimeout(() => b.classList.remove('wrong'), 450);
+    }
+  }));
+}
+
+function quiz() {
+  const ITEMS = [
+    { e: '🏙️', t: 'What are there in my town?', a: 'streets', o: ['streets', 'flowers', 'beds'] },
+    { e: '🛣️', t: 'What are there in my street?', a: 'houses', o: ['houses', 'baskets', 'trains'] },
+    { e: '🏠', t: 'What are there in my house?', a: 'rooms', o: ['rooms', 'streets', 'towns'] },
+    { e: '🚪', t: 'What is there in my room?', a: 'a bed', o: ['a bed', 'a street', 'a train'] },
+    { e: '🛏️', t: 'What is there on the bed?', a: 'a basket', o: ['a basket', 'a house', 'a town'] },
+    { e: '🧺', t: 'What are there in the basket?', a: 'some flowers', o: ['some flowers', 'some rooms', 'some streets'] },
+    { e: '🛏️', t: 'Where is the basket?', a: 'on the bed', o: ['on the bed', 'in the street', 'in the town'] },
+  ];
+  area.innerHTML = `<div class="card" id="game" style="width:100%;max-width:76rem"></div>`;
+  G.quiz({
+    el: G.$('#game'),
+    items: ITEMS,
+    shuffleItems: false,
+    question: (it) => `<div class="e">${it.e}</div><div class="t">${it.t}</div>`,
+    options: (it) => G.shuffle(it.o).map((x) => ({ label: x, value: x })),
+    answer: (it) => it.a,
+    onShow: (it) => G.say(it.t),
+    endMsg: 'You know the poem “This is My Town”!',
+  });
+}
+
+G.$('#mOrder').onclick = order;
+G.$('#mQuiz').onclick = quiz;
+order();
+</script>
+</body>
+</html>

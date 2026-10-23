@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .wrap { display: grid; grid-template-columns: 1fr 24rem; gap: 1.4rem; width: 100%; max-width: 110rem; align-items: start; }
+  .env { background: #fffdf5; border: 0.3rem solid #e0c97a; border-radius: 1rem; padding: 1.2rem 1.6rem; position: relative; }
+  .env::before { content: '✉️'; position: absolute; right: 1rem; top: 0.6rem; font-size: 3rem; }
+  .row2 { display: grid; grid-template-columns: 15rem 1fr; gap: 0.8rem; align-items: center; margin-bottom: 0.7rem; }
+  .row2 label { font-size: 1.6rem; font-weight: 800; color: var(--muted); }
+  .row2 input { font-family: var(--read); font-size: 2.2rem; padding: 0.4rem 0.9rem; border-radius: 0.8rem; border: 0.25rem solid var(--line); min-height: 4.4rem; width: 100%; }
+  .row2 input:focus { outline: none; border-color: var(--blue); }
+  .side { display: flex; flex-direction: column; gap: 0.8rem; }
+  .side .big-btn { width: 100%; }
+  .chain { font-size: 1.4rem; line-height: 1.8; }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } .row2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Write your home address. Tap a box and type. Then tap 🔊 to hear it!</p>
+  <div class="wrap">
+    <div class="env" id="env">
+      <div class="row2"><label for="f1">Name / House No.</label><input id="f1" autocomplete="off"></div>
+      <div class="row2"><label for="f2">Name of the street</label><input id="f2" autocomplete="off"></div>
+      <div class="row2"><label for="f3">Name of the area</label><input id="f3" autocomplete="off"></div>
+      <div class="row2"><label for="f4">Town</label><input id="f4" autocomplete="off"></div>
+      <div class="row2"><label for="f5">State</label><input id="f5" autocomplete="off"></div>
+      <div class="row2"><label for="f6">Country</label><input id="f6" autocomplete="off"></div>
+    </div>
+    <div class="side">
+      <button class="big-btn green" id="read">🔊 Read my address</button>
+      <button class="big-btn purple" id="ex">👀 See an example</button>
+      <button class="big-btn ghost" id="clear">🧹 Clear</button>
+      <div class="card chain">🏠 House <b>in</b> the street<br>🛣️ Street <b>in</b> the area<br>🏙️ Area <b>in</b> the town<br>🗺️ Town <b>in</b> the state<br>🇮🇳 State <b>in</b> the country</div>
+    </div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'My Address', subtitle: 'This is My Town · Let us write', back: '../index.html#ch7' });
+
+/* Nothing typed here is saved, so each child can use the board in turn. */
+const EXAMPLE = ['Riya, House No. 12', 'Lotus Street', 'Green Park', 'Pune', 'Maharashtra', 'India'];
+const fields = G.$$('#env input');
+G.$('#read').onclick = () => {
+  const vals = fields.map((f) => f.value.trim());
+  if (vals.every((v) => !v)) { G.say('Type your address first.'); fields[0].focus(); return; }
+  G.say('My address is: ' + vals.filter(Boolean).join(', ') + '.');
+  if (vals.every(Boolean)) { G.star(2); G.confetti(15); }
+};
+G.$('#ex').onclick = () => { fields.forEach((f, i) => (f.value = EXAMPLE[i])); G.say('Here is an example. Now write your own address.'); };
+G.$('#clear').onclick = () => { fields.forEach((f) => (f.value = '')); fields[0].focus(); };
+fields.forEach((f, i) => f.addEventListener('keydown', (e) => { if (e.key === 'Enter') (fields[i + 1] || G.$('#read')).focus(); }));
+</script>
+</body>
+</html>

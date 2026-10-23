@@ -288,7 +288,40 @@ const CHAPTERS = [
       ]},
     ],
   },
-  ...Array.from({ length: 7 }, (_, i) => ({ n: i + 7, title: 'Coming soon', sections: [] })),
+  {
+    n: 7, unit: 'Unit 3 · Going Places', title: 'This is My Town',
+    sections: [
+      { key: 'recite', name: '📖 Let us read', games: [
+        { href: 'ch7/poem.html', ic: '🏙️', t: 'Poem Time', d: 'Listen, read and say "This is My Town"' },
+        { href: 'ch7/inside.html', ic: '🧺', t: 'What Is Inside?', d: 'Town › street › house › room › bed › basket' },
+      ]},
+      { key: 'read', name: '👀 Words', games: [
+        { href: 'ch7/sight-words.html', ic: '🎈', t: 'Pop the Sight Word', d: 'in · this · that · there · my' },
+        { href: 'ch7/new-words.html', ic: '🃏', t: 'New Word Cards', d: 'train · town · street · house · flower · basket' },
+      ]},
+      { key: 'speak', name: '🗣️ Let us speak', games: [
+        { href: 'ch7/talk-wheel.html', ic: '🎡', t: 'Talk Wheel', d: 'What is the name of your town and street?' },
+        { href: 'ch7/listen-point.html', ic: '👉', t: 'Listen and Point', d: 'shirt · shell · shoe …' },
+      ]},
+      { key: 'listen', name: '👂 Let us listen', games: [
+        { href: 'ch7/listen-pairs.html', ic: '🐭', t: 'Which Word Did You Hear?', d: 'fan/fin · wall/well · house/mouse …' },
+      ]},
+      { key: 'write', name: '✏️ Let us write', games: [
+        { href: 'ch7/make-word.html', ic: '🔤', t: 'Make a Word', d: 'e-b-d → bed · then a sentence' },
+        { href: 'ch7/address.html', ic: '✉️', t: 'My Address', d: 'House, street, area, town, state, country' },
+        { href: 'ch7/count-letters.html', ic: '🔢', t: 'Count the Letters', d: 'How many e? How many u?' },
+        { href: 'ch7/sh-words.html', ic: '👕', t: 'The “sh” Sound', d: '_ _ining · _ _orts · _ _irt · _ _awl · _ _oes' },
+      ]},
+      { key: 'think', name: '🎨 Let us do and draw', games: [
+        { href: 'ch7/spot-difference.html', ic: '🔍', t: 'Spot the Difference', d: 'Find what is different' },
+        { href: 'ch7/complete-picture.html', ic: '🖍️', t: 'Complete the Picture', d: 'Add what the street needs' },
+      ]},
+      { key: 'play', name: '🏁 Class challenge', games: [
+        { href: 'ch7/town-race.html', ic: '🏆', t: 'Town Race', d: 'Team A vs Team B – whole chapter quiz' },
+      ]},
+    ],
+  },
+  ...Array.from({ length: 6 }, (_, i) => ({ n: i + 8, title: 'Coming soon', sections: [] })),
 ];
 
 const tabs = document.getElementById('tabs');

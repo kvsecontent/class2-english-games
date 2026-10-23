@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; width: 100%; max-width: 100rem; }
+  .tile { background: #fff; border: 0.25rem solid var(--line); border-radius: 1.4rem; box-shadow: var(--shadow); padding: 0.6rem; display: flex; flex-direction: column; align-items: center; font-family: var(--read); font-size: 2.4rem; }
+  .tile .e { font-size: 5rem; line-height: 1.1; height: 6rem; display: flex; align-items: center; }
+  .tile .e svg { height: 5rem; }
+  .tile b { color: var(--orange); }
+  .tile.book { border-color: var(--purple); background: #f4f0ff; }
+  .sents { display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 100rem; }
+  .sent { font-family: var(--read); font-size: 2.6rem; line-height: 1.8; display: flex; align-items: center; flex-wrap: wrap; gap: 0.3rem; }
+  .sent .n { font-family: var(--head); background: var(--purple); color: #fff; border-radius: 50%; width: 3.2rem; height: 3.2rem; display: inline-flex; align-items: center; justify-content: center; font-size: 1.7rem; margin-right: 0.6rem; flex: none; }
+  .gap { display: inline-flex; align-items: center; justify-content: center; min-width: 4.6rem; height: 4rem; border-radius: 0.6rem; border: 0.25rem dashed var(--orange); background: #fffaf0; color: var(--orange); vertical-align: middle; }
+  .gap.filled { border-style: solid; border-color: var(--green); background: #d9f7e8; color: #117a4a; font-weight: 700; animation: pop 0.35s; }
+  .gap.nope { border-color: var(--red); background: #ffe1e3; animation: shake 0.4s; }
+  .word { white-space: nowrap; }
+  .bank { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 1.4rem 0 0.4rem; }
+  .chip { border: 0; border-radius: 1rem; background: var(--blue); color: #fff; font-family: var(--read); font-size: 2.6rem; font-weight: 700; min-width: 6rem;
+    padding: 0.3rem 1.2rem; min-height: 4.4rem; box-shadow: 0 0.35rem 0 rgba(0, 0, 0, 0.2); }
+  .chip.used { visibility: hidden; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mRead">📖 Read “sh” words</button>
+    <button class="big-btn orange" id="mFill">✏️ Fill in “sh”</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'The “sh” Sound', subtitle: 'This is My Town · Let us write', back: '../index.html#ch7' });
+
+/* The first three are from the book. */
+const WORDS = [
+  { w: 'shirt', e: '👕', book: true }, { w: 'shell', e: '🐚', book: true }, { w: 'shoe', e: '👟', book: true },
+  { w: 'sheep', e: '🐑' }, { w: 'ship', e: '🚢' }, { w: 'shorts', e: '🩳' }, { w: 'shark', e: '🦈' },
+  { w: 'fish', e: '🐟' }, { w: 'brush', e: '🪥' }, { w: 'shower', e: '🚿' },
+];
+const SENTS = [
+  ['The sun is', ['', 'ining'], 'today.'],
+  ['I am wearing T-shirt and', ['', 'orts'], '.'],
+  ['My father is wearing a new', ['', 'irt'], '.'],
+  ['My grandmother is folding a', ['', 'awl'], '.'],
+  ['My uncle is polishing his', ['', 'oes'], '.'],
+];
+const area = G.$('#area');
+const mark = (w) => w.replace('sh', '<b>sh</b>');
+
+function read() {
+  area.innerHTML = `<p class="hint">Tap a picture to hear the word. Listen for the “sh” sound!</p>
+    <div class="tiles">${WORDS.map((x) => `<button class="tile ${x.book ? 'book' : ''}" data-w="${x.w}"><span class="e">${x.e}</span><span>${mark(x.w)}</span></button>`).join('')}</div>`;
+  G.$$('.tile', area).forEach((t) => (t.onclick = () => G.say(t.dataset.w, { rate: 0.7 })));
+}
+
+function fill() {
+  let need = 0, done = 0;
+  area.innerHTML = `<p class="hint">Write “sh” to fill in the blanks. Drag “sh” to each gap (or tap it, then the gap). Then read the sentences aloud.</p>
+    <div class="card sents">${SENTS.map((s, i) => `<div class="sent"><span class="n">${i + 1}</span>` + s.map((p) => {
+      if (typeof p === 'string') return `<span>${p}</span>`;
+      need++;
+      return `<span class="word">${p[0]}<span class="gap">?</span>${p[1]}</span>`;
+    }).join(' ') + ` <button class="say" data-i="${i}">🔊</button></div>`).join('')}</div>
+    <div class="bank">${G.shuffle([...Array(need).fill('sh'), 'ch', 'th', 'ch']).map((c) => `<button class="chip" data-c="${c}">${c}</button>`).join('')}</div>`;
+  const text = (i) => SENTS[i].map((p) => (typeof p === 'string' ? p : p[0] + 'sh' + p[1])).join(' ').replace(/ \./g, '.');
+  G.$$('.say[data-i]').forEach((b) => (b.onclick = () => G.say(text(+b.dataset.i))));
+  G.tapDrag(G.$$('.chip'), G.$$('.gap'), (chip, gap) => {
+    if (gap.classList.contains('filled')) return;
+    if (chip.dataset.c === 'sh') {
+      gap.classList.add('filled');
+      gap.textContent = 'sh';
+      chip.classList.add('used');
+      chip.dataset.locked = 1;
+      G.sfx('good');
+      G.star();
+      G.say(gap.parentElement.textContent);
+      if (++done === need) setTimeout(() => G.end({ title: 'Well done!', msg: 'shining · shorts · shirt · shawl · shoes', onReplay: fill }), 1800);
+    } else {
+      gap.classList.add('nope');
+      G.sfx('bad');
+      G.say(`Not ${chip.dataset.c}. Try sh!`);
+      setTimeout(() => gap.classList.remove('nope'), 500);
+    }
+  });
+}
+
+G.$('#mRead').onclick = read;
+G.$('#mFill').onclick = fill;
+read();
+</script>
+</body>
+</html>

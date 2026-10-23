@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .pics { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; width: 100%; max-width: 120rem; }
+  .scene { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius); overflow: hidden; border: 0.3rem solid var(--line);
+    background: linear-gradient(#bfe6ff 0 45%, #9be38a 45% 80%, #9aa0ad 80% 100%); cursor: pointer; }
+  .scene .it { position: absolute; transform: translate(-50%, -50%); line-height: 1; pointer-events: none; }
+  .scene .hit { position: absolute; transform: translate(-50%, -50%); width: 9rem; height: 9rem; border-radius: 50%; border: 0; background: transparent; }
+  .scene .hit.found { border: 0.45rem solid var(--red); animation: pop 0.35s; }
+  .scene.miss { animation: shake 0.4s; }
+  .score { font-size: 2rem; font-weight: 800; margin: 0.6rem 0; }
+  @media (max-width: 900px) { .pics { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Look at the two pictures. Can you spot the differences? Tap a difference in either picture.</p>
+  <div class="score">Found <span id="n">0</span> of <span id="t">0</span> differences</div>
+  <div class="pics"><div class="scene" id="A"></div><div class="scene" id="B"></div></div>
+  <div class="row" style="margin-top:1rem"><button class="big-btn ghost" id="reveal">👀 Show the answers</button><button class="big-btn ghost" id="again">🔁 Play again</button></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Spot the Difference', subtitle: 'This is My Town · Let us do · B', back: '../index.html#ch7' });
+
+/* Our own town picture (not the book's). a = left, b = right; an empty string means it is missing. */
+const ITEMS = [
+  { x: 82, y: 14, s: 5, a: '☀️', b: '⛅', n: 'the sun' },
+  { x: 22, y: 50, s: 7, a: '🏠', b: '🏡', n: 'the house' },
+  { x: 50, y: 46, s: 6.5, a: '🏫', b: '🏫' },
+  { x: 76, y: 52, s: 6, a: '🌳', b: '', n: 'the tree' },
+  { x: 36, y: 18, s: 3.4, a: '', b: '🐦', n: 'the bird' },
+  { x: 30, y: 89, s: 5, a: '🚗', b: '🚙', n: 'the car' },
+  { x: 70, y: 70, s: 4, a: '🐕', b: '🐈', n: 'the dog' },
+  { x: 10, y: 72, s: 3.6, a: '🌷🌷', b: '🌷🌷' },
+  { x: 86, y: 88, s: 4, a: '🚲', b: '🚲' },
+];
+const DIFFS = ITEMS.filter((it) => it.a !== it.b);
+let found = 0;
+
+function build() {
+  found = 0;
+  G.$('#n').textContent = 0;
+  G.$('#t').textContent = DIFFS.length;
+  ['A', 'B'].forEach((id) => {
+    const sc = G.$('#' + id);
+    sc.innerHTML = ITEMS.map((it) => `<span class="it" style="left:${it.x}%;top:${it.y}%;font-size:${it.s}rem">${id === 'A' ? it.a : it.b}</span>`).join('') +
+      DIFFS.map((it, k) => `<button class="hit" data-k="${k}" style="left:${it.x}%;top:${it.y}%" aria-label="difference"></button>`).join('');
+    sc.onclick = (e) => {
+      const h = e.target.closest('.hit');
+      if (!h) { sc.classList.remove('miss'); void sc.offsetWidth; sc.classList.add('miss'); G.sfx('bad'); return; }
+      const k = h.dataset.k;
+      if (h.classList.contains('found')) return;
+      G.$$(`.hit[data-k="${k}"]`).forEach((x) => x.classList.add('found'));
+      found++;
+      G.$('#n').textContent = found;
+      G.star(); G.sfx('good');
+      G.say('Yes! Look at ' + DIFFS[k].n + '.');
+      if (found === DIFFS.length) setTimeout(() => G.end({ title: 'Sharp eyes!', msg: 'You found all the differences.', onReplay: build }), 1500);
+    };
+  });
+}
+G.$('#reveal').onclick = () => G.$$('.hit').forEach((h) => h.classList.add('found'));
+G.$('#again').onclick = build;
+build();
+</script>
+</body>
+</html>
