@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; width: 100%; max-width: 100rem; }
+  .it { position: relative; background: #fff; border: 0.25rem solid var(--line); border-radius: 1.6rem; box-shadow: var(--shadow); padding: 0.6rem; display: flex; flex-direction: column; align-items: center; font-family: var(--read); font-size: 1.9rem; font-weight: 700; min-height: 8.5rem; justify-content: center; }
+  .it .e { font-size: 3.8rem; line-height: 1.1; }
+  .it.on::after { content: ''; position: absolute; inset: 0.3rem; border: 0.45rem solid var(--red); border-radius: 50%; pointer-events: none; animation: pop 0.3s; }
+  .it.good { background: #d9f7e8; border-color: var(--green); }
+  .it.miss { background: #fff4cc; border-color: var(--yellow); }
+  .it.bad { background: #ffe1e3; border-color: var(--red); }
+  @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Circle all the things that Ravi and his friend see on their way to school. Tap to circle, tap again to remove. Then tap <b>Check</b>.</p>
+  <div class="grid" id="grid"></div>
+  <div class="row" style="margin-top:1rem">
+    <button class="big-btn green" id="check">✅ Check</button>
+    <button class="big-btn ghost" id="reset">🔁 Start again</button>
+  </div>
+  <div class="feedback" id="fb"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'On the Way to School', subtitle: 'Between Home and School · Let us write · Circle', back: '../index.html#ch6' });
+
+/* The 12 words from the book; ok = Ravi sees it in the story. */
+const ITEMS = [
+  { w: 'canals', e: '🌊', ok: true }, { w: 'bank', e: '🏦' }, { w: 'hospital', e: '🏥' }, { w: 'water park', e: '🛝' },
+  { w: 'mango grove', e: '🥭🌳', ok: true }, { w: 'paddy fields', e: '🌾', ok: true }, { w: 'lizards', e: '🦎', ok: true }, { w: 'park', e: '🏞️' },
+  { w: 'cars', e: '🚗' }, { w: 'train', e: '🚆' }, { w: 'main road', e: '🛣️', ok: true }, { w: 'trees', e: '🌳', ok: true },
+];
+
+function build() {
+  G.$('#fb').textContent = '';
+  G.$('#grid').innerHTML = G.shuffle(ITEMS).map((x) => `<button class="it" data-w="${x.w}"><span class="e">${x.e}</span>${x.w}</button>`).join('');
+  G.$$('.it').forEach((b) => (b.onclick = () => {
+    G.$$('.it').forEach((x) => x.classList.remove('good', 'miss', 'bad'));
+    b.classList.toggle('on');
+    G.sfx('pop');
+    G.say(b.dataset.w);
+  }));
+}
+G.$('#check').onclick = () => {
+  let right = 0, wrong = 0, missed = 0;
+  G.$$('.it').forEach((b) => {
+    const ok = ITEMS.find((x) => x.w === b.dataset.w).ok, on = b.classList.contains('on');
+    b.classList.remove('good', 'miss', 'bad');
+    if (ok && on) { right++; b.classList.add('good'); }
+    else if (ok) { missed++; b.classList.add('miss'); }
+    else if (on) { wrong++; b.classList.add('bad'); }
+  });
+  if (!wrong && !missed) {
+    G.star(3);
+    G.feedback(G.$('#fb'), true, '🎉 All correct! Canals, mango grove, paddy fields, lizards, main road and trees.');
+    setTimeout(() => G.end({ title: 'Well done!', msg: 'You found everything Ravi sees on his way to school.', onReplay: build }), 2500);
+  } else {
+    G.sfx('bad');
+    const msg = [wrong && `${wrong} ${wrong > 1 ? 'are' : 'is'} not in the story (red)`, missed && `${missed} more to find (yellow)`].filter(Boolean).join(' · ');
+    G.feedback(G.$('#fb'), false, `🙂 ${right} right. ${msg}.`);
+    G.say('Read the story again and try!');
+  }
+};
+G.$('#reset').onclick = build;
+build();
+</script>
+</body>
+</html>

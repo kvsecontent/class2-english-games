@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .wrap { display: grid; grid-template-columns: 1fr 30rem; gap: 1.2rem; width: 100%; align-items: start; }
+  .sheet { background: #fffdf5; border: 0.3rem solid #e0c97a; border-radius: 0.6rem; box-shadow: 0 0.6rem 0 rgba(0, 0, 0, 0.08); padding: 1rem; min-height: calc(100vh - 12rem); }
+  .sheet h2 { margin: 0 0 0.8rem; text-align: center; font-size: 2.2rem; color: var(--red); }
+  .pasted { display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); gap: 0.8rem; }
+  .pic { background: #fff; border: 0.2rem solid var(--line); border-radius: 0.6rem; padding: 0.4rem; display: flex; flex-direction: column; align-items: center; transform: rotate(var(--r)); animation: pop 0.4s; }
+  .pic .e { font-size: 4.4rem; line-height: 1.1; }
+  .pic b { font-family: var(--read); font-size: 1.7rem; }
+  .side { display: flex; flex-direction: column; gap: 0.8rem; }
+  .deck { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+  .deck button { font-size: 3rem; height: 5.4rem; border-radius: 1rem; border: 0.2rem solid var(--line); background: #fff; }
+  .deck button.on { background: #fff4cc; border-color: var(--yellow); }
+  .deck button.done { opacity: 0.25; pointer-events: none; }
+  .ask { font-size: 1.7rem; font-weight: 800; text-align: center; min-height: 2.4rem; }
+  .choice { font-family: var(--read); font-size: 1.8rem; min-width: 8rem; min-height: 4rem; padding: 0.4rem 1rem; }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="wrap">
+    <div class="sheet"><h2>🚌 Our Vehicle Chart 🚲</h2><div class="pasted" id="pasted"></div></div>
+    <div class="side card">
+      <p class="hint" style="margin:0">Pick a picture. Then choose its name to paste it on the chart.</p>
+      <div class="deck" id="deck"></div>
+      <div class="ask" id="ask"></div>
+      <div class="row" id="opts"></div>
+      <div class="feedback" id="fb" style="font-size:1.4rem;min-height:2rem"></div>
+      <p class="hint" style="margin:0;font-size:1rem">👩‍🏫 In class: children bring vehicle pictures from old magazines, paste them on a big sheet and write the names.</p>
+    </div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Vehicle Chart', subtitle: 'Between Home and School · Let us do · B', back: '../index.html#ch6' });
+
+const V = [
+  ['🚌', 'bus'], ['🚗', 'car'], ['🚲', 'bicycle'], ['🚆', 'train'], ['✈️', 'aeroplane'], ['🚢', 'ship'],
+  ['🚕', 'taxi'], ['🚜', 'tractor'], ['🚁', 'helicopter'], ['🛺', 'auto rickshaw'], ['🏍️', 'motorbike'], ['🚑', 'ambulance'],
+];
+let cur = null, count = 0;
+G.$('#deck').innerHTML = V.map(([e, n], i) => `<button data-i="${i}">${e}</button>`).join('');
+G.$$('#deck button').forEach((b) => (b.onclick = () => {
+  G.$$('#deck button').forEach((x) => x.classList.toggle('on', x === b));
+  cur = V[+b.dataset.i];
+  G.$('#ask').textContent = `${cur[0]} What is it?`;
+  G.$('#fb').textContent = '';
+  const opts = G.$('#opts');
+  opts.innerHTML = '';
+  G.shuffle([cur[1], ...G.shuffle(V.filter((v) => v !== cur)).slice(0, 2).map((v) => v[1])]).forEach((n) => {
+    const c = document.createElement('button');
+    c.className = 'choice';
+    c.textContent = n;
+    c.onclick = () => {
+      if (n !== cur[1]) { c.classList.add('wrong'); G.sfx('bad'); setTimeout(() => c.classList.remove('wrong'), 450); return; }
+      G.$('#pasted').insertAdjacentHTML('beforeend', `<div class="pic" style="--r:${(Math.random() * 6 - 3).toFixed(1)}deg"><span class="e">${cur[0]}</span><b>${cur[1]}</b></div>`);
+      b.classList.add('done'); b.classList.remove('on');
+      G.star(); G.sfx('good'); G.say(`This is ${/^[aeiou]/.test(cur[1]) ? 'an' : 'a'} ${cur[1]}.`);
+      opts.innerHTML = ''; G.$('#ask').textContent = '';
+      if (++count === V.length) setTimeout(() => G.end({ title: 'What a chart!', msg: 'You named all the vehicles.', onReplay: () => location.reload() }), 1500);
+    };
+    opts.append(c);
+  });
+  G.say('What is it?');
+}));
+</script>
+</body>
+</html>

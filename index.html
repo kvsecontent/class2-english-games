@@ -256,7 +256,39 @@ const CHAPTERS = [
       ]},
     ],
   },
-  ...Array.from({ length: 8 }, (_, i) => ({ n: i + 6, title: 'Coming soon', sections: [] })),
+  {
+    n: 6, unit: 'Unit 3 · Going Places', title: 'Between Home and School',
+    sections: [
+      { key: 'recite', name: '📖 Let us read', games: [
+        { href: 'ch6/story.html', ic: '🎒', t: 'Story Time', d: 'Listen, read and say "Between Home and School"' },
+        { href: 'ch6/true-false.html', ic: '✅', t: 'Tick or Cross', d: 'Is it right? Check the story' },
+      ]},
+      { key: 'read', name: '👀 Words', games: [
+        { href: 'ch6/new-words.html', ic: '🃏', t: 'New Word Cards', d: 'paddy · grove · route · canals · lizards …' },
+      ]},
+      { key: 'speak', name: '🗣️ Let us speak', games: [
+        { href: 'ch6/talk-wheel.html', ic: '🎡', t: 'Talk Wheel', d: 'What time do you leave home for school?' },
+        { href: 'ch6/listen-point.html', ic: '👉', t: 'Listen and Point', d: 'Hear the word, point to the object' },
+      ]},
+      { key: 'write', name: '✏️ Let us write', games: [
+        { href: 'ch6/ch-words.html', ic: '🪑', t: 'The “ch” Sound', d: 'lun_ _ · _ _ips · chart · chalk · chair' },
+        { href: 'ch6/what-they-see.html', ic: '🌾', t: 'On the Way to School', d: 'Circle what Ravi sees' },
+        { href: 'ch6/long-journey.html', ic: '🚆', t: 'A Long Journey', d: 'Who went far? Where? By what?' },
+        { href: 'ch6/jumbled.html', ic: '🔀', t: 'Jumbled Words', d: 'Rearrange the letters: o-g-n-a-m' },
+        { href: 'ch6/make-sentences.html', ic: '📝', t: 'Make Sentences', d: 'gate · road · tree · lunch · lizard' },
+      ]},
+      { key: 'think', name: '🎨 Let us draw', games: [
+        { href: 'ch6/route-draw.html', ic: '🗺️', t: 'My Route to School', d: 'Draw the way from home to school' },
+      ]},
+      { key: 'listen', name: '✂️ Let us do', games: [
+        { href: 'ch6/vehicle-chart.html', ic: '🚌', t: 'Vehicle Chart', d: 'Paste vehicles and write their names' },
+      ]},
+      { key: 'play', name: '🏁 Class challenge', games: [
+        { href: 'ch6/school-race.html', ic: '🏆', t: 'Race to School', d: 'Team A vs Team B – whole chapter quiz' },
+      ]},
+    ],
+  },
+  ...Array.from({ length: 7 }, (_, i) => ({ n: i + 7, title: 'Coming soon', sections: [] })),
 ];
 
 const tabs = document.getElementById('tabs');

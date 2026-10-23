@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1.2rem; }
+  .pets { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; width: 100%; max-width: 100rem; }
+  .pet {
+    border: 0.3rem solid var(--line); background: #fff; border-radius: 1.6rem; padding: 0.8rem 0.5rem;
+    display: flex; flex-direction: column; align-items: center; gap: 0.2rem; box-shadow: var(--shadow);
+    font-size: 1.6rem; font-weight: 800; min-height: 9.5rem; justify-content: center;
+  }
+  .pet .e { font-size: 5rem; line-height: 1; }
+  .pet small { font-family: var(--read); font-size: 1.3rem; color: var(--muted); font-weight: 700; }
+  .pet.talk .e { animation: pop 0.4s 2; }
+  .pet.right { border-color: var(--green); background: #d9f7e8; }
+  .pet.wrong { border-color: var(--red); background: #ffe1e3; animation: shake 0.4s; }
+  .mystery { font-size: 7rem; border: 0; background: #fff4cc; border-radius: 50%; width: 11rem; height: 11rem; box-shadow: var(--shadow); margin: 0.4rem 0 0.6rem; }
+  .mystery:active { transform: scale(0.95); }
+  .tip { font-size: 1.2rem; color: var(--muted); margin-top: 1rem; }
+  @media (max-width: 900px) { .pets { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mExplore">👂 Learn the words</button>
+    <button class="big-btn orange" id="mGame">👉 Listen and point</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+  <p class="tip">👩‍🏫 Teacher tip: bring these objects to class too. Say a word and let children point to the real object.</p>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Listen and Point', subtitle: 'Between Home and School · Let us speak · C', back: '../index.html#ch6' });
+
+/* Sounds are spoken by the browser, so no sound files or internet are needed. */
+const ANIMALS = [
+  { id: 'bag', e: '🎒', n: 'Bag' }, { id: 'book', e: '📘', n: 'Book' }, { id: 'pencil', e: '✏️', n: 'Pencil' }, { id: 'chair', e: '🪑', n: 'Chair' },
+  { id: 'chalk', e: '🖍️', n: 'Chalk' }, { id: 'lunch', e: '🍱', n: 'Lunch box' }, { id: 'mango', e: '🥭', n: 'Mango' }, { id: 'tree', e: '🌳', n: 'Tree' },
+  { id: 'lizard', e: '🦎', n: 'Lizard' }, { id: 'bicycle', e: '🚲', n: 'Bicycle' }, { id: 'clock', e: '🕰️', n: 'Clock' }, { id: 'bottle', e: '🍶', n: 'Water bottle' },
+];
+const area = G.$('#area');
+const card = (a, showName) => `<button class="pet" data-id="${a.id}"><span class="e">${a.e}</span>${showName ? a.n : ''}</button>`;
+const play = (a) => G.say(a.n, { rate: 0.8 });
+function wiggle(btn) { btn.classList.remove('talk'); void btn.offsetWidth; btn.classList.add('talk'); }
+
+function explore() {
+  area.innerHTML = `<p class="hint">Tap a picture to hear the word. Say it with your teacher.</p>
+    <div class="pets">${ANIMALS.map((a) => card(a, true)).join('')}</div>`;
+  G.$$('.pet', area).forEach((btn) => (btn.onclick = () => {
+    const a = ANIMALS.find((x) => x.id === btn.dataset.id);
+    wiggle(btn);
+    G.say(a.n, { rate: 0.8 });
+  }));
+}
+
+function game() {
+  let order = [], i = 0, firstTry = true;
+  const start = () => { order = G.shuffle(ANIMALS).slice(0, 8); i = 0; round(); };
+  function round() {
+    if (i >= order.length) { G.end({ title: 'Super listening!', msg: 'You pointed to every word.', onReplay: start }); return; }
+    firstTry = true;
+    const cur = order[i];
+    const choices = G.shuffle([cur, ...G.shuffle(ANIMALS.filter((a) => a !== cur)).slice(0, 5)]);
+    area.innerHTML = `<div class="progress" id="pg"></div>
+      <button class="mystery" id="play">🔊</button>
+      <div class="prompt">Listen to the word. Point to it!</div>
+      <div class="pets">${choices.map((a) => card(a, false)).join('')}</div>
+      <div class="feedback" id="fb"></div>`;
+    G.progress(G.$('#pg'), i, order.length);
+    G.$('#play').onclick = () => play(cur);
+    setTimeout(() => play(cur), 400);
+    G.$$('.pet', area).forEach((btn) => (btn.onclick = () => {
+      if (btn.dataset.id === cur.id) {
+        btn.classList.add('right');
+        G.$$('.pet', area).forEach((x) => (x.disabled = true));
+        if (firstTry) G.star();
+        G.sfx('good');
+        G.feedback(G.$('#fb'), true, `🎉 Yes! ${cur.n}.`);
+        G.say(`Yes! ${cur.n}.`);
+        i++;
+        setTimeout(round, 2300);
+      } else {
+        firstTry = false;
+        btn.classList.add('wrong');
+        G.sfx('bad');
+        G.feedback(G.$('#fb'), false, '🙂 Listen again!');
+        setTimeout(() => btn.classList.remove('wrong'), 500);
+      }
+    }));
+  }
+  start();
+}
+
+G.$('#mExplore').onclick = explore;
+G.$('#mGame').onclick = game;
+explore();
+</script>
+</body>
+</html>

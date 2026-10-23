@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .q .e { font-size: 7rem; line-height: 1; }
+  .q .st { font-family: var(--read); font-size: 3rem; margin: 0.6rem 0 1.4rem; }
+  .choice { font-size: 5rem; min-width: 12rem; min-height: 9rem; }
+  .choice.tick { color: var(--green); }
+  .choice.cross { color: var(--red); }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Is the sentence correct? Tap ✓ for correct and ✘ for incorrect.</p>
+  <div class="card" id="game" style="width:100%;max-width:76rem"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Tick or Cross', subtitle: 'Between Home and School · Story check', back: '../index.html#ch6' });
+
+const ITEMS = [
+  { e: '👦🏽', s: 'Ravi studies in Class 2.', ok: true, fix: 'Yes, Ravi is in Class 2.' },
+  { e: '🚌', s: 'Ravi goes to school by bus.', ok: false, fix: 'He goes to school <b>on foot</b>.' },
+  { e: '🌾', s: 'They pass through the paddy fields.', ok: true, fix: 'Yes, and the mango grove.' },
+  { e: '🛣️', s: 'They take the longest route to school.', ok: false, fix: 'They take the <b>shortest</b> route.' },
+  { e: '🌊', s: 'They jump over the canals.', ok: true, fix: 'What fun!' },
+  { e: '🦎', s: 'They watch garden lizards.', ok: true, fix: 'Yes, they watch garden lizards.' },
+  { e: '⏰', s: 'They reach school late.', ok: false, fix: 'They reach school <b>on time</b>.' },
+];
+
+G.quiz({
+  el: G.$('#game'),
+  items: ITEMS,
+  shuffleItems: false,
+  question: (it) => `<div class="e">${it.e}</div><div class="st">${it.s}</div>`,
+  options: () => [{ label: '✓', value: true }, { label: '✘', value: false }],
+  answer: (it) => it.ok,
+  onShow: (it, el) => {
+    const [t, c] = G.$$('.choice', el);
+    t.classList.add('tick'); c.classList.add('cross');
+    G.say(it.s);
+  },
+  explain: (it) => it.fix,
+  endMsg: 'You checked all the sentences!',
+});
+</script>
+</body>
+</html>

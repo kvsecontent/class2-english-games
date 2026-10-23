@@ -9,5 +9,6 @@ Interactive games for a 75" smartboard. Open `index.html` → pick a chapter tab
 - `ch3/` – Chapter 3 "It is Fun" (16 games)
 - `ch4/` – Chapter 4 "Seeing without Seeing" (15 games)
 - `ch5/` – Chapter 5 "Come Back Soon" (12 games)
+- `ch6/` – Chapter 6 "Between Home and School" (13 games)
 
 Chapter PDFs: Google Drive › Lesson Plan Organiser Class 1-5 › Class 2 English.

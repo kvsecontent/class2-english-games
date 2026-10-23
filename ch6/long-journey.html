@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .lines { display: flex; flex-direction: column; gap: 0.4rem; width: 100%; max-width: 90rem; }
+  .ln { font-family: var(--read); font-size: 2.1rem; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+  .ln .n { font-family: var(--head); background: var(--purple); color: #fff; border-radius: 50%; width: 3rem; height: 3rem; display: inline-flex; align-items: center; justify-content: center; font-size: 1.6rem; flex: none; }
+  .gap { display: inline-flex; align-items: center; justify-content: center; min-width: 11rem; height: 3.8rem; border-radius: 0.8rem; padding: 0 0.8rem;
+    border: 0.25rem dashed var(--orange); background: #fffaf0; color: var(--orange); }
+  .gap.filled { border-style: solid; border-color: var(--green); background: #d9f7e8; color: #117a4a; font-weight: 700; animation: pop 0.35s; }
+  .gap.nope { border-color: var(--red); animation: shake 0.4s; }
+  .banks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; width: 100%; max-width: 110rem; margin-top: 0.6rem; text-align: center; }
+  @media (max-width: 900px) { .banks { grid-template-columns: 1fr; } }
+  .bank-label { font-size: 1.3rem; font-weight: 800; color: var(--muted); margin-top: 0.4rem; }
+  .bank { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin: 0.3rem 0; max-width: 110rem; }
+  .chip { border: 0; border-radius: 1rem; color: #fff; font-family: var(--read); font-size: 1.7rem; font-weight: 700; padding: 0.2rem 0.9rem; min-height: 3.8rem; box-shadow: 0 0.35rem 0 rgba(0, 0, 0, 0.2); }
+  .chip.who { background: var(--pink); } .chip.where { background: var(--teal); } .chip.how { background: var(--blue); }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Ask your family: who went on a very long journey? Where did they go? How did they go and come back? Then fill the gaps (drag a word, or tap it and then the gap).</p>
+  <div class="card lines">
+    <div class="ln"><span class="n">1</span>My <span class="gap" data-k="who">?</span> went on a very long journey.</div>
+    <div class="ln"><span class="n">2</span>They went to <span class="gap" data-k="where">?</span>.</div>
+    <div class="ln"><span class="n">3</span>They went by <span class="gap" data-k="how">?</span>.</div>
+    <div class="ln"><span class="n">4</span>They came back by <span class="gap" data-k="how">?</span>.</div>
+  </div>
+  <div class="banks">
+    <div><div class="bank-label">👨‍👩‍👧 Who?</div><div class="bank" id="who"></div></div>
+    <div><div class="bank-label">📍 Where?</div><div class="bank" id="where"></div></div>
+    <div><div class="bank-label">🚆 How?</div><div class="bank" id="how"></div></div>
+  </div>
+  <div class="row" style="margin-top:0.6rem">
+    <button class="big-btn green" id="read">🔊 Read my story</button>
+    <button class="big-btn ghost" id="reset">🔁 Start again</button>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'A Long Journey', subtitle: 'Between Home and School · Let us write · B2', back: '../index.html#ch6' });
+
+const BANKS = {
+  who: ['grandfather', 'grandmother', 'father', 'mother', 'uncle', 'aunt'],
+  where: ['the mountains', 'the sea', 'a big city', 'a village', 'a temple', 'a fair'],
+  how: ['train', 'bus', 'plane', 'car', 'ship', 'motorbike'],
+};
+const PIC = { train: '🚆', bus: '🚌', plane: '✈️', car: '🚗', ship: '🚢', motorbike: '🏍️' };
+let done = false;
+Object.entries(BANKS).forEach(([k, list]) => (G.$('#' + k).innerHTML = list.map((w) => `<button class="chip ${k}" data-k="${k}" data-w="${w}">${PIC[w] ? PIC[w] + ' ' : ''}${w}</button>`).join('')));
+const gaps = G.$$('.gap');
+const story = () => G.$$('.ln').map((l) => l.textContent.replace(/^\d/, '').replace(/\s+/g, ' ').trim()).join(' ');
+
+G.tapDrag(G.$$('.chip'), gaps, (chip, gap) => {
+  if (chip.dataset.k !== gap.dataset.k) { gap.classList.add('nope'); G.sfx('bad'); setTimeout(() => gap.classList.remove('nope'), 450); return; }
+  gap.textContent = chip.dataset.w;
+  gap.classList.add('filled');
+  G.sfx('pop');
+  G.say(chip.dataset.w);
+  if (!done && gaps.every((g) => g.classList.contains('filled'))) {
+    done = true;
+    G.star(3); G.sfx('good'); G.confetti(15);
+    setTimeout(() => G.say(story()), 900);
+  }
+});
+G.$('#read').onclick = () => G.say(story());
+G.$('#reset').onclick = () => { done = false; gaps.forEach((g) => { g.textContent = '?'; g.classList.remove('filled'); }); };
+</script>
+</body>
+</html>
