@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .q { font-family: var(--read); font-size: 2.8rem; margin: 1rem 0 1.6rem; line-height: 1.4; }
+  .q .blank { display: inline-block; min-width: 7rem; border-bottom: 0.3rem dashed var(--orange); color: var(--orange); }
+  .q .pic { font-size: 5rem; display: block; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Read the line from the song. Tap the missing word.</p>
+  <div class="card" id="game" style="width:100%;max-width:70rem"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Missing Word', subtitle: 'Little Drops of Water · Let us sing', back: '../index.html#ch12' });
+
+const ITEMS = [
+  { pic: '💧', a: 'Little drops of', w: 'water,', b: '', opts: ['water,', 'milk,', 'sand,'] },
+  { pic: '🏖️', a: 'Little grains of', w: 'sand,', b: '', opts: ['sand,', 'rice,', 'love,'] },
+  { pic: '🌊', a: 'Make the mighty', w: 'ocean', b: '', opts: ['ocean', 'mountain', 'river'] },
+  { pic: '🏞️', a: 'And the', w: 'pleasant', b: 'land.', opts: ['pleasant', 'mighty', 'little'] },
+  { pic: '💗', a: 'Little words of', w: 'love,', b: '', opts: ['love,', 'water,', 'sand,'] },
+  { pic: '🤝', a: 'Little acts of', w: 'kindness,', b: '', opts: ['kindness,', 'happiness,', 'sadness,'] },
+  { pic: '🫶', a: 'Little deeds of', w: 'warmth', b: '', opts: ['warmth', 'water', 'wind'] },
+  { pic: '😊', a: 'Spread', w: 'smiles', b: 'and happiness.', opts: ['smiles', 'tears', 'sand'] },
+];
+
+G.quiz({
+  el: G.$('#game'),
+  items: ITEMS,
+  shuffleItems: false,
+  question: (it) => `<span class="pic">${it.pic}</span>${it.a} <span class="blank">&nbsp;?&nbsp;</span> ${it.b}`,
+  options: (it) => G.shuffle(it.opts).map((o) => ({ label: o, value: o })),
+  answer: (it) => it.w,
+  onShow: (it, el) => {
+    const s = el.querySelector('.q');
+    G.$$('.choice', el).forEach((b) => b.addEventListener('click', () => {
+      if (b.classList.contains('right')) s.querySelector('.blank').textContent = it.w;
+    }));
+  },
+  explain: (it) => `${it.a} ${it.w} ${it.b}`,
+  endMsg: 'Little acts of kindness spread smiles and happiness!',
+});
+</script>
+</body>
+</html>

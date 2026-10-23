@@ -450,7 +450,41 @@ const CHAPTERS = [
       ]},
     ],
   },
-  ...Array.from({ length: 2 }, (_, i) => ({ n: i + 12, title: 'Coming soon', sections: [] })),
+  {
+    n: 12, unit: 'Unit 5 · Harmony', title: 'Little Drops of Water',
+    sections: [
+      { key: 'recite', name: '🎵 Let us sing', games: [
+        { href: 'ch12/song.html', ic: '💧', t: 'Song Time', d: 'Sing "Little Drops of Water"' },
+        { href: 'ch12/song-missing.html', ic: '🧩', t: 'Missing Word', d: 'Find the word that fits the song' },
+      ]},
+      { key: 'read', name: '👀 Words', games: [
+        { href: 'ch12/new-words.html', ic: '🃏', t: 'New Word Cards', d: 'mighty · pleasant · kindness · peaceful · ocean' },
+      ]},
+      { key: 'speak', name: '🗣️ Let us speak', games: [
+        { href: 'ch12/water-web.html', ic: '🕸️', t: 'Water Words', d: 'Words that come to mind for “water”' },
+        { href: 'ch12/talk-wheel.html', ic: '🎡', t: 'Talk Wheel', d: 'What do we use water for?' },
+      ]},
+      { key: 'listen', name: '👂 Let us listen', games: [
+        { href: 'ch12/colour-listen.html', ic: '🎨', t: 'Listen and Colour', d: 'Colour the birds. Colour the leaves…' },
+      ]},
+      { key: 'think', name: '🎨 Let us draw', games: [
+        { href: 'ch12/draw-earth.html', ic: '🌍', t: 'A Beautiful Earth', d: 'Draw one thing to make the earth beautiful' },
+      ]},
+      { key: 'write', name: '✏️ Let us write', games: [
+        { href: 'ch12/match-phrases.html', ic: '🔗', t: 'Match the Phrases', d: 'drops of water · grains of sand …' },
+        { href: 'ch12/drops-of.html', ic: '🥛', t: 'Drops Of…', d: 'Circle the liquids' },
+        { href: 'ch12/measure-words.html', ic: '🍞', t: 'A Cup Of…', d: 'cup · slice · tube · box · bag' },
+        { href: 'ch12/rearrange.html', ic: '🔀', t: 'Rearrange the Words', d: 'went Ramona school to → Ramona went to school.' },
+      ]},
+      { key: 'think', name: '🧂 Project work', games: [
+        { href: 'ch12/grainy.html', ic: '🌾', t: 'Is It Grainy?', d: 'salt · sugar · rice · wheat' },
+      ]},
+      { key: 'play', name: '🏁 Class challenge', games: [
+        { href: 'ch12/water-race.html', ic: '🏆', t: 'Water Drop Race', d: 'Team A vs Team B – whole chapter quiz' },
+      ]},
+    ],
+  },
+  { n: 13, title: 'Coming soon', sections: [] },
 ];
 
 const tabs = document.getElementById('tabs');

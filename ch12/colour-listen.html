@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .wrap { display: grid; grid-template-columns: 1fr 24rem; gap: 1.2rem; width: 100%; max-width: 120rem; align-items: center; }
+  .board { background: #fff; border-radius: var(--radius); border: 0.25rem solid var(--line); padding: 0.6rem; }
+  #pic { width: 100%; max-height: calc(100vh - 12rem); display: block; }
+  #pic [data-g] { cursor: pointer; stroke: #2b2140; stroke-width: 3; }
+  #pic [data-g].wrong { animation: shake 0.4s; }
+  .side { display: flex; flex-direction: column; gap: 0.8rem; align-items: center; }
+  .cmd { font-size: 2.2rem; font-weight: 800; color: var(--purple); text-align: center; min-height: 6rem; }
+  .palette { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+  .sw { width: 4.8rem; height: 4.8rem; border-radius: 50%; border: 0.3rem solid #fff; box-shadow: 0 0 0 0.2rem var(--line); }
+  .sw.on { box-shadow: 0 0 0 0.4rem var(--ink); }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Listen to the directions and fill the colours. Use any colour you like!</p>
+  <div class="wrap">
+    <div class="board"><svg id="pic" viewBox="0 0 600 420"></svg></div>
+    <div class="side card">
+      <div class="cmd" id="cmd">👂 Listen…</div>
+      <button class="big-btn green" id="again">🔊 Say it again</button>
+      <div class="palette" id="pal"></div>
+      <button class="big-btn ghost" id="reset">🔁 Start again</button>
+    </div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Listen and Colour', subtitle: 'Little Drops of Water · Let us listen', back: '../index.html#ch12' });
+
+/* Our own picture: two birds and a plant in a pot. The three directions are from the book. */
+const STEPS = [['bird', 'Colour the birds.'], ['leaf', 'Colour the leaves.'], ['plant', 'Colour the plant.']];
+const COLS = ['#e63946', '#ff8a3d', '#ffc93c', '#2bb673', '#2f7de1', '#8a5cf6', '#ff6fa8', '#8b5a2b', '#13b5b1'];
+const leaf = (x, y, r) => `<path data-g="leaf" d="M${x} ${y} q 40 -40 80 0 q -40 40 -80 0 Z" transform="rotate(${r} ${x} ${y})" fill="#fff"/>`;
+const bird = (x, y) => `<g>
+  <path d="M${x - 46} ${y - 4} l -28 -14 l 6 22 Z" fill="#fff" data-g="bird"/>
+  <ellipse data-g="bird" cx="${x}" cy="${y}" rx="48" ry="28" fill="#fff"/>
+  <circle data-g="bird" cx="${x + 46}" cy="${y - 24}" r="20" fill="#fff"/>
+  <path d="M${x + 64} ${y - 28} l 18 6 l -18 6 Z" fill="#ffc93c" pointer-events="none"/>
+  <circle cx="${x + 52}" cy="${y - 30}" r="3.5" fill="#2b2140" pointer-events="none"/>
+  <path data-g="bird" d="M${x - 18} ${y - 6} q 20 -46 44 -10 Z" fill="#fff"/></g>`;
+let step = 0, pick = COLS[0];
+
+function build() {
+  step = 0;
+  G.$('#pic').innerHTML = `
+    <rect x="0" y="360" width="600" height="60" fill="#eee" stroke="none"/>
+    ${bird(80, 90)}${bird(420, 60)}
+    <path data-g="plant" d="M300 330 C 298 280, 302 230, 300 170" fill="none" stroke-width="10"/>
+    ${leaf(300, 300, -150)}${leaf(300, 270, -30)}${leaf(300, 235, -160)}${leaf(300, 205, -20)}${leaf(300, 175, -90)}
+    <path data-g="plant" d="M230 330 H370 L350 400 H250 Z" fill="#fff"/>`;
+  G.$$('#pic [data-g]').forEach((el) => el.addEventListener('click', () => paint(el)));
+  next();
+}
+function next() {
+  if (step >= STEPS.length) { G.$('#cmd').textContent = '🎉 Beautiful!'; setTimeout(() => G.end({ title: 'Well done!', msg: 'You listened carefully and coloured the picture.', onReplay: build }), 1200); return; }
+  const say = STEPS[step][1];
+  G.$('#cmd').textContent = '👂 ' + say;
+  setTimeout(() => G.say(say), 500);
+}
+function paint(el) {
+  if (step >= STEPS.length) return;
+  const want = STEPS[step][0];
+  if (el.dataset.g !== want) { el.classList.remove('wrong'); void el.getBBox(); el.classList.add('wrong'); G.sfx('bad'); G.say('Listen again. ' + STEPS[step][1]); return; }
+  if (want === 'plant' && el.getAttribute('fill') === 'none') el.style.stroke = pick; // the stem is a line, so colour its stroke
+  else el.setAttribute('fill', pick);
+  el.dataset.done = 1;
+  G.sfx('pop');
+  if (G.$$(`#pic [data-g="${want}"]`).every((x) => x.dataset.done)) { G.star(); G.sfx('good'); G.say(G.praise()); step++; setTimeout(next, 900); }
+}
+G.$('#pal').innerHTML = COLS.map((c, i) => `<button class="sw ${i ? '' : 'on'}" data-c="${c}" style="background:${c}"></button>`).join('');
+G.$('#pal').onclick = (e) => { const b = e.target.closest('.sw'); if (!b) return; pick = b.dataset.c; G.$$('.sw').forEach((x) => x.classList.toggle('on', x === b)); };
+G.$('#again').onclick = () => STEPS[step] && G.say(STEPS[step][1]);
+G.$('#reset').onclick = build;
+build();
+</script>
+</body>
+</html>

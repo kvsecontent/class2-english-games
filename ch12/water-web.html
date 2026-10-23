@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .wrap { display: grid; grid-template-columns: 1fr 30rem; gap: 1.2rem; width: 100%; max-width: 120rem; align-items: start; }
+  .web { position: relative; height: calc(100vh - 13rem); min-height: 28rem; background: #eaf6ff; border-radius: var(--radius); border: 0.25rem solid var(--line); overflow: hidden; }
+  .web svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .hub, .bub { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-family: var(--read); font-weight: 700; }
+  .hub { left: 50%; top: 50%; width: 13rem; height: 13rem; background: var(--blue); color: #fff; font-size: 2.4rem; box-shadow: var(--shadow); }
+  .hub span { font-size: 4rem; line-height: 1; }
+  .bub { width: 10rem; height: 10rem; background: #fff; border: 0.3rem solid var(--teal); font-size: 1.7rem; animation: pop 0.4s; box-shadow: var(--shadow); padding: 0.3rem; }
+  .bub span { font-size: 2.6rem; line-height: 1.1; }
+  .side { display: flex; flex-direction: column; gap: 0.8rem; }
+  .bank { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+  .bank button { font-family: var(--read); font-size: 1.6rem; font-weight: 700; min-height: 3.8rem; border-radius: 1rem; border: 0.2rem solid var(--line); background: #fff; padding: 0.2rem 0.8rem; }
+  .bank button.used { opacity: 0.3; }
+  .own { display: flex; gap: 0.5rem; }
+  .own input { flex: 1; font-family: var(--read); font-size: 1.8rem; padding: 0.3rem 0.8rem; border-radius: 0.8rem; border: 0.25rem solid var(--line); min-width: 0; }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Say all the words that come to your mind when you think of the word “water”. Tap a word (or type your own) to add it to the web!</p>
+  <div class="wrap">
+    <div class="web" id="web"><svg id="lines"></svg><div class="hub"><span>💧</span>water</div></div>
+    <div class="side card">
+      <b style="font-size:1.5rem">💭 Word bank</b>
+      <div class="bank" id="bank"></div>
+      <div class="own"><input id="own" placeholder="My word…" maxlength="16" aria-label="Your own word"><button class="big-btn green" id="add" style="min-width:0;font-size:1.4rem">➕</button></div>
+      <button class="big-btn ghost" id="clear">🧹 Clear the web</button>
+    </div>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Water Words', subtitle: 'Little Drops of Water · Let us speak · A and B', back: '../index.html#ch12' });
+
+const BANK = [
+  ['🌧️', 'rain'], ['🏞️', 'river'], ['🌊', 'sea'], ['🥤', 'drink'], ['🛁', 'bath'], ['🧼', 'wash'], ['🍲', 'cook'],
+  ['🪴', 'plants'], ['🐟', 'fish'], ['🧊', 'ice'], ['🏊', 'swim'], ['⛵', 'boat'], ['💦', 'wet'], ['🚰', 'tap'],
+];
+const MAX = 12;
+const esc = (t) => t.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+let words = [];
+
+function draw() {
+  const web = G.$('#web');
+  G.$$('.bub', web).forEach((b) => b.remove());
+  let lines = '';
+  words.forEach(([e, w], i) => {
+    const a = (i / MAX) * Math.PI * 2 - Math.PI / 2, r = i % 2 ? 36 : 30;
+    const x = 50 + r * Math.cos(a) * 1.1, y = 50 + r * 1.35 * Math.sin(a);
+    lines += `<line x1="50%" y1="50%" x2="${x}%" y2="${y}%" stroke="#13b5b1" stroke-width="4" stroke-dasharray="8 6"/>`;
+    web.insertAdjacentHTML('beforeend', `<div class="bub" style="left:${x}%;top:${y}%"><span>${e}</span>${esc(w)}</div>`);
+  });
+  G.$('#lines').innerHTML = lines;
+}
+function add(e, w) {
+  if (words.length >= MAX || words.some((x) => x[1] === w)) return false;
+  words.push([e, w]);
+  draw();
+  G.sfx('pop'); G.star(); G.say(w);
+  if (words.length === 6) G.confetti(12);
+  return true;
+}
+G.$('#bank').innerHTML = BANK.map(([e, w]) => `<button data-e="${e}" data-w="${w}">${e} ${w}</button>`).join('');
+G.$$('#bank button').forEach((b) => (b.onclick = () => { if (add(b.dataset.e, b.dataset.w)) b.classList.add('used'); }));
+G.$('#add').onclick = () => { const w = G.$('#own').value.trim(); if (w && add('💬', w)) G.$('#own').value = ''; };
+G.$('#own').addEventListener('keydown', (e) => e.key === 'Enter' && G.$('#add').click());
+G.$('#clear').onclick = () => { words = []; draw(); G.$$('#bank button').forEach((b) => b.classList.remove('used')); };
+</script>
+</body>
+</html>

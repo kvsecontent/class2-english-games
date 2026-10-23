@@ -15,5 +15,6 @@ Interactive games for a 75" smartboard. Open `index.html` → pick a chapter tab
 - `ch9/` – Chapter 9 "My Name" (13 games)
 - `ch10/` – Chapter 10 "The Crow" (12 games)
 - `ch11/` – Chapter 11 "The Smart Monkey" (14 games)
+- `ch12/` – Chapter 12 "Little Drops of Water" (14 games)
 
 Chapter PDFs: Google Drive › Lesson Plan Organiser Class 1-5 › Class 2 English.
