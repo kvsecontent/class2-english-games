@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .q .e { font-size: 7rem; line-height: 1; }
+  .q .st { font-family: var(--read); font-size: 3rem; margin: 0.6rem 0 1.4rem; }
+  .choice { font-size: 5rem; min-width: 12rem; min-height: 9rem; }
+  .choice.tick { color: var(--green); }
+  .choice.cross { color: var(--red); }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Is the sentence correct? Tap ✓ for correct and ✘ for incorrect.</p>
+  <div class="card" id="game" style="width:100%;max-width:76rem"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Tick or Cross', subtitle: 'Seeing without Seeing · Story check', back: '../index.html#ch4' });
+
+const ITEMS = [
+  { e: '🤫', s: 'Onshangla was very quiet that day.', ok: true, fix: 'Yes, she opened the door quietly.' },
+  { e: '👧🏽', s: 'A new girl came to Onshangla’s school.', ok: false, fix: 'A new <b>boy</b> came to her school.' },
+  { e: '🕶️', s: 'The new boy wears black glasses.', ok: true, fix: 'He wears black glasses. He cannot see.' },
+  { e: '🪑', s: 'The teacher helped him sit at the back.', ok: false, fix: 'He sat in the <b>front</b> desk.' },
+  { e: '🍪', s: 'Ava placed biscuits and milk on the table.', ok: true, fix: 'Yes, biscuits and milk.' },
+  { e: '🌻', s: 'Ava had a sunflower in her hand.', ok: false, fix: 'Ava had a <b>rose</b>.' },
+  { e: '🔔', s: 'Onshangla could hear the bell.', ok: true, fix: 'The bell gave a musical sound.' },
+  { e: '💧', s: 'The glass had water in it.', ok: false, fix: 'It was <b>orange juice</b>.' },
+  { e: '🤝', s: 'Ava hopes the children will be friends with the new boy.', ok: true, fix: 'Let us all be friends!' },
+];
+
+G.quiz({
+  el: G.$('#game'),
+  items: ITEMS,
+  shuffleItems: false,
+  question: (it) => `<div class="e">${it.e}</div><div class="st">${it.s}</div>`,
+  options: () => [{ label: '✓', value: true }, { label: '✘', value: false }],
+  answer: (it) => it.ok,
+  onShow: (it, el) => {
+    const [t, c] = G.$$('.choice', el);
+    t.classList.add('tick'); c.classList.add('cross');
+    G.say(it.s);
+  },
+  explain: (it) => it.fix,
+  endMsg: 'You checked all the sentences!',
+});
+</script>
+</body>
+</html>

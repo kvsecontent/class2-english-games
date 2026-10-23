@@ -187,7 +187,43 @@ const CHAPTERS = [
       ]},
     ],
   },
-  ...Array.from({ length: 10 }, (_, i) => ({ n: i + 4, title: 'Coming soon', sections: [] })),
+  {
+    n: 4, unit: 'Unit 2 · Welcome to My World', title: 'Seeing without Seeing',
+    sections: [
+      { key: 'recite', name: '📖 Let us read', games: [
+        { href: 'ch4/story.html', ic: '🧣', t: 'Story Time', d: 'Listen, read and say "Seeing without Seeing"' },
+        { href: 'ch4/senses.html', ic: '🌹', t: 'Guess Without Seeing', d: 'Play Ava’s game: touch, smell, hear, taste' },
+        { href: 'ch4/true-false.html', ic: '✅', t: 'Tick or Cross', d: 'Is it right? Check the story' },
+      ]},
+      { key: 'read', name: '👀 Words', games: [
+        { href: 'ch4/sight-words.html', ic: '🎈', t: 'Pop the Sight Word', d: 'is · from · what · on · how · and · it …' },
+        { href: 'ch4/new-words.html', ic: '🃏', t: 'New Word Cards', d: 'quiet · front · sniff · remove · joy · blink …' },
+      ]},
+      { key: 'speak', name: '🗣️ Let us speak', games: [
+        { href: 'ch4/mother-words.html', ic: '💗', t: 'Words for Mother', d: 'Ava, Maa, Amma… What do you say?' },
+        { href: 'ch4/eyes-closed.html', ic: '🙈', t: 'Eyes Closed!', d: 'Which sense helps? Where is the clap?' },
+      ]},
+      { key: 'think', name: '🎨 Let us draw', games: [
+        { href: 'ch4/smell-taste.html', ic: '👃', t: 'Smell and Taste', d: 'Draw two things to smell and two to taste' },
+      ]},
+      { key: 'write', name: '✏️ Let us write', games: [
+        { href: 'ch4/fill-blanks.html', ic: '📝', t: 'Complete the Sentence', d: 'game · milk · quiet · biscuits · orange · boy' },
+        { href: 'ch4/i-like-to.html', ic: '💪', t: 'About Me', d: 'I like to … with my … · I can … by myself' },
+        { href: 'ch4/eye-care.html', ic: '👁️', t: 'Care for Your Eyes', d: '✓ good for eyes · ✘ not good' },
+      ]},
+      { key: 'listen', name: '🤸 Let us do', games: [
+        { href: 'ch4/eye-exercise.html', ic: '👀', t: 'Eye Exercise', d: 'Look up, down, left, right' },
+      ]},
+      { key: 'read', name: '🔤 Sound "o" (a / an)', games: [
+        { href: 'ch4/a-or-an.html', ic: '🦊', t: 'a or an?', d: 'a clock · a fox · an ox · an orange' },
+        { href: 'ch4/word-train.html', ic: '🚂', t: 'Word Train', d: 'Make words: b + ox = box' },
+      ]},
+      { key: 'play', name: '🏁 Class challenge', games: [
+        { href: 'ch4/senses-race.html', ic: '🏆', t: 'Senses Race', d: 'Team A vs Team B – whole chapter quiz' },
+      ]},
+    ],
+  },
+  ...Array.from({ length: 9 }, (_, i) => ({ n: i + 5, title: 'Coming soon', sections: [] })),
 ];
 
 const tabs = document.getElementById('tabs');

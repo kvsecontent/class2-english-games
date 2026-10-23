@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .heart { font-size: 6rem; line-height: 1; animation: bob 2s ease-in-out infinite; }
+  .wall { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; width: 100%; max-width: 110rem; margin: 1rem 0; }
+  .tile { border: 0.25rem solid var(--line); border-radius: 1.4rem; background: #fff; padding: 0.6rem 1.4rem; box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: center; min-width: 13rem; }
+  .tile b { font-family: var(--read); font-size: 3rem; color: var(--pink); }
+  .tile small { font-size: 1.2rem; color: var(--muted); font-weight: 700; }
+  .tile.story { border-color: var(--purple); background: #f4f0ff; }
+  .tile.mine { border-color: var(--green); background: #effbf4; animation: pop 0.4s; }
+  .add { display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: center; align-items: center; }
+  .add input { font-family: var(--read); font-size: 2rem; padding: 0.5rem 1rem; border-radius: 1rem; border: 0.25rem solid var(--line); width: 18rem; min-height: 4rem; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="heart">💗</div>
+  <div class="prompt">Onshangla calls her mother “Ava”. What do you call your mother?</div>
+  <p class="hint">Tap a word to hear it. Add the words of your class – every child can say the word in their own language!</p>
+  <div class="wall" id="wall"></div>
+  <div class="add card">
+    <input id="word" placeholder="Our word…" aria-label="Word for mother" maxlength="20">
+    <input id="lang" placeholder="Language (optional)" aria-label="Language" maxlength="20" style="width:14rem;font-size:1.5rem">
+    <button class="big-btn green" id="addBtn">➕ Add</button>
+    <button class="big-btn ghost" id="clear">🗑️ Clear ours</button>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Words for Mother', subtitle: 'Seeing without Seeing · Let us speak', back: '../index.html#ch4' });
+
+const WORDS = [
+  { w: 'Ava', l: 'Onshangla (story)', story: true },
+  { w: 'Mother', l: 'English' }, { w: 'Maa', l: 'Hindi' }, { w: 'Amma', l: 'Tamil' },
+  { w: 'Aai', l: 'Marathi' }, { w: 'Ba', l: 'Gujarati' }, { w: 'Ammi', l: 'Urdu' }, { w: 'Bou', l: 'Odia' },
+];
+const KEY = 'ch4-mother-words';
+/* The class's own words are kept only in this browser. */
+const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } };
+const save = (list) => { try { localStorage.setItem(KEY, JSON.stringify(list)); } catch {} };
+let mine = load();
+const esc = (t) => t.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+function draw() {
+  G.$('#wall').innerHTML = [...WORDS, ...mine.map((m) => ({ ...m, mine: true }))].map((x) =>
+    `<button class="tile ${x.story ? 'story' : ''} ${x.mine ? 'mine' : ''}" data-w="${esc(x.w)}"><b>${esc(x.w)}</b><small>${esc(x.l || 'Our class')}</small></button>`).join('');
+  G.$$('.tile').forEach((t) => (t.onclick = () => G.say(t.dataset.w)));
+}
+G.$('#addBtn').onclick = () => {
+  const w = G.$('#word').value.trim(), l = G.$('#lang').value.trim();
+  if (!w) { G.$('#word').focus(); return; }
+  mine.push({ w, l });
+  save(mine);
+  G.$('#word').value = ''; G.$('#lang').value = '';
+  G.star(); G.sfx('good'); G.confetti(10);
+  draw();
+  G.say(w);
+};
+G.$('#word').addEventListener('keydown', (e) => e.key === 'Enter' && G.$('#addBtn').click());
+G.$('#clear').onclick = () => { if (confirm('Remove the words your class added?')) { mine = []; save(mine); draw(); } };
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 0.8rem; }
+  .sent { font-family: var(--read); font-size: 2.6rem; display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; justify-content: center; margin: 0.4rem 0; }
+  .gap { display: inline-flex; align-items: center; justify-content: center; min-width: 12rem; height: 4.6rem; border-radius: 0.8rem; padding: 0 0.8rem;
+    border: 0.25rem dashed var(--orange); background: #fffaf0; color: var(--orange); }
+  .gap.filled { border-style: solid; border-color: var(--green); background: #d9f7e8; color: #117a4a; font-weight: 700; animation: pop 0.35s; }
+  .bank { display: flex; flex-wrap: wrap; gap: 0.7rem; justify-content: center; margin: 0.4rem 0 0.8rem; max-width: 110rem; }
+  .bank-label { font-size: 1.3rem; font-weight: 800; color: var(--muted); }
+  .chip { border: 0; border-radius: 1rem; color: #fff; font-family: var(--read); font-size: 1.9rem; font-weight: 700;
+    padding: 0.4rem 1.1rem; min-height: 4rem; box-shadow: 0 0.35rem 0 rgba(0, 0, 0, 0.2); }
+  .chip.a { background: var(--blue); } .chip.b { background: var(--pink); }
+  .mine { font-family: var(--read); font-size: 1.8rem; width: 100%; max-width: 80rem; min-height: 6rem; }
+  .mine ol { margin: 0.2rem 0; padding-left: 2.4rem; }
+  .ex { font-family: var(--read); font-size: 1.5rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mLike">👨‍👩‍👧 I like to … with my …</button>
+    <button class="big-btn orange" id="mCan">💪 I can … by myself</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'About Me', subtitle: 'Seeing without Seeing · Let us write · 2 and 3', back: '../index.html#ch4' });
+
+const MODES = {
+  like: {
+    hint: 'What do you like to do with your family? Make sentences. Drag a word to each gap (or tap the word, then the gap).',
+    ex: 'e.g. I like to walk with my grandfather.',
+    parts: ['I like to', 'a', 'with my', 'b', '.'],
+    a: ['walk', 'play', 'cook', 'read', 'sing', 'draw', 'dance', 'eat'],
+    b: ['grandfather', 'grandmother', 'mother', 'father', 'sister', 'brother', 'aunt', 'uncle'],
+    need: 2,
+  },
+  can: {
+    hint: 'Write five things you can do by yourself. Drag a word to the gap (or tap the word, then the gap).',
+    ex: 'e.g. I can take a bath by myself.',
+    parts: ['I can', 'a', 'by myself.'],
+    a: ['take a bath', 'brush my teeth', 'wear my shoes', 'eat my food', 'comb my hair', 'pack my bag', 'drink water', 'fold my clothes'],
+    need: 5,
+  },
+};
+const area = G.$('#area');
+
+function run(key) {
+  const M = MODES[key];
+  const made = [];
+  area.innerHTML = `<p class="hint">${M.hint}</p>
+    <div class="card" style="width:100%;max-width:90rem">
+      <div class="ex">${M.ex}</div>
+      <div class="sent" id="sent">${M.parts.map((p) => (p === 'a' || p === 'b' ? `<span class="gap" data-k="${p}">?</span>` : `<span>${p}</span>`)).join('')}</div>
+    </div>
+    ${['a', 'b'].filter((k) => M[k]).map((k) => `<div class="bank-label">${k === 'a' ? 'What?' : 'With whom?'}</div>
+      <div class="bank">${M[k].map((w) => `<button class="chip ${k}" data-k="${k}" data-w="${w}">${w}</button>`).join('')}</div>`).join('')}
+    <div class="card mine"><b style="font-family:var(--head)">✏️ My sentences (${M.need})</b><ol id="list"></ol></div>`;
+  const gaps = G.$$('.gap');
+  const reset = () => gaps.forEach((g) => { g.textContent = '?'; g.classList.remove('filled'); delete g.dataset.w; });
+  G.tapDrag(G.$$('.chip'), gaps, (chip, gap) => {
+    if (chip.dataset.k !== gap.dataset.k) { G.sfx('bad'); return; }
+    gap.dataset.w = chip.dataset.w;
+    gap.textContent = chip.dataset.w;
+    gap.classList.add('filled');
+    G.sfx('pop');
+    if (gaps.every((g) => g.dataset.w)) {
+      const s = M.parts.map((p) => (p === 'a' || p === 'b' ? G.$(`.gap[data-k="${p}"]`).dataset.w : p)).join(' ').replace(' .', '.');
+      if (made.includes(s)) { G.say('You already have this one. Try a new sentence!'); setTimeout(reset, 1200); return; }
+      made.push(s);
+      G.$('#list').insertAdjacentHTML('beforeend', `<li>${s}</li>`);
+      G.star(); G.sfx('good');
+      G.say(s);
+      setTimeout(reset, 1400);
+      if (made.length === M.need) setTimeout(() => G.end({ title: 'Well done!', msg: 'Now write your sentences in your notebook.', onReplay: () => run(key) }), 2400);
+    }
+  });
+}
+G.$('#mLike').onclick = () => run('like');
+G.$('#mCan').onclick = () => run('can');
+run('like');
+</script>
+</body>
+</html>

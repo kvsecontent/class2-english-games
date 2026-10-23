@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .modes { margin-bottom: 1rem; }
+  .q .e { font-size: 6rem; line-height: 1; }
+  .q .t { font-family: var(--read); font-size: 2.6rem; margin: 0.4rem 0 1rem; }
+  .choice { font-size: 2rem; }
+  .ears { display: flex; align-items: center; justify-content: center; gap: 3rem; margin: 1rem 0; }
+  .ears .kid { font-size: 8rem; line-height: 1; position: relative; }
+  .ears .kid .scarf { position: absolute; left: 50%; top: 36%; transform: translateX(-50%); width: 80%; height: 1.6rem; background: var(--purple); border-radius: 0.8rem; }
+  .side-btn { font-size: 2.4rem; min-width: 16rem; min-height: 8rem; }
+  .side-btn.hit { animation: pop 0.4s; background: #d9f7e8; border-color: var(--green); }
+  .clap-big { font-size: 5rem; border: 0; background: #fff4cc; border-radius: 50%; width: 10rem; height: 10rem; box-shadow: var(--shadow); }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <div class="row modes">
+    <button class="big-btn purple" id="mSense">🙈 Which sense helps?</button>
+    <button class="big-btn orange" id="mClap">👏 Where is the clap?</button>
+  </div>
+  <div id="area" style="width:100%" class="center"></div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Eyes Closed!', subtitle: 'Seeing without Seeing · Let us speak', back: '../index.html#ch4' });
+
+const area = G.$('#area');
+const OPTS = [['✋ Touch', 'touch'], ['👃 Smell', 'smell'], ['👂 Hear', 'hear'], ['👅 Taste', 'taste']];
+
+function sense() {
+  area.innerHTML = `<p class="hint">Close your eyes. How would you find out what it is? Then say it: “I can <b>touch</b> it.”</p>
+    <div class="card" id="game" style="width:100%;max-width:76rem"></div>`;
+  const ITEMS = [
+    { e: '💧', t: 'How would you know it is water?', a: 'touch', no: 'taste', x: 'I can touch it. It is wet. I can also taste it.' },
+    { e: '🌺', t: 'How would you know it is a flower?', a: 'smell', no: 'touch', x: 'I can smell it. I can also touch the soft petals.' },
+    { e: '🍚', t: 'How would you know it is sugar?', a: 'taste', x: 'I can taste it. It is sweet.' },
+    { e: '👏', t: 'How would you know where someone is clapping?', a: 'hear', x: 'I can hear the clap and turn to it.' },
+    { e: '🔔', t: 'How would you know it is a bell?', a: 'hear', x: 'I can hear it ring.' },
+    { e: '🧸', t: 'How would you know it is a soft toy?', a: 'touch', x: 'I can touch it. It is soft.' },
+  ];
+  G.quiz({
+    el: G.$('#game'),
+    items: ITEMS,
+    question: (it) => `<div class="e">${it.e}</div><div class="t">${it.t}</div>`,
+    // where two senses both work, the second one is left out so there is one right answer
+    options: (it) => OPTS.filter(([, v]) => v !== it.no).map(([label, value]) => ({ label, value })),
+    answer: (it) => it.a,
+    onShow: (it) => G.say('Close your eyes. ' + it.t),
+    explain: (it) => it.x,
+    endMsg: 'We can find out things even with our eyes closed!',
+  });
+}
+
+/* A short burst of noise sounds like a hand clap; the panner sends it to the left or right speaker. */
+function clap(pan, at = 0) {
+  if (G.isMuted()) return;
+  const c = G.ctx();
+  const buf = c.createBuffer(1, c.sampleRate * 0.15, c.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 4);
+  const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(), p = c.createStereoPanner();
+  src.buffer = buf; f.type = 'bandpass'; f.frequency.value = 1500; g.gain.value = 0.9; p.pan.value = pan;
+  src.connect(f).connect(g).connect(p).connect(c.destination);
+  src.start(c.currentTime + at);
+}
+
+function clapGame() {
+  let i = 0, side = 'left', firstTry = true;
+  const N = 6;
+  area.innerHTML = `<p class="hint">Close your eyes and listen. Is the clap on your <b>left</b> or your <b>right</b>? Point to it! (Works best with two speakers.)</p>
+    <div class="progress" id="pg"></div>
+    <div class="ears">
+      <button class="choice side-btn" data-s="left">👈 Left</button>
+      <div class="kid">🧒🏽<span class="scarf"></span></div>
+      <button class="choice side-btn" data-s="right">Right 👉</button>
+    </div>
+    <button class="clap-big" id="again">👏</button>
+    <div class="feedback" id="fb"></div>`;
+  const round = () => {
+    if (i >= N) { G.end({ title: 'Super listening!', msg: 'You found the clap with your ears.', onReplay: clapGame }); return; }
+    G.progress(G.$('#pg'), i, N);
+    side = Math.random() < 0.5 ? 'left' : 'right';
+    firstTry = true;
+    G.$$('.side-btn').forEach((b) => b.classList.remove('hit', 'wrong', 'right'));
+    G.$('#fb').textContent = '';
+    play();
+  };
+  const play = () => { [0, 0.45, 0.9].forEach((t) => clap(side === 'left' ? -1 : 1, t)); };
+  G.$('#again').onclick = play;
+  G.$$('.side-btn').forEach((b) => (b.onclick = () => {
+    if (b.dataset.s === side) {
+      b.classList.add('hit');
+      if (firstTry) G.star();
+      G.sfx('good');
+      G.feedback(G.$('#fb'), true, `🎉 Yes! The clap was on your ${side}.`);
+      G.say(`Yes! On your ${side}.`);
+      i++;
+      setTimeout(round, 2000);
+    } else {
+      firstTry = false;
+      b.classList.add('wrong');
+      G.sfx('bad');
+      G.feedback(G.$('#fb'), false, '🙂 Listen again!');
+      setTimeout(() => b.classList.remove('wrong'), 500);
+    }
+  }));
+  setTimeout(round, 600);
+}
+
+G.$('#mSense').onclick = sense;
+G.$('#mClap').onclick = clapGame;
+sense();
+</script>
+</body>
+</html>

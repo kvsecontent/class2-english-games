@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .face-box { position: relative; width: min(52rem, 90vw); height: 20rem; display: flex; align-items: center; justify-content: center; }
+  #eyes { width: 30rem; }
+  #eyes .pupil { transition: transform 0.6s ease; }
+  #eyes .lid { transition: opacity 0.25s; opacity: 0; }
+  #eyes.shut .lid { opacity: 1; }
+  .arrow { position: absolute; font-size: 6rem; opacity: 0; transition: opacity 0.3s; }
+  .arrow.on { opacity: 1; animation: pop 0.5s; }
+  .a-up { top: -1rem; left: 50%; transform: translateX(-50%); } .a-down { bottom: -1rem; left: 50%; transform: translateX(-50%); }
+  .a-left { left: 0; top: 50%; transform: translateY(-50%); } .a-right { right: 0; top: 50%; transform: translateY(-50%); }
+  .say-big { font-size: 3rem; font-weight: 800; min-height: 4rem; color: var(--purple); }
+  .count { font-size: 2.4rem; font-weight: 800; color: var(--orange); min-height: 3rem; }
+  .dir { font-size: 1.8rem; min-width: 11rem; }
+</style>
+</head>
+<body>
+<main class="stage center">
+  <p class="hint">Do not move your face and body. Only move your eyes!</p>
+  <div class="say-big" id="cmd">Ready?</div>
+  <div class="face-box">
+    <span class="arrow a-up">⬆️</span><span class="arrow a-down">⬇️</span><span class="arrow a-left">⬅️</span><span class="arrow a-right">➡️</span>
+    <svg id="eyes" viewBox="0 0 360 160">
+      <g transform="translate(90 80)">
+        <ellipse rx="80" ry="62" fill="#fff" stroke="#2b2140" stroke-width="6"/>
+        <g class="pupil"><circle r="30" fill="#6b3f1f"/><circle r="15" fill="#111"/><circle cx="-8" cy="-9" r="6" fill="#fff"/></g>
+        <g class="lid"><ellipse rx="83" ry="65" fill="#e8b48a" stroke="#2b2140" stroke-width="6"/><path d="M-70 0 Q0 30 70 0" fill="none" stroke="#2b2140" stroke-width="6" stroke-linecap="round"/></g>
+      </g>
+      <g transform="translate(270 80)">
+        <ellipse rx="80" ry="62" fill="#fff" stroke="#2b2140" stroke-width="6"/>
+        <g class="pupil"><circle r="30" fill="#6b3f1f"/><circle r="15" fill="#111"/><circle cx="-8" cy="-9" r="6" fill="#fff"/></g>
+        <g class="lid"><ellipse rx="83" ry="65" fill="#e8b48a" stroke="#2b2140" stroke-width="6"/><path d="M-70 0 Q0 30 70 0" fill="none" stroke="#2b2140" stroke-width="6" stroke-linecap="round"/></g>
+      </g>
+    </svg>
+  </div>
+  <div class="count" id="count"></div>
+  <div class="row">
+    <button class="big-btn green" id="go">▶ Start the eye exercise</button>
+    <button class="big-btn ghost" id="stop">⏹ Stop</button>
+  </div>
+  <div class="row" style="margin-top:0.8rem">
+    <button class="big-btn purple dir" data-d="up">⬆️ Up</button>
+    <button class="big-btn purple dir" data-d="down">⬇️ Down</button>
+    <button class="big-btn purple dir" data-d="left">⬅️ Left</button>
+    <button class="big-btn purple dir" data-d="right">➡️ Right</button>
+    <button class="big-btn orange dir" data-d="blink">😌 Close</button>
+  </div>
+</main>
+<script src="../assets/common.js"></script>
+<script>
+G.init({ title: 'Eye Exercise', subtitle: 'Seeing without Seeing · Let us do', back: '../index.html#ch4' });
+
+const MOVE = { centre: [0, 0], up: [0, -28], down: [0, 28], left: [-42, 0], right: [42, 0] };
+const WORDS = { up: 'Look up', down: 'Look down', left: 'Look left', right: 'Look right', blink: 'Close your eyes', centre: 'Look in front' };
+let token = 0;
+
+function look(d) {
+  const eyes = G.$('#eyes');
+  eyes.classList.toggle('shut', d === 'blink');
+  const [x, y] = MOVE[d] || MOVE.centre;
+  G.$$('.pupil').forEach((p) => (p.style.transform = `translate(${x}px, ${y}px)`));
+  G.$$('.arrow').forEach((a) => a.classList.toggle('on', a.classList.contains('a-' + d)));
+  G.$('#cmd').textContent = WORDS[d] + (d === 'blink' || d === 'centre' ? '' : '!');
+}
+function stopAll() { token++; speechSynthesis.cancel(); look('centre'); G.$('#cmd').textContent = 'Ready?'; G.$('#count').textContent = ''; }
+
+/* Each step: say it, hold for a count of three, back to the front. */
+const ROUTINE = ['up', 'down', 'left', 'right', 'up', 'down', 'left', 'right', 'blink'];
+function run() {
+  const my = ++token;
+  let i = 0;
+  const step = () => {
+    if (my !== token) return;
+    if (i >= ROUTINE.length) { look('centre'); G.$('#cmd').textContent = 'Open your eyes. Well done!'; G.say('Open your eyes. Well done!'); G.$('#count').textContent = ''; G.star(3); G.confetti(20); return; }
+    const d = ROUTINE[i++];
+    look(d);
+    G.say(WORDS[d]);
+    let n = 0;
+    const tick = () => {
+      if (my !== token) return;
+      n++;
+      G.$('#count').textContent = '● '.repeat(n).trim();
+      G.sfx('pop');
+      if (n < 3) setTimeout(tick, 1000);
+      else setTimeout(() => { if (my !== token) return; look('centre'); G.$('#count').textContent = ''; setTimeout(step, 1100); }, 1000);
+    };
+    setTimeout(tick, 1200);
+  };
+  step();
+}
+G.$('#go').onclick = run;
+G.$('#stop').onclick = stopAll;
+G.$$('.dir').forEach((b) => (b.onclick = () => { token++; look(b.dataset.d); G.say(WORDS[b.dataset.d]); }));
+</script>
+</body>
+</html>
